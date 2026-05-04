@@ -407,7 +407,7 @@
         <button class="vbtn active" id="vDay" onclick="setView('day')">Dia</button>
         <button class="vbtn" id="vWeek" onclick="setView('week')">Semana</button>
       </div>
-      <a class="btn-new" href="modal-agendamento.html" style="text-decoration:none;color:#fff">+ Novo Agendamento</a>
+      <button class="btn-new" onclick="openModal(null)">+ Novo Agendamento</button>
     </div>
 
     <!-- filter toolbar -->
@@ -539,7 +539,7 @@
         <div class="m-title">Novo Agendamento</div>
         <div style="font-size:10px;color:var(--text-soft);margin-top:2px" id="mPrefillInfo"></div>
       </div>
-      <button class="m-close" id="mCloseBtn">✕</button>
+      <button class="m-close" id="mCloseBtn" onclick="window.location.href='agenda-equilibrio-v3.html'">✕</button>
     </div>
     <div class="m-body">
 
@@ -596,8 +596,8 @@
       </div>
     </div>
     <div class="m-foot">
-      <button class="btn-cancel" id="mCancelBtn">Cancelar</button>
-      <button class="btn-save" id="mConfirmBtn">Confirmar Agendamento</button>
+      <button class="btn-cancel" id="mCancelBtn" onclick="window.location.href='agenda-equilibrio-v3.html'">Cancelar</button>
+      <button class="btn-save" id="mConfirmBtn" onclick="confirmModalAppt()">Confirmar Agendamento</button>
     </div>
   </div>
 </div>
@@ -785,7 +785,7 @@ function buildDayView(){
         const lbl=document.createElement('div'); lbl.className='free-label';
         lbl.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Agendar '+slotTime;
         cell.appendChild(lbl);
-        cell.onclick=()=>{ window.location.href='modal-agendamento.html'; };
+        cell.onclick=()=>{ openModal({prof:p, time:slotTime}); };
       }
       col.appendChild(cell);
     }
