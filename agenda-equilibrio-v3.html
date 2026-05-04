@@ -374,7 +374,7 @@
     <nav class="sb-nav">
       <div class="nav-lbl">Principal</div>
       <div class="nav-item active"><span class="nav-icon">📅</span>Agenda<span class="nav-badge" id="apptBadge">0</span></div>
-      <div class="nav-item" onclick="window.location.href='cadastro-pacientes.html'"><span class="nav-icon">👥</span>Pacientes</div>
+      <a class="nav-item" href="cadastro-pacientes.html" style="text-decoration:none"><span class="nav-icon">👥</span>Pacientes</a>
       <div class="nav-item"><span class="nav-icon">🔢</span>Painel de Senhas</div>
       <div class="nav-lbl" style="margin-top:5px">Clínica</div>
       <div class="nav-item"><span class="nav-icon">🧠</span>Profissionais</div>
@@ -407,7 +407,7 @@
         <button class="vbtn active" id="vDay" onclick="setView('day')">Dia</button>
         <button class="vbtn" id="vWeek" onclick="setView('week')">Semana</button>
       </div>
-      <button class="btn-new" onclick="openModal(null)">+ Novo Agendamento</button>
+      <a class="btn-new" href="modal-agendamento.html" style="text-decoration:none;color:#fff">+ Novo Agendamento</a>
     </div>
 
     <!-- filter toolbar -->
@@ -496,7 +496,7 @@
       <!-- search -->
       <div class="f-search">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" placeholder="Buscar paciente…" oninput="searchPaciente(this.value)"/>
+        <input type="text" placeholder="Buscar profissional ou sala…" oninput="searchPaciente(this.value)"/>
       </div>
     </div>
 
@@ -761,7 +761,7 @@ function buildDayView(){
         const lbl=document.createElement('div'); lbl.className='free-label';
         lbl.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Agendar '+slotTime;
         cell.appendChild(lbl);
-        cell.onclick=()=>openModal({prof:p, time:slotTime});
+        cell.onclick=()=>{ window.location.href='modal-agendamento.html'; };
       }
       col.appendChild(cell);
     }
