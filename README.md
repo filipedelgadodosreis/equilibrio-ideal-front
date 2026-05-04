@@ -1,0 +1,1 @@
+# equilibrio-ideal-front
