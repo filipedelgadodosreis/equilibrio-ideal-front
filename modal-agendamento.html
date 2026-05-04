@@ -195,7 +195,7 @@
         <div class="m-bi"><span>Ψ</span></div>
         <div><div class="m-bn">Novo Agendamento</div><div class="m-bs">Clínica Equilíbrio Ideal</div></div>
       </div>
-      <button class="m-close" onclick="resetModal()">✕</button>
+      <button class="m-close" onclick="window.location.href='agenda-equilibrio-v3.html'">✕</button>
     </div>
     <div class="steps">
       <div class="step active" id="si1"><div class="step-num" id="sn1">1</div><div class="step-lbl">Paciente</div></div>
@@ -568,6 +568,10 @@ function buildSummary() {
 }
 
 function confirmAppt() {
+  var patName = document.getElementById('pcName') ? document.getElementById('pcName').textContent : '';
+  if(patName) sessionStorage.setItem('lastBookedPat', patName);
+  window.location.href = 'agenda-equilibrio-v3.html';
+  return;
   document.getElementById('confirmContent').style.display='none';
   document.getElementById('successPanel').classList.add('show');
   var profSel=document.getElementById('profSel');
