@@ -532,14 +532,14 @@
 </div>
 
 <!-- MODAL -->
-<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+<div class="overlay" id="overlay" onclick="if(event.target===this)goBackToAgenda()">
   <div class="modal" style="width:500px;max-width:96vw;max-height:90vh;overflow-y:auto">
     <div class="m-hd">
       <div>
         <div class="m-title">Novo Agendamento</div>
         <div style="font-size:10px;color:var(--text-soft);margin-top:2px" id="mPrefillInfo"></div>
       </div>
-      <button class="m-close" onclick="window.location.href='agenda-equilibrio-v3.html'">✕</button>
+      <button class="m-close" id="mCloseBtn">✕</button>
     </div>
     <div class="m-body">
 
@@ -596,8 +596,8 @@
       </div>
     </div>
     <div class="m-foot">
-      <button class="btn-cancel" onclick="window.location.href='agenda-equilibrio-v3.html'">Cancelar</button>
-      <button class="btn-save" onclick="confirmModalAppt()">Confirmar Agendamento</button>
+      <button class="btn-cancel" id="mCancelBtn">Cancelar</button>
+      <button class="btn-save" id="mConfirmBtn">Confirmar Agendamento</button>
     </div>
   </div>
 </div>
@@ -1003,6 +1003,14 @@ function goToday(){ curDate=new Date(); render(); }
 
 // ══════════ MODAL ══════════
 function openModal(ctx){
+  // attach button events fresh each time
+  var closeBtn   = document.getElementById('mCloseBtn');
+  var cancelBtn  = document.getElementById('mCancelBtn');
+  var confirmBtn = document.getElementById('mConfirmBtn');
+  if(closeBtn)   closeBtn.onclick   = function(){ goBackToAgenda(); };
+  if(cancelBtn)  cancelBtn.onclick  = function(){ goBackToAgenda(); };
+  if(confirmBtn) confirmBtn.onclick = function(){ confirmModalAppt(); };
+
   document.getElementById('overlay').classList.add('open');
   document.getElementById('mData').value=curDate.toISOString().split('T')[0];
   const pre=document.getElementById('mPrefill');
@@ -1020,6 +1028,7 @@ function openModal(ctx){
   }
 }
 function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
+function goBackToAgenda(){ window.location.href='agenda-equilibrio-v3.html'; }
 function setType(btn,type){
   document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active','conv','part'));
   btn.classList.add('active',type);
