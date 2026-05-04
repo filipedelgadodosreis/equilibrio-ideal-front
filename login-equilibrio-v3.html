@@ -456,7 +456,7 @@
       transition: background .2s, transform .15s;
       box-shadow: 0 4px 18px rgba(27,58,92,.18);
     }
-    .btn-enter::after {
+    .btn-enter::after { pointer-events:none;
       content: '';
       position: absolute;
       inset: 0;
@@ -678,7 +678,7 @@
         <a href="#" class="link-forgot">Esqueci a senha</a>
       </div>
 
-      <button class="btn-enter" onclick="window.location.href='agenda-equilibrio-v3.html'">Entrar</button>
+      <a href="agenda-equilibrio-v3.html" class="btn-enter" style="display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit">Entrar</a>
 
       <div class="or-line"><span>acesso rápido para pacientes</span></div>
 
