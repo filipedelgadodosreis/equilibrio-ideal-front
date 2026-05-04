@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clínica Equilíbrio Ideal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sky:         #7DA8C9;
+      --sky-light:   #B8D4E8;
+      --sky-pale:    #EBF4FA;
+      --sky-mist:    #F4F9FC;
+      --navy:        #1B3A5C;
+      --navy-mid:    #2E5480;
+      --gold:        #C9A96E;
+      --gold-light:  #E8D5AC;
+      --gold-pale:   #FBF5EA;
+      --cream:       #FDFAF5;
+      --white:       #FFFFFF;
+      --text:        #1B3A5C;
+      --text-soft:   #6B8BA4;
+      --border:      #D4E8F2;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Lato', sans-serif;
+      background: var(--sky-mist);
+      color: var(--text);
+    }
+
+    /* ══ LAYOUT ══ */
+    .page {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+    }
+
+    /* ══════════════════════════════
+       LEFT — identidade
+    ══════════════════════════════ */
+    .left {
+      position: relative;
+      background: linear-gradient(160deg, var(--sky-pale) 0%, var(--sky-mist) 60%, var(--cream) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 52px 48px;
+      overflow: hidden;
+    }
+
+    /* leaves top-right */
+    .leaf-svg {
+      position: absolute;
+      pointer-events: none;
+    }
+    .leaf-tr { top: -10px; right: -20px; width: 240px; opacity: .75; }
+    .leaf-bl { bottom: -20px; left: -20px; width: 210px; opacity: .6; transform: rotate(180deg) scaleX(-1); }
+    .leaf-mr { top: 42%; right: -10px; width: 120px; opacity: .35; transform: rotate(15deg); }
+
+    /* gold arcs */
+    .arc {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(201,169,110,.2);
+      pointer-events: none;
+    }
+    .arc-1 { width: 420px; height: 420px; top: -180px; left: -180px; }
+    .arc-2 { width: 260px; height: 260px; bottom: 40px;  right: -100px; }
+
+    /* sparkles */
+    .spark {
+      position: absolute;
+      color: var(--gold);
+      font-size: 13px;
+      opacity: 0;
+      animation: sparkle 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .spark:nth-child(1) { top: 22%; left: 14%; animation-delay: 0s; }
+    .spark:nth-child(2) { top: 55%; right: 22%; animation-delay: 1.5s; }
+    .spark:nth-child(3) { bottom: 28%; left: 42%; animation-delay: .8s; }
+    @keyframes sparkle {
+      0%,100% { opacity: 0; transform: scale(.6); }
+      50%      { opacity: .8; transform: scale(1.2); }
+    }
+
+    /* content */
+    .left-inner {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      animation: fadeUp .9s ease both;
+    }
+
+    /* logo */
+    .logo {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .logo-circle {
+      width: 78px; height: 78px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 2px solid var(--sky-light);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 28px rgba(125,168,201,.25);
+      position: relative;
+      margin-bottom: 14px;
+    }
+    .logo-circle::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,169,110,.3);
+    }
+    .psi {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      color: var(--navy);
+      line-height: 1;
+    }
+    .logo-text { text-align: center; }
+    .logo-clinic-label {
+      display: block;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--sky);
+      margin-bottom: 3px;
+    }
+    .logo-name-main {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.05;
+    }
+    .logo-name-sub {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 400;
+      color: var(--navy);
+      line-height: 1.05;
+    }
+    .logo-star { color: var(--gold); font-size: 13px; }
+
+    /* divider */
+    .divider-gold {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 260px;
+      margin: 24px auto;
+    }
+    .divider-gold::before, .divider-gold::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+    }
+    .divider-gold span { color: var(--gold); font-size: 12px; }
+
+    /* tagline */
+    .tagline-a {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      color: var(--text-soft);
+      font-weight: 400;
+      margin-bottom: 4px;
+      letter-spacing: .01em;
+    }
+    .tagline-b {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--sky);
+      font-weight: 400;
+    }
+
+    /* specialties */
+    .specs {
+      display: flex;
+      gap: 0;
+      margin-top: 34px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255,255,255,.8);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 20px rgba(125,168,201,.1);
+    }
+    .spec {
+      flex: 1;
+      padding: 16px 10px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .spec:last-child { border-right: none; }
+    .spec-icon { font-size: 20px; display: block; margin-bottom: 5px; }
+    .spec-name {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+    .spec-desc { display: block; font-size: 10px; color: var(--text-soft); font-weight: 300; }
+
+    /* ══════════════════════════════
+       RIGHT — form
+    ══════════════════════════════ */
+    .right {
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 44px;
+      border-left: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* soft blue wash top */
+    .right::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(184,212,232,.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .right::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -60px;
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,169,110,.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .form-box {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 380px;
+      animation: fadeUp .8s .1s ease both;
+    }
+
+    .form-head { margin-bottom: 30px; }
+    .form-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .26em;
+      text-transform: uppercase;
+      color: var(--sky);
+      margin-bottom: 8px;
+    }
+    .form-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--navy);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .form-title em { font-style: italic; font-weight: 400; color: var(--sky); }
+    .form-hint { font-size: 13px; color: var(--text-soft); font-weight: 300; }
+
+    /* ── profile cards ── */
+    .profiles-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 10px;
+    }
+    .profiles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .prof-card {
+      padding: 14px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: var(--sky-mist);
+      cursor: pointer;
+      transition: all .2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      font-family: 'Lato', sans-serif;
+    }
+    .prof-card:hover {
+      border-color: var(--sky);
+      background: var(--sky-pale);
+    }
+    .prof-card.active {
+      border-color: var(--sky);
+      background: var(--white);
+      box-shadow: 0 2px 16px rgba(125,168,201,.2);
+    }
+    .prof-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+      background: var(--sky-pale);
+      border: 1px solid var(--border);
+      transition: background .2s;
+    }
+    .prof-card.active .prof-icon {
+      background: var(--sky-light);
+      border-color: var(--sky);
+    }
+    .prof-info {}
+    .prof-name {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 1px;
+    }
+    .prof-role {
+      display: block;
+      font-size: 10px;
+      color: var(--text-soft);
+      font-weight: 300;
+      line-height: 1.3;
+    }
+    .prof-card.active .prof-name { color: var(--navy); }
+
+    /* check mark on active */
+    .prof-check {
+      margin-left: auto;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .prof-card.active .prof-check {
+      background: var(--sky);
+      border-color: var(--sky);
+    }
+    .prof-check-inner {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: white;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .prof-card.active .prof-check-inner { opacity: 1; }
+
+    /* fields */
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 6px;
+    }
+    .field-wrap { position: relative; }
+    .field-wrap svg {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--sky-light);
+      pointer-events: none;
+    }
+    .field input {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px 0 42px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: var(--sky-mist);
+      font-family: 'Lato', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+    .field input::placeholder { color: var(--sky-light); }
+    .field input:focus {
+      border-color: var(--sky);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(125,168,201,.12);
+    }
+
+    .row-opts {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 14px 0 22px;
+    }
+    .remember {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--text-soft);
+      cursor: pointer;
+    }
+    .remember input[type=checkbox] {
+      accent-color: var(--sky);
+      width: 14px; height: 14px;
+    }
+    .link-forgot {
+      font-size: 12px;
+      color: var(--sky);
+      text-decoration: none;
+      font-weight: 700;
+      transition: color .2s;
+    }
+    .link-forgot:hover { color: var(--navy); }
+
+    .btn-enter {
+      width: 100%;
+      height: 50px;
+      border: none;
+      border-radius: 10px;
+      background: var(--navy);
+      color: var(--white);
+      font-family: 'Lato', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 4px 18px rgba(27,58,92,.18);
+    }
+    .btn-enter::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.06) 0%, transparent 60%);
+    }
+    .btn-enter:hover { background: var(--navy-mid); transform: translateY(-1px); }
+    .btn-enter:active { transform: translateY(0); }
+
+    /* wpp patient shortcut */
+    .or-line {
+      display: flex; align-items: center; gap: 12px;
+      margin: 18px 0;
+    }
+    .or-line::before, .or-line::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--border);
+    }
+    .or-line span { font-size: 11px; color: var(--text-soft); letter-spacing: .08em; }
+
+    .btn-wpp {
+      width: 100%;
+      height: 46px;
+      border: 1.5px solid #b2e8c4;
+      border-radius: 10px;
+      background: #f0fff6;
+      color: #1a7a42;
+      font-family: 'Lato', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px;
+      transition: background .2s, border-color .2s;
+    }
+    .btn-wpp:hover { background: #e0faee; border-color: #88d4a8; }
+
+    .form-footer {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 11px;
+      color: var(--text-soft);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+    .form-footer a { color: var(--sky); text-decoration: none; font-weight: 700; }
+    .form-footer a:hover { color: var(--navy); }
+
+    /* ══ ANIMATIONS ══ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══ MOBILE / PWA ══ */
+    @media (max-width: 780px) {
+      html, body { overflow: auto; }
+      .page { grid-template-columns: 1fr; min-height: 100dvh; }
+      .left { padding: 44px 24px 32px; }
+      .leaf-tr { width: 160px; }
+      .leaf-bl { width: 140px; }
+      .right { padding: 36px 24px 52px; border-left: none; border-top: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ LEFT ══ -->
+  <div class="left">
+    <div class="arc arc-1"></div>
+    <div class="arc arc-2"></div>
+    <div class="spark">✦</div>
+    <div class="spark">✦</div>
+    <div class="spark">✦</div>
+
+    <!-- leaves -->
+    <svg class="leaf-svg leaf-tr" viewBox="0 0 280 260" fill="none">
+      <ellipse cx="70"  cy="55"  rx="36" ry="66" fill="#7DA8C9" fill-opacity=".38" transform="rotate(-38 70 55)"/>
+      <ellipse cx="130" cy="35"  rx="26" ry="54" fill="#9BBDD6" fill-opacity=".3"  transform="rotate(-22 130 35)"/>
+      <ellipse cx="185" cy="72"  rx="22" ry="46" fill="#6E9EBE" fill-opacity=".32" transform="rotate(-10 185 72)"/>
+      <ellipse cx="235" cy="44"  rx="18" ry="38" fill="#8CB4CC" fill-opacity=".22" transform="rotate(6 235 44)"/>
+      <ellipse cx="100" cy="108" rx="14" ry="32" fill="#7DA8C9" fill-opacity=".2"  transform="rotate(-52 100 108)"/>
+      <path d="M55 25 Q75 78 95 125"  stroke="#7DA8C9" stroke-width="1.4" stroke-opacity=".45" fill="none"/>
+      <path d="M120 18 Q142 58 150 108" stroke="#9BBDD6" stroke-width="1.1" stroke-opacity=".35" fill="none"/>
+      <path d="M210 8 Q228 48 218 98"  stroke="#C9A96E" stroke-width=".9" stroke-opacity=".28" fill="none"/>
+    </svg>
+
+    <svg class="leaf-svg leaf-bl" viewBox="0 0 260 240" fill="none">
+      <ellipse cx="70"  cy="55"  rx="36" ry="66" fill="#7DA8C9" fill-opacity=".38" transform="rotate(-38 70 55)"/>
+      <ellipse cx="128" cy="34"  rx="26" ry="54" fill="#9BBDD6" fill-opacity=".28" transform="rotate(-22 128 34)"/>
+      <ellipse cx="180" cy="70"  rx="22" ry="44" fill="#6E9EBE" fill-opacity=".3"  transform="rotate(-10 180 70)"/>
+      <path d="M55 25 Q75 78 95 125" stroke="#7DA8C9" stroke-width="1.4" stroke-opacity=".4" fill="none"/>
+    </svg>
+
+    <svg class="leaf-svg leaf-mr" viewBox="0 0 120 220" fill="none">
+      <ellipse cx="50" cy="60" rx="22" ry="52" fill="#7DA8C9" fill-opacity=".25" transform="rotate(-15 50 60)"/>
+      <ellipse cx="70" cy="100" rx="16" ry="38" fill="#9BBDD6" fill-opacity=".2" transform="rotate(5 70 100)"/>
+      <path d="M45 20 Q60 80 65 150" stroke="#7DA8C9" stroke-width="1" stroke-opacity=".35" fill="none"/>
+    </svg>
+
+    <div class="left-inner">
+      <!-- Logo -->
+      <div class="logo">
+        <div class="logo-circle">
+          <span class="psi">Ψ</span>
+        </div>
+        <div class="logo-text">
+          <span class="logo-clinic-label">Clínica</span>
+          <span class="logo-name-main">Equilíbrio</span>
+          <span class="logo-name-sub">Ideal <span class="logo-star">✦</span></span>
+        </div>
+      </div>
+
+      <div class="divider-gold"><span>✦</span></div>
+
+      <p class="tagline-a">Cuidado que acolhe.</p>
+      <p class="tagline-b">Presença que transforma.</p>
+
+      <!-- specialties -->
+      <div class="specs">
+        <div class="spec">
+          <span class="spec-icon">🧠</span>
+          <span class="spec-name">Psicologia</span>
+          <span class="spec-desc">Saúde mental</span>
+        </div>
+        <div class="spec">
+          <span class="spec-icon">🥗</span>
+          <span class="spec-name">Nutrição</span>
+          <span class="spec-desc">Bem-estar</span>
+        </div>
+        <div class="spec">
+          <span class="spec-icon">🗣️</span>
+          <span class="spec-name">Fonoaudio.</span>
+          <span class="spec-desc">Comunicação</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT ══ -->
+  <div class="right">
+    <div class="form-box">
+
+      <div class="form-head">
+        <div class="form-eyebrow">Plataforma de Gestão</div>
+        <h1 class="form-title">Olá,<br>bem-vindo <em>de volta</em></h1>
+        <p class="form-hint">Selecione seu perfil para continuar</p>
+      </div>
+
+      <!-- 4 profiles -->
+      <div class="profiles-label">Quem é você?</div>
+      <div class="profiles" id="profiles">
+
+        <div class="prof-card active" onclick="setProfile(this)">
+          <div class="prof-icon">🏥</div>
+          <div class="prof-info">
+            <span class="prof-name">Recepção</span>
+            <span class="prof-role">Agenda & pacientes</span>
+          </div>
+          <div class="prof-check"><div class="prof-check-inner"></div></div>
+        </div>
+
+        <div class="prof-card" onclick="setProfile(this)">
+          <div class="prof-icon">🧠</div>
+          <div class="prof-info">
+            <span class="prof-name">Profissional</span>
+            <span class="prof-role">Minha agenda</span>
+          </div>
+          <div class="prof-check"><div class="prof-check-inner"></div></div>
+        </div>
+
+        <div class="prof-card" onclick="setProfile(this)">
+          <div class="prof-icon">👑</div>
+          <div class="prof-info">
+            <span class="prof-name">Admin</span>
+            <span class="prof-role">Acesso completo</span>
+          </div>
+          <div class="prof-check"><div class="prof-check-inner"></div></div>
+        </div>
+
+        <div class="prof-card" onclick="setProfile(this)">
+          <div class="prof-icon">👤</div>
+          <div class="prof-info">
+            <span class="prof-name">Paciente</span>
+            <span class="prof-role">Minhas consultas</span>
+          </div>
+          <div class="prof-check"><div class="prof-check-inner"></div></div>
+        </div>
+
+      </div>
+
+      <!-- fields -->
+      <div class="field">
+        <label>E-mail</label>
+        <div class="field-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          </svg>
+          <input type="email" placeholder="seu@email.com"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Senha</label>
+        <div class="field-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <input type="password" placeholder="••••••••"/>
+        </div>
+      </div>
+
+      <div class="row-opts">
+        <label class="remember">
+          <input type="checkbox"/> Lembrar-me
+        </label>
+        <a href="#" class="link-forgot">Esqueci a senha</a>
+      </div>
+
+      <button class="btn-enter">Entrar</button>
+
+      <div class="or-line"><span>acesso rápido para pacientes</span></div>
+
+      <button class="btn-wpp">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="#25D366">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+        </svg>
+        Agendar via WhatsApp
+      </button>
+
+      <div class="form-footer">
+        Santo André, SP &nbsp;·&nbsp;
+        <a href="tel:1131100069">(11) 3110-0069</a> &nbsp;·&nbsp;
+        <a href="#">clinicaequilibrioideal.com.br</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function setProfile(card) {
+    document.querySelectorAll('.prof-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Modal de Agendamento — Clínica Equilíbrio Ideal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA; --sky-mist:#F4F9FC;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-pale:#FBF5EA;
+      --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --psico:#5A9EC9; --psico-bg:#EBF4FA;
+      --nutri:#5AAE82; --nutri-bg:#EDFAF3;
+      --fono:#C9A96E; --fono-bg:#FBF5EA;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
+    }
+    html, body { min-height:100vh; font-family:'Lato',sans-serif; background:linear-gradient(135deg,var(--sky-mist) 0%,#EEF5FA 100%); display:flex; align-items:center; justify-content:center; padding:24px; color:var(--text); }
+    .backdrop { position:fixed; inset:0; background:rgba(15,35,56,.38); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; }
+    .modal { width:580px; max-width:98vw; max-height:96vh; background:var(--white); border-radius:18px; box-shadow:0 24px 80px rgba(27,58,92,.22); overflow:hidden; display:flex; flex-direction:column; animation:mIn .25s ease; }
+    @keyframes mIn { from{opacity:0;transform:translateY(14px) scale(.97)} to{opacity:1;transform:none} }
+
+    /* header */
+    .m-hd { padding:20px 24px 0; background:var(--white); flex-shrink:0; }
+    .m-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .m-brand { display:flex; align-items:center; gap:10px; }
+    .m-bi { width:33px; height:33px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .m-bi span { color:#fff; font-family:'Playfair Display',serif; font-size:14px; }
+    .m-bn { font-size:12px; font-weight:700; color:var(--navy); }
+    .m-bs { font-size:10px; color:var(--text-soft); }
+    .m-close { width:29px; height:29px; border:none; background:var(--sky-mist); border-radius:8px; cursor:pointer; font-size:15px; color:var(--text-soft); display:flex; align-items:center; justify-content:center; }
+    .m-close:hover { background:var(--sky-pale); }
+
+    /* steps */
+    .steps { display:flex; align-items:center; padding-bottom:16px; border-bottom:1px solid var(--border); }
+    .step { display:flex; align-items:center; gap:6px; }
+    .step-num { width:25px; height:25px; border-radius:50%; border:2px solid var(--border); background:var(--white); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--text-soft); flex-shrink:0; transition:all .25s; }
+    .step.active .step-num { border-color:var(--navy); background:var(--navy); color:#fff; }
+    .step.done   .step-num { border-color:var(--green); background:var(--green); color:#fff; }
+    .step-lbl { font-size:10.5px; font-weight:700; color:var(--text-soft); white-space:nowrap; transition:color .25s; }
+    .step.active .step-lbl { color:var(--navy); }
+    .step.done   .step-lbl { color:var(--green); }
+    .step-line { flex:1; height:2px; background:var(--border); margin:0 6px; transition:background .25s; }
+    .step-line.done { background:var(--green); }
+
+    /* body */
+    .m-body { padding:20px 24px; flex:1; overflow-y:auto; }
+    .m-body::-webkit-scrollbar { width:4px; }
+    .m-body::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:2px; }
+    .panel { display:none; animation:pIn .2s ease; }
+    .panel.active { display:block; }
+    @keyframes pIn { from{opacity:0;transform:translateX(8px)} to{opacity:1;transform:none} }
+    .sec-title { font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); margin-bottom:3px; }
+    .sec-sub   { font-size:12px; color:var(--text-soft); margin-bottom:18px; }
+
+    /* fields */
+    .field { margin-bottom:13px; }
+    .field label { display:block; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:5px; }
+    .field input,.field select,.field textarea { width:100%; padding:0 12px; border:1.5px solid var(--border); border-radius:9px; font-family:'Lato',sans-serif; font-size:13px; color:var(--text); background:var(--sky-mist); outline:none; transition:border-color .15s,background .15s; height:43px; }
+    .field textarea { height:68px; padding:10px 12px; resize:none; }
+    .field input:focus,.field select:focus,.field textarea:focus { border-color:var(--sky); background:#fff; }
+    .field input::placeholder { color:var(--sky-light); }
+    .f2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+    /* step 1 */
+    .srch-wrap { position:relative; }
+    .srch-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--sky-light); pointer-events:none; }
+    .srch-input { width:100%; height:47px; padding:0 44px 0 38px; border:1.5px solid var(--border); border-radius:9px; font-family:'Lato',sans-serif; font-size:14px; color:var(--text); background:var(--sky-mist); outline:none; transition:border-color .15s,background .15s; }
+    .srch-input:focus { border-color:var(--sky); background:#fff; }
+    .srch-input::placeholder { color:var(--sky-light); }
+    .srch-x { position:absolute; right:12px; top:50%; transform:translateY(-50%); width:22px; height:22px; border-radius:50%; background:var(--border); border:none; cursor:pointer; font-size:10px; color:var(--text-soft); display:none; align-items:center; justify-content:center; }
+    .srch-x.show { display:flex; }
+    .sr-list { display:none; margin-top:6px; border:1.5px solid var(--border); border-radius:9px; background:#fff; overflow:hidden; box-shadow:0 4px 16px rgba(27,58,92,.08); }
+    .sr-list.show { display:block; }
+    .sr-item { display:flex; align-items:center; gap:10px; padding:10px 13px; cursor:pointer; border-bottom:1px solid var(--border); transition:background .12s; }
+    .sr-item:last-child { border-bottom:none; }
+    .sr-item:hover { background:var(--sky-pale); }
+    .sr-av { width:35px; height:35px; border-radius:50%; background:var(--sky-pale); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .sr-name { font-size:13px; font-weight:700; color:var(--navy); }
+    .sr-info { font-size:11px; color:var(--text-soft); }
+    .sr-tag  { margin-left:auto; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700; white-space:nowrap; }
+    .sr-tag.conv { background:var(--psico-bg); color:#1E6FA3; }
+    .sr-tag.part { background:#F2EFFA; color:#6B52A8; }
+    .not-found { display:none; margin-top:12px; padding:13px 15px; border-radius:9px; background:var(--gold-pale); border:1.5px solid var(--gold); }
+    .not-found.show { display:block; }
+    .nf-title { font-size:13px; font-weight:700; color:var(--navy); margin-bottom:3px; }
+    .nf-sub   { font-size:11px; color:var(--text-soft); margin-bottom:10px; }
+    .btn-cad  { display:inline-flex; align-items:center; gap:6px; padding:7px 13px; border:none; border-radius:7px; background:var(--navy); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; }
+    .pat-card { display:none; margin-top:12px; padding:12px 14px; border-radius:9px; background:var(--green-pale); border:1.5px solid var(--green-bdr); align-items:center; gap:12px; }
+    .pat-card.show { display:flex; }
+    .pc-av { width:38px; height:38px; border-radius:50%; background:#fff; border:2px solid var(--green-bdr); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .pc-name { font-size:13px; font-weight:700; color:var(--navy); }
+    .pc-info { font-size:11px; color:var(--text-soft); }
+    .pc-change { margin-left:auto; font-size:11px; color:var(--sky); cursor:pointer; font-weight:700; white-space:nowrap; }
+    .mini-reg { display:none; margin-top:14px; padding:15px; border-radius:9px; background:var(--sky-mist); border:1.5px solid var(--border); }
+    .mini-reg.show { display:block; }
+    .mr-title { font-size:12px; font-weight:700; color:var(--navy); margin-bottom:12px; display:flex; align-items:center; gap:7px; }
+    .mr-badge { background:var(--gold); color:var(--navy); font-size:9px; padding:2px 7px; border-radius:10px; }
+
+    /* step 2 */
+    .spec-sel { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+    .spec-btn { padding:10px 8px; border:1.5px solid var(--border); border-radius:9px; background:var(--sky-mist); cursor:pointer; text-align:center; transition:all .18s; font-family:'Lato',sans-serif; }
+    .spec-btn:hover { border-color:var(--sky); background:var(--sky-pale); }
+    .spec-btn.active.psico { border-color:var(--psico); background:var(--psico-bg); }
+    .spec-btn.active.nutri { border-color:var(--nutri); background:var(--nutri-bg); }
+    .spec-btn.active.fono  { border-color:var(--fono);  background:var(--fono-bg); }
+    .spec-icon  { font-size:20px; display:block; margin-bottom:4px; }
+    .spec-name  { font-size:11px; font-weight:700; color:var(--navy); display:block; }
+    .spec-count { font-size:10px; color:var(--text-soft); display:block; }
+    .prof-wrap { position:relative; }
+    .prof-wrap select { padding-left:38px; }
+    .prof-av { position:absolute; left:10px; top:50%; transform:translateY(-50%); width:23px; height:23px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8.5px; font-weight:700; pointer-events:none; }
+    .prof-av.psico { background:var(--psico-bg); color:#1E6FA3; }
+    .prof-av.nutri { background:var(--nutri-bg); color:#1A6A42; }
+    .prof-av.fono  { background:var(--fono-bg);  color:#8B6A1E; }
+    .slots-lbl  { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:7px; }
+    .slots-grid { display:flex; flex-wrap:wrap; gap:6px; }
+    .slot-btn { padding:5px 12px; border:1.5px solid var(--border); border-radius:7px; background:var(--sky-mist); cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; color:var(--text-soft); transition:all .15s; }
+    .slot-btn:hover { border-color:var(--sky); color:var(--navy); background:var(--sky-pale); }
+    .slot-btn.active { border-color:var(--green-bdr); background:var(--green-pale); color:var(--green); }
+    .slot-btn.busy   { opacity:.35; cursor:not-allowed; text-decoration:line-through; }
+
+    /* step 3 */
+    .type-cards { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+    .type-card  { padding:14px; border:2px solid var(--border); border-radius:10px; cursor:pointer; transition:all .18s; background:var(--sky-mist); }
+    .type-card:hover { border-color:var(--sky); background:var(--sky-pale); }
+    .type-card.active.conv { border-color:var(--psico); background:var(--psico-bg); }
+    .type-card.active.part { border-color:#9B8EC4; background:#F2EFFA; }
+    .tc-icon { font-size:22px; margin-bottom:5px; display:block; }
+    .tc-name { font-size:13px; font-weight:700; color:var(--navy); display:block; }
+    .tc-desc { font-size:10px; color:var(--text-soft); display:block; margin-top:2px; }
+    .conv-sel { width:100%; height:43px; padding:0 12px; border:1.5px solid var(--border); border-radius:9px; font-family:'Lato',sans-serif; font-size:13px; color:var(--text); background:var(--sky-mist); outline:none; margin-bottom:12px; cursor:pointer; }
+    .conv-sel:focus { border-color:var(--sky); background:#fff; }
+    .auth-badge { display:none; padding:10px 14px; border-radius:8px; margin-bottom:12px; align-items:center; gap:10px; }
+    .auth-badge.req { display:flex; background:#FEF9EC; border:1.5px solid var(--gold); }
+    .auth-badge.opt { display:flex; background:var(--green-pale); border:1.5px solid var(--green-bdr); }
+    .ab-icon { font-size:18px; }
+    .ab-title { font-size:12px; font-weight:700; color:var(--navy); display:block; }
+    .ab-sub   { font-size:11px; color:var(--text-soft); }
+
+    /* step 4 */
+    .confirm-card { background:var(--sky-mist); border:1.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:16px; }
+    .cc-row { display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); }
+    .cc-row:last-child { border-bottom:none; }
+    .cc-icon { font-size:15px; width:22px; text-align:center; flex-shrink:0; margin-top:2px; }
+    .cc-lbl  { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-soft); }
+    .cc-val  { font-size:13px; color:var(--navy); font-weight:700; }
+    .cc-sub2 { font-size:11px; color:var(--text-soft); }
+    .notif-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--text-soft); margin-bottom:9px; }
+    .notif-items { display:flex; flex-direction:column; gap:7px; }
+    .notif-item { display:flex; align-items:center; gap:12px; padding:10px 13px; border:1.5px solid var(--border); border-radius:9px; background:var(--sky-mist); cursor:pointer; transition:all .18s; }
+    .notif-item.on { border-color:var(--green-bdr); background:var(--green-pale); }
+    .notif-icon { font-size:17px; flex-shrink:0; }
+    .notif-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .notif-dest { font-size:11px; color:var(--text-soft); }
+    .notif-tog { width:33px; height:19px; border-radius:10px; background:var(--border); position:relative; transition:background .18s; flex-shrink:0; margin-left:auto; }
+    .notif-tog::after { content:''; position:absolute; top:2px; left:2px; width:15px; height:15px; border-radius:50%; background:#fff; transition:left .18s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .notif-item.on .notif-tog { background:var(--green); }
+    .notif-item.on .notif-tog::after { left:16px; }
+    .success { display:none; text-align:center; padding:16px 0; }
+    .success.show { display:block; }
+    .success-icon  { font-size:52px; margin-bottom:12px; animation:pop .4s ease; }
+    @keyframes pop { from{transform:scale(.4);opacity:0} 60%{transform:scale(1.15)} to{transform:scale(1);opacity:1} }
+    .success-title { font-family:'Playfair Display',serif; font-size:22px; color:var(--navy); margin-bottom:5px; }
+    .success-sub   { font-size:13px; color:var(--text-soft); margin-bottom:14px; }
+    .success-tags  { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+    .stag { padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
+    .stag.wpp   { background:var(--green-pale); color:#1A7A42; border:1px solid var(--green-bdr); }
+    .stag.email { background:var(--sky-pale); border:1px solid var(--sky); color:#1E6FA3; }
+
+    /* footer */
+    .m-foot { padding:13px 24px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; background:var(--sky-mist); flex-shrink:0; }
+    .step-ind { font-size:11px; color:var(--text-soft); }
+    .f-spc { flex:1; }
+    .btn-back { padding:8px 17px; border:1.5px solid var(--border); border-radius:8px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; color:var(--text-soft); transition:all .15s; display:none; }
+    .btn-back.show { display:block; }
+    .btn-back:hover { border-color:var(--sky); color:var(--navy); }
+    .btn-next { padding:9px 22px; border:none; border-radius:8px; background:var(--navy); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:background .15s; }
+    .btn-next:hover { background:var(--navy-mid); }
+    .btn-next.confirm  { background:var(--green); }
+    .btn-next.new-appt { background:var(--sky); }
+  </style>
+</head>
+<body>
+<div class="backdrop">
+<div class="modal">
+
+  <!-- HEADER -->
+  <div class="m-hd">
+    <div class="m-top">
+      <div class="m-brand">
+        <div class="m-bi"><span>Ψ</span></div>
+        <div><div class="m-bn">Novo Agendamento</div><div class="m-bs">Clínica Equilíbrio Ideal</div></div>
+      </div>
+      <button class="m-close" onclick="resetModal()">✕</button>
+    </div>
+    <div class="steps">
+      <div class="step active" id="si1"><div class="step-num" id="sn1">1</div><div class="step-lbl">Paciente</div></div>
+      <div class="step-line" id="sl1"></div>
+      <div class="step" id="si2"><div class="step-num" id="sn2">2</div><div class="step-lbl">Consulta</div></div>
+      <div class="step-line" id="sl2"></div>
+      <div class="step" id="si3"><div class="step-num" id="sn3">3</div><div class="step-lbl">Confirmar</div></div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="m-body">
+
+    <!-- STEP 1: PACIENTE -->
+    <div class="panel active" id="panel1">
+      <div class="sec-title">Quem será atendido?</div>
+      <div class="sec-sub">Busque pelo nome, CPF ou telefone do paciente</div>
+      <div class="srch-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="srch-input" id="srchInput" type="text" placeholder="Ex: João Silva ou 123.456.789-00" oninput="handleSearch(this.value)"/>
+        <button class="srch-x" id="srchX" onclick="clearSearch()">✕</button>
+      </div>
+      <div class="sr-list" id="srList"></div>
+      <div class="not-found" id="notFound">
+        <div class="nf-title">Paciente não encontrado</div>
+        <div class="nf-sub">Nenhum resultado para "<span id="srchTerm"></span>". Deseja cadastrar agora?</div>
+        <button class="btn-cad" onclick="showRegister()">+ Cadastrar novo paciente</button>
+      </div>
+      <div class="pat-card" id="patCard">
+        <div class="pc-av" id="pcAv"></div>
+        <div><div class="pc-name" id="pcName"></div><div class="pc-info" id="pcInfo"></div></div>
+        <div class="pc-change" onclick="changePatient()">Trocar</div>
+      </div>
+      <div class="mini-reg" id="miniReg">
+        <div class="mr-title">Cadastro rápido <span class="mr-badge">Novo paciente</span></div>
+        <div class="f2">
+          <div class="field"><label>Nome completo</label><input type="text" id="newName" placeholder="Nome do paciente" oninput="handleNewName(this.value)"/></div>
+          <div class="field"><label>CPF</label><input type="text" placeholder="000.000.000-00"/></div>
+        </div>
+        <div class="f2">
+          <div class="field"><label>WhatsApp</label><input type="text" id="newPhone" placeholder="(11) 99999-9999"/></div>
+          <div class="field"><label>E-mail</label><input type="text" id="newEmail" placeholder="email@exemplo.com"/></div>
+        </div>
+        <div class="f2">
+          <div class="field"><label>Data de nascimento</label><input type="date"/></div>
+          <div class="field"><label>Sexo</label>
+            <select><option value="">Selecionar</option><option>Feminino</option><option>Masculino</option><option>Outro</option></select>
+          </div>
+        </div>
+        <div class="f2">
+          <div class="field">
+            <label>Convênio</label>
+            <select id="newConv" onchange="toggleCartNew(this.value)">
+              <option value="">Selecionar convênio…</option>
+              <option value="particular">Particular</option>
+              <option disabled>──────────────────────</option>
+              <option value="hapvida">HAPVIDA NOTREDAME SP/RJ</option>
+              <option value="bradesco">BRADESCO SAÚDE</option>
+              <option value="prevent">PREVENT SENIOR</option>
+              <option value="porto">PORTO SEGURO</option>
+              <option value="totalmed">TOTAL MEDCARE</option>
+              <option value="careplus">CARE PLUS</option>
+              <option value="mediservice">MEDISERVICE</option>
+              <option value="vivest">VIVEST</option>
+              <option value="bradesco-op">BRADESCO SAÚDE - OPERADORA DE PLANOS S/A</option>
+              <option value="omint">OMINT SAÚDE</option>
+              <option value="itau">FUNDAÇÃO SAÚDE ITAÚ</option>
+            </select>
+          </div>
+          <div class="field" id="cartNewField" style="display:none">
+            <label>Nº da carteirinha</label>
+            <input type="text" placeholder="000000000000000"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: CONSULTA -->
+    <div class="panel" id="panel2">
+      <div class="sec-title">Detalhes da consulta</div>
+      <div class="sec-sub">Selecione especialidade, profissional e horário</div>
+      <div class="field"><label>Especialidade</label>
+        <div class="spec-sel">
+          <button class="spec-btn active psico" onclick="selectSpec(this,'psico')"><span class="spec-icon">🧠</span><span class="spec-name">Psicologia</span><span class="spec-count">10 profissionais</span></button>
+          <button class="spec-btn" onclick="selectSpec(this,'nutri')"><span class="spec-icon">🥗</span><span class="spec-name">Nutrição</span><span class="spec-count">5 profissionais</span></button>
+          <button class="spec-btn" onclick="selectSpec(this,'fono')"><span class="spec-icon">🗣️</span><span class="spec-name">Fonoaudiologia</span><span class="spec-count">5 profissionais</span></button>
+        </div>
+      </div>
+      <div class="f2">
+        <div class="field"><label>Profissional</label>
+          <div class="prof-wrap">
+            <div class="prof-av psico" id="profAv">AC</div>
+            <select id="profSel" onchange="updateProfAv()"></select>
+          </div>
+        </div>
+        <div class="field"><label>Sala</label><select id="salaSel"></select></div>
+      </div>
+      <div class="f2">
+        <div class="field"><label>Data</label><input type="date" id="dataInput" value="2026-05-04"/></div>
+        <div class="field"><label>Duração</label>
+          <select id="durSel"><option>30 min</option><option selected>50 min</option><option>1h</option><option>1h 30min</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <div class="slots-lbl">Horários disponíveis</div>
+        <div class="slots-grid" id="slotsGrid"></div>
+      </div>
+    </div>
+
+    <!-- STEP 3: CONFIRMAR -->
+    <div class="panel" id="panel3">
+      <div class="success" id="successPanel">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Consulta agendada!</div>
+        <div class="success-sub" id="successSub"></div>
+        <div class="success-tags"><div class="stag wpp">💬 WhatsApp enviado</div><div class="stag email">📧 E-mail enviado</div></div>
+      </div>
+      <div id="confirmContent">
+        <div class="sec-title">Confirmar agendamento</div>
+        <div class="sec-sub">Revise os dados antes de confirmar</div>
+        <div class="confirm-card">
+          <div class="cc-row"><div class="cc-icon">👤</div><div><div class="cc-lbl">Paciente</div><div class="cc-val" id="ccPac">—</div></div></div>
+          <div class="cc-row"><div class="cc-icon">🧠</div><div><div class="cc-lbl">Especialidade &amp; Profissional</div><div class="cc-val" id="ccProf">—</div><div class="cc-sub2" id="ccSala">—</div></div></div>
+          <div class="cc-row"><div class="cc-icon">📅</div><div><div class="cc-lbl">Data &amp; Horário</div><div class="cc-val" id="ccData">—</div><div class="cc-sub2" id="ccDur">—</div></div></div>
+          <div class="cc-row"><div class="cc-icon">🏥</div><div><div class="cc-lbl">Convênio</div><div class="cc-val" id="ccCob">—</div></div></div>
+        </div>
+        <div class="notif-title">Notificar paciente</div>
+        <div class="notif-items">
+          <div class="notif-item on" onclick="this.classList.toggle('on')">
+            <div class="notif-icon">💬</div>
+            <div><div class="notif-name">WhatsApp</div><div class="notif-dest" id="notifWpp">—</div></div>
+            <div class="notif-tog"></div>
+          </div>
+          <div class="notif-item on" onclick="this.classList.toggle('on')">
+            <div class="notif-icon">📧</div>
+            <div><div class="notif-name">E-mail</div><div class="notif-dest" id="notifEmail">—</div></div>
+            <div class="notif-tog"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- m-body -->
+
+  <!-- FOOTER -->
+  <div class="m-foot">
+    <div class="step-ind" id="stepInd">Passo 1 de 4</div>
+    <div class="f-spc"></div>
+    <button class="btn-back" id="btnBack" onclick="prevStep()">← Voltar</button>
+    <button class="btn-next" id="btnNext" onclick="nextStep()">Próximo →</button>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── DATA ──
+const PATIENTS = [
+  {id:1, name:'João Pereira',    cpf:'123.456.789-00', phone:'(11) 99123-4567', email:'joao@email.com',    ini:'JP', conv:'Unimed'},
+  {id:2, name:'Fernanda Souza',  cpf:'987.654.321-00', phone:'(11) 98765-4321', email:'fernanda@email.com', ini:'FS', conv:'Bradesco Saúde'},
+  {id:3, name:'Ricardo Alves',   cpf:'456.789.123-00', phone:'(11) 97456-1230', email:'ricardo@email.com',  ini:'RA', conv:null},
+  {id:4, name:'Luciana Martins', cpf:'321.654.987-00', phone:'(11) 96321-6549', email:'luciana@email.com',  ini:'LM', conv:'Hapvida'},
+  {id:5, name:'Carlos Nunes',    cpf:'789.123.456-00', phone:'(11) 95789-1234', email:'carlos@email.com',   ini:'CN', conv:'Prevent Senior'},
+  {id:6, name:'Patrícia Gomes',  cpf:'654.321.987-00', phone:'(11) 94654-3219', email:'patricia@email.com', ini:'PG', conv:'Unimed'},
+  {id:7, name:'Amanda Ferreira', cpf:'111.222.333-00', phone:'(11) 93111-2233', email:'amanda@email.com',   ini:'AF', conv:null},
+  {id:8, name:'Marcos Ribeiro',  cpf:'444.555.666-00', phone:'(11) 92444-5566', email:'marcos@email.com',   ini:'MR', conv:'Bradesco Saúde'},
+];
+const PROFS = {
+  psico:{ names:['Dra. Ana Costa','Dr. Bruno Silva','Dra. Carla Mendes','Dr. Diego Ramos','Dra. Elisa Torres'], inis:['AC','BS','CM','DR','ET'] },
+  nutri:{ names:['Dra. Karen Alves','Dr. Lucas Pinto','Dra. Marina Rocha','Dr. Nelson Braga','Dra. Olívia Santos'], inis:['KA','LP','MR','NB','OS'] },
+  fono: { names:['Dr. Paulo Ribeiro','Dra. Quésia Moreira','Dr. Rafael Duarte','Dra. Sabrina Lima','Dr. Tiago Carvalho'], inis:['PR','QM','RD','SL','TC'] },
+};
+const SPECS_LBL = {psico:'Psicologia', nutri:'Nutrição', fono:'Fonoaudiologia'};
+const SLOTS_FREE = ['08:00','08:30','09:00','10:00','10:30','11:00','13:30','14:00','15:00','15:30','16:30','17:00'];
+const SLOTS_BUSY = ['09:30','11:30','13:00','14:30','16:00'];
+
+// ── STATE ──
+var cur = 1, selPat = null, selSpec = 'psico', selSlot = null;
+var selType = 'conv', selConvName = '', selConvAuth = '', isNew = false;
+
+// ── STEP NAV ──
+function goStep(n) {
+  cur = n;
+  document.querySelectorAll('.panel').forEach(function(p,i){ p.classList.toggle('active', i+1===n); });
+  for (var i=1; i<=3; i++) {
+    var si = document.getElementById('si'+i);
+    var sn = document.getElementById('sn'+i);
+    si.className = 'step' + (i===n?' active':i<n?' done':'');
+    sn.textContent = i < n ? '✓' : String(i);
+    if (i < 3) document.getElementById('sl'+i).className = 'step-line' + (i<n?' done':'');
+  }
+  document.getElementById('stepInd').textContent = 'Passo '+n+' de 3';
+  document.getElementById('btnBack').className = 'btn-back' + (n>1?' show':'');
+  var btn = document.getElementById('btnNext');
+  if (n===3) { btn.textContent='✓ Confirmar Agendamento'; btn.className='btn-next confirm'; }
+  else { btn.textContent='Próximo →'; btn.className='btn-next'; }
+  if (n===3) buildSummary();
+}
+
+function nextStep() {
+  if (cur===1) { if (!selPat && !isNew) return; buildSlots(); goStep(2); }
+  else if (cur===2) { if (!selSlot) return; goStep(3); }
+  else if (cur===3) { confirmAppt(); }
+}
+function prevStep() { if (cur>1) goStep(cur-1); }
+
+// ── STEP 1 ──
+function handleSearch(val) {
+  document.getElementById('srchX').classList.toggle('show', val.length>0);
+  if (val.length<2) { elHide('srList'); elHide('notFound'); return; }
+  var res = PATIENTS.filter(function(p){
+    return p.name.toLowerCase().indexOf(val.toLowerCase())>-1 || p.cpf.indexOf(val)>-1 || p.phone.indexOf(val)>-1;
+  });
+  var list = document.getElementById('srList');
+  if (res.length>0) {
+    list.innerHTML='';
+    res.forEach(function(p){
+      var item=document.createElement('div'); item.className='sr-item';
+      item.innerHTML='<div class="sr-av">'+p.ini+'</div><div><div class="sr-name">'+p.name+'</div><div class="sr-info">'+p.cpf+' · '+p.phone+'</div></div><div class="sr-tag '+(p.conv?'conv':'part')+'">'+(p.conv||'Particular')+'</div>';
+      item.onclick=function(){ selectPatient(p); };
+      list.appendChild(item);
+    });
+    elShow('srList'); elHide('notFound');
+  } else {
+    elHide('srList');
+    document.getElementById('srchTerm').textContent=val;
+    elShow('notFound');
+  }
+  elHide('miniReg');
+  document.getElementById('patCard').classList.remove('show');
+}
+
+function clearSearch() {
+  document.getElementById('srchInput').value='';
+  document.getElementById('srchX').classList.remove('show');
+  elHide('srList'); elHide('notFound'); elHide('miniReg');
+  document.getElementById('patCard').classList.remove('show');
+  selPat=null; isNew=false;
+}
+
+function selectPatient(p) {
+  selPat=p; isNew=false;
+  document.getElementById('srchInput').value=p.name;
+  elHide('srList'); elHide('notFound'); elHide('miniReg');
+  document.getElementById('pcAv').textContent=p.ini;
+  document.getElementById('pcName').textContent=p.name;
+  document.getElementById('pcInfo').textContent=p.cpf+' · '+p.phone+' · '+(p.conv||'Particular');
+  document.getElementById('patCard').classList.add('show');
+  if (p.conv) selConvName=p.conv;
+}
+
+function changePatient() {
+  selPat=null; isNew=false;
+  document.getElementById('patCard').classList.remove('show');
+  document.getElementById('srchInput').value='';
+  document.getElementById('srchInput').focus();
+}
+
+function showRegister() { isNew=true; elShow('miniReg'); elHide('notFound'); }
+
+function handleNewName(val) {
+  if (val.length>2) {
+    var parts=val.split(' ');
+    var ini=(parts[0]?parts[0][0]:'')+(parts[1]?parts[1][0]:'');
+    ini=ini.toUpperCase();
+    selPat={id:999,name:val,cpf:'—',phone:document.getElementById('newPhone').value||'—',email:document.getElementById('newEmail').value||'—',ini:ini,conv:null};
+    document.getElementById('pcAv').textContent=ini;
+    document.getElementById('pcName').textContent=val;
+    document.getElementById('pcInfo').textContent='Novo paciente';
+    document.getElementById('patCard').classList.add('show');
+  }
+}
+
+function toggleCartNew(val) {
+  document.getElementById('cartNewField').style.display=(val&&val!=='particular')?'block':'none';
+}
+
+// ── STEP 2 ──
+function selectSpec(btn, spec) {
+  selSpec=spec; selSlot=null;
+  document.querySelectorAll('.spec-btn').forEach(function(b){ b.className='spec-btn'; });
+  btn.className='spec-btn active '+spec;
+  buildProfSelect(); buildSlots();
+}
+
+function buildProfSelect() {
+  var sel=document.getElementById('profSel'); sel.innerHTML='';
+  PROFS[selSpec].names.forEach(function(name,i){
+    var o=document.createElement('option'); o.value=String(i); o.textContent=name;
+    o.setAttribute('data-ini',PROFS[selSpec].inis[i]); sel.appendChild(o);
+  });
+  updateProfAv();
+}
+
+function updateProfAv() {
+  var sel=document.getElementById('profSel');
+  var ini=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].getAttribute('data-ini'):'?';
+  var av=document.getElementById('profAv');
+  av.textContent=ini; av.className='prof-av '+selSpec;
+}
+
+function buildSlots() {
+  var grid=document.getElementById('slotsGrid'); grid.innerHTML='';
+  var all=SLOTS_FREE.concat(SLOTS_BUSY).sort();
+  all.forEach(function(t){
+    var btn=document.createElement('button'); btn.className='slot-btn';
+    var busy=SLOTS_BUSY.indexOf(t)>-1;
+    if (busy){ btn.classList.add('busy'); btn.disabled=true; }
+    if (t===selSlot) btn.classList.add('active');
+    btn.textContent=t;
+    btn.onclick=function(){
+      selSlot=t;
+      document.querySelectorAll('.slot-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+    };
+    grid.appendChild(btn);
+  });
+}
+
+function buildSalaSelect() {
+  var sel=document.getElementById('salaSel'); sel.innerHTML='';
+  for (var i=1;i<=20;i++){
+    var o=document.createElement('option');
+    o.textContent='Sala '+(i<10?'0'+i:String(i)); sel.appendChild(o);
+  }
+}
+
+// ── STEP 3 ──
+function selectType(type) {
+  selType=type;
+  document.getElementById('tcConv').className='type-card'+(type==='conv'?' active conv':'');
+  document.getElementById('tcPart').className='type-card'+(type==='part'?' active part':'');
+  document.getElementById('convPanel').style.display=type==='conv'?'block':'none';
+  document.getElementById('partPanel').style.display=type==='part'?'block':'none';
+}
+
+function handleConvChange(val) {
+  if (!val){ resetAuth(); return; }
+  var parts=val.split('|');
+  selConvName=parts[0]; selConvAuth=parts[1];
+  document.getElementById('authReq').className='auth-badge'+(selConvAuth==='requires'?' req':'');
+  document.getElementById('authOpt').className='auth-badge'+(selConvAuth==='optional'?' opt':'');
+  document.getElementById('authFields').style.display=selConvAuth==='none'?'none':'grid';
+}
+
+function resetAuth() {
+  document.getElementById('authReq').className='auth-badge';
+  document.getElementById('authOpt').className='auth-badge';
+  document.getElementById('authFields').style.display='none';
+}
+
+// ── STEP 4 ──
+function buildSummary() {
+  var profSel=document.getElementById('profSel');
+  var profName=profSel.options[profSel.selectedIndex]?profSel.options[profSel.selectedIndex].textContent:'—';
+  var salaSel=document.getElementById('salaSel');
+  var sala=salaSel.options[salaSel.selectedIndex]?salaSel.options[salaSel.selectedIndex].textContent:'—';
+  var data=document.getElementById('dataInput').value;
+  var durSel=document.getElementById('durSel');
+  var dur=durSel.options[durSel.selectedIndex]?durSel.options[durSel.selectedIndex].textContent:'50 min';
+  var dataFmt=data?new Date(data+'T12:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'—';
+  document.getElementById('ccPac').textContent=selPat?selPat.name:'—';
+  document.getElementById('ccProf').textContent=SPECS_LBL[selSpec]+' · '+profName;
+  document.getElementById('ccSala').textContent=sala;
+  document.getElementById('ccData').textContent=dataFmt+(selSlot?' às '+selSlot:'');
+  document.getElementById('ccDur').textContent='Duração: '+dur;
+  document.getElementById('ccCob').textContent=selPat&&selPat.conv?selPat.conv:'Particular';
+  document.getElementById('notifWpp').textContent=selPat?selPat.phone:'—';
+  document.getElementById('notifEmail').textContent=selPat?selPat.email:'—';
+}
+
+function confirmAppt() {
+  document.getElementById('confirmContent').style.display='none';
+  document.getElementById('successPanel').classList.add('show');
+  var profSel=document.getElementById('profSel');
+  var profName=profSel.options[profSel.selectedIndex]?profSel.options[profSel.selectedIndex].textContent:'';
+  document.getElementById('successSub').textContent=(selPat?selPat.name:'Paciente')+' · '+(selSlot||'—')+' · '+profName;
+  document.getElementById('btnBack').className='btn-back';
+  var btn=document.getElementById('btnNext');
+  btn.textContent='+ Novo Agendamento';
+  btn.className='btn-next new-appt';
+  btn.onclick=resetModal;
+  document.getElementById('stepInd').textContent='Concluído ✓';
+}
+
+function resetModal() {
+  cur=1; selPat=null; selSpec='psico'; selSlot=null;
+  selType='conv'; selConvName=''; selConvAuth=''; isNew=false;
+  document.getElementById('srchInput').value='';
+  document.getElementById('srchX').classList.remove('show');
+  document.getElementById('patCard').classList.remove('show');
+  elHide('srList'); elHide('notFound'); elHide('miniReg');
+  document.getElementById('successPanel').classList.remove('show');
+  document.getElementById('confirmContent').style.display='block';
+  document.getElementById('btnNext').onclick=nextStep;
+  buildSlots(); goStep(1);
+}
+
+function elShow(id){ document.getElementById(id).classList.add('show'); }
+function elHide(id){ document.getElementById(id).classList.remove('show'); }
+
+// ── INIT ──
+buildProfSelect();
+buildSlots();
+buildSalaSelect();
+</script>
+</body>
+</html>

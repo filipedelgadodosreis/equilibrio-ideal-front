@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pacientes — Clínica Equilíbrio Ideal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA; --sky-mist:#F4F9FC;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-pale:#FBF5EA;
+      --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
+      --red:#E05252; --red-pale:#FEF0F0;
+      --sidebar-w:208px;
+    }
+    html, body { height:100%; overflow:hidden; font-family:'Lato',sans-serif; background:var(--sky-mist); color:var(--text); font-size:13px; }
+    .app { display:flex; height:100vh; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { width:var(--sidebar-w); background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+    .sb-brand { padding:13px 14px 11px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .sb-icon { width:31px; height:31px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sb-icon span { color:#fff; font-size:13px; font-family:'Playfair Display',serif; }
+    .sb-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .sb-sub  { font-size:10px; color:var(--text-soft); }
+    .sb-nav  { padding:9px 7px; flex:1; overflow-y:auto; }
+    .sb-nav::-webkit-scrollbar { display:none; }
+    .nav-lbl  { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-soft); padding:6px 6px 3px; }
+    .nav-item { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:7px; cursor:pointer; color:var(--text-soft); font-size:12px; transition:all .15s; margin-bottom:1px; }
+    .nav-item:hover  { background:var(--sky-pale); color:var(--navy); }
+    .nav-item.active { background:var(--sky-pale); color:var(--navy); font-weight:700; }
+    .nav-icon { font-size:14px; width:18px; text-align:center; }
+    .nav-badge { margin-left:auto; background:var(--sky); color:#fff; font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px; }
+    .sb-foot { padding:10px 13px; border-top:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .u-av   { width:28px; height:28px; border-radius:50%; background:var(--sky-light); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .u-name { font-size:11px; font-weight:700; color:var(--navy); }
+    .u-role { font-size:9px; color:var(--text-soft); }
+    .u-out  { margin-left:auto; color:var(--text-soft); cursor:pointer; font-size:12px; }
+
+    /* ═══ MAIN ═══ */
+    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+    /* ── LIST VIEW ── */
+    #listView { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+    /* header */
+    .lv-hd { height:56px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 20px; gap:12px; flex-shrink:0; }
+    .lv-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .lv-spc { flex:1; }
+    .lv-search { position:relative; }
+    .lv-search svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--sky-light); pointer-events:none; }
+    .lv-sinput { width:220px; height:34px; padding:0 12px 0 30px; border:1.5px solid var(--border); border-radius:8px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .lv-sinput:focus { border-color:var(--sky); background:#fff; }
+    .lv-sinput::placeholder { color:var(--sky-light); }
+    .btn-new-pat { display:flex; align-items:center; gap:6px; padding:8px 16px; border:none; border-radius:8px; background:var(--navy); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:background .15s; }
+    .btn-new-pat:hover { background:var(--navy-mid); }
+
+    /* filter bar */
+    .lv-filters { padding:0 20px; height:44px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .ftab { padding:4px 13px; border:1.5px solid var(--border); border-radius:18px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); transition:all .15s; white-space:nowrap; }
+    .ftab:hover { border-color:var(--sky); color:var(--navy); }
+    .ftab.active { background:var(--navy); border-color:var(--navy); color:#fff; }
+    .lv-filter-spc { flex:1; }
+    .lv-sort { font-size:11px; color:var(--text-soft); display:flex; align-items:center; gap:6px; }
+    .lv-sort select { border:1.5px solid var(--border); border-radius:7px; padding:3px 8px; font-family:'Lato',sans-serif; font-size:11px; background:var(--sky-mist); outline:none; color:var(--text); height:28px; }
+
+    /* table */
+    .table-wrap { flex:1; overflow-y:auto; }
+    .table-wrap::-webkit-scrollbar { width:5px; }
+    .table-wrap::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:3px; }
+    table { width:100%; border-collapse:collapse; }
+    thead th { padding:9px 16px; text-align:left; font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); border-bottom:1.5px solid var(--border); background:var(--sky-mist); position:sticky; top:0; white-space:nowrap; z-index:5; }
+    thead th:first-child { padding-left:20px; }
+    thead th:last-child  { padding-right:20px; }
+    tbody tr { border-bottom:1px solid rgba(212,232,242,.5); cursor:pointer; transition:background .12s; }
+    tbody tr:hover { background:var(--sky-pale); }
+    tbody td { padding:11px 16px; font-size:12px; }
+    tbody td:first-child { padding-left:20px; }
+    tbody td:last-child  { padding-right:20px; }
+
+    .td-pat { display:flex; align-items:center; gap:10px; }
+    .td-av  { width:34px; height:34px; border-radius:50%; background:var(--sky-pale); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .td-name { font-size:13px; font-weight:700; color:var(--navy); }
+    .td-sub  { font-size:10px; color:var(--text-soft); margin-top:1px; }
+    .tag { display:inline-block; padding:2px 9px; border-radius:8px; font-size:10px; font-weight:700; }
+    .tag.conv   { background:var(--sky-pale); color:#1E6FA3; border:1px solid var(--sky-light); }
+    .tag.part   { background:#F2EFFA; color:#6B52A8; border:1px solid #C5B8E8; }
+    .tag.active { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .tag.inactive { background:#F5F5F5; color:#999; border:1px solid #DDD; }
+    .td-actions { display:flex; gap:5px; }
+    .act-btn { width:28px; height:28px; border:1.5px solid var(--border); border-radius:7px; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--text-soft); transition:all .12s; }
+    .act-btn:hover { border-color:var(--sky); color:var(--navy); }
+
+    /* empty state */
+    .empty-state { padding:60px 20px; text-align:center; }
+    .empty-icon  { font-size:40px; margin-bottom:12px; }
+    .empty-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); margin-bottom:6px; }
+    .empty-sub   { font-size:13px; color:var(--text-soft); }
+
+    /* ── RECORD VIEW ── */
+    #recordView { flex:1; display:none; flex-direction:column; overflow:hidden; }
+
+    /* record header */
+    .rv-hd { background:var(--white); border-bottom:1px solid var(--border); flex-shrink:0; }
+    .rv-hd-top { display:flex; align-items:center; gap:12px; padding:14px 20px; }
+    .btn-back { display:flex; align-items:center; gap:6px; padding:6px 12px; border:1.5px solid var(--border); border-radius:7px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); transition:all .15s; }
+    .btn-back:hover { border-color:var(--sky); color:var(--navy); }
+    .rv-name { font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); }
+    .rv-hd-spc { flex:1; }
+    .btn-agendar { display:flex; align-items:center; gap:6px; padding:8px 14px; border:1.5px solid var(--sky); border-radius:8px; background:var(--sky-pale); color:var(--navy); cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:all .15s; }
+    .btn-agendar:hover { background:var(--sky); color:#fff; }
+    .btn-edit-pat { display:flex; align-items:center; gap:6px; padding:8px 14px; border:none; border-radius:8px; background:var(--navy); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:background .15s; }
+    .btn-edit-pat:hover { background:var(--navy-mid); }
+
+    /* patient summary card */
+    .pat-summary { margin:0 20px 0; padding:16px 18px; background:var(--sky-mist); border-radius:12px; border:1.5px solid var(--border); display:flex; align-items:center; gap:16px; }
+    .ps-av { width:52px; height:52px; border-radius:50%; background:var(--sky-light); border:2px solid var(--sky); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .ps-name  { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .ps-info  { font-size:11px; color:var(--text-soft); margin-top:3px; display:flex; gap:12px; flex-wrap:wrap; }
+    .ps-info span { display:flex; align-items:center; gap:4px; }
+    .ps-stats { margin-left:auto; display:flex; gap:20px; flex-shrink:0; }
+    .ps-stat  { text-align:center; }
+    .ps-stat-n { font-family:'Playfair Display',serif; font-size:22px; color:var(--navy); line-height:1; }
+    .ps-stat-l { font-size:10px; color:var(--text-soft); margin-top:2px; }
+
+    /* tabs */
+    .rv-tabs { display:flex; gap:0; padding:0 20px; border-bottom:1px solid var(--border); background:var(--white); margin-top:14px; }
+    .rv-tab { padding:10px 16px; font-size:12px; font-weight:700; color:var(--text-soft); cursor:pointer; border-bottom:2.5px solid transparent; transition:all .15s; white-space:nowrap; }
+    .rv-tab:hover { color:var(--navy); }
+    .rv-tab.active { color:var(--navy); border-bottom-color:var(--navy); }
+
+    /* record body */
+    .rv-body { flex:1; overflow-y:auto; padding:20px; }
+    .rv-body::-webkit-scrollbar { width:5px; }
+    .rv-body::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:3px; }
+
+    /* tab panels */
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* sections */
+    .section { background:var(--white); border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:16px; }
+    .sec-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .sec-title { font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); }
+    .sec-edit { font-size:11px; color:var(--sky); cursor:pointer; font-weight:700; }
+    .sec-edit:hover { color:var(--navy); }
+
+    /* fields grid */
+    .fg2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 20px; }
+    .fg3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 20px; }
+    .fg4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:14px 20px; }
+    .fld-label { font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:4px; }
+    .fld-value { font-size:13px; color:var(--navy); font-weight:400; }
+    .fld-value.bold { font-weight:700; }
+    .fld-empty { color:var(--text-soft); font-style:italic; font-size:12px; }
+
+    /* edit mode fields */
+    .edit-input { width:100%; height:36px; padding:0 10px; border:1.5px solid var(--border); border-radius:7px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .edit-input:focus { border-color:var(--sky); background:#fff; }
+    .edit-textarea { width:100%; padding:9px 10px; border:1.5px solid var(--border); border-radius:7px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; resize:none; height:72px; transition:all .15s; }
+    .edit-textarea:focus { border-color:var(--sky); background:#fff; }
+    .edit-select { width:100%; height:36px; padding:0 10px; border:1.5px solid var(--border); border-radius:7px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; }
+
+    /* history table */
+    .hist-table { width:100%; border-collapse:collapse; }
+    .hist-table th { padding:8px 12px; text-align:left; font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); border-bottom:1.5px solid var(--border); }
+    .hist-table td { padding:11px 12px; font-size:12px; border-bottom:1px solid rgba(212,232,242,.5); }
+    .hist-table tr:last-child td { border-bottom:none; }
+    .hist-table tr:hover td { background:var(--sky-mist); }
+    .hist-spec { display:inline-flex; align-items:center; gap:5px; }
+    .hist-dot  { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .hist-dot.psico { background:#5A9EC9; }
+    .hist-dot.nutri { background:#5AAE82; }
+    .hist-dot.fono  { background:#C9A96E; }
+    .hist-status { display:inline-block; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700; }
+    .hist-status.realizada { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .hist-status.cancelada { background:var(--red-pale); color:var(--red); border:1px solid #F5B8B8; }
+    .hist-status.agendada  { background:var(--sky-pale); color:#1E6FA3; border:1px solid var(--sky-light); }
+
+    /* obs section */
+    .obs-box { background:var(--gold-pale); border:1.5px solid var(--gold); border-radius:9px; padding:14px; font-size:13px; color:var(--text); line-height:1.7; min-height:80px; }
+
+    /* save bar */
+    .save-bar { display:none; position:sticky; bottom:0; background:var(--white); border-top:1px solid var(--border); padding:12px 20px; align-items:center; gap:10px; box-shadow:0 -4px 16px rgba(27,58,92,.06); }
+    .save-bar.show { display:flex; }
+    .save-bar-msg { font-size:12px; color:var(--text-soft); }
+    .save-spc { flex:1; }
+    .btn-discard { padding:8px 16px; border:1.5px solid var(--border); border-radius:7px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; color:var(--text-soft); }
+    .btn-save-pat { padding:8px 20px; border:none; border-radius:7px; background:var(--green); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .app { animation:fadeUp .4s ease; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-icon"><span>Ψ</span></div>
+      <div><div class="sb-name">Equilíbrio Ideal</div><div class="sb-sub">Clínica Multidisciplinar</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-lbl">Principal</div>
+      <div class="nav-item" onclick=""><span class="nav-icon">📅</span>Agenda</div>
+      <div class="nav-item active"><span class="nav-icon">👥</span>Pacientes<span class="nav-badge">8</span></div>
+      <div class="nav-item"><span class="nav-icon">🔢</span>Painel de Senhas</div>
+      <div class="nav-lbl" style="margin-top:5px">Clínica</div>
+      <div class="nav-item"><span class="nav-icon">🧠</span>Profissionais</div>
+      <div class="nav-item"><span class="nav-icon">🏥</span>Salas</div>
+      <div class="nav-lbl" style="margin-top:5px">Sistema</div>
+      <div class="nav-item"><span class="nav-icon">⚙️</span>Configurações</div>
+    </nav>
+    <div class="sb-foot">
+      <div class="u-av">MR</div>
+      <div><div class="u-name">Maria Recepção</div><div class="u-role">Recepção</div></div>
+      <div class="u-out">↩</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══ LIST VIEW ══ -->
+    <div id="listView">
+      <div class="lv-hd">
+        <div class="lv-title">Pacientes</div>
+        <div class="lv-spc"></div>
+        <div class="lv-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="lv-sinput" type="text" placeholder="Buscar por nome, CPF ou telefone…" oninput="filterPatients(this.value)"/>
+        </div>
+        <button class="btn-new-pat" onclick="openNewPatient()">+ Novo Paciente</button>
+      </div>
+
+      <div class="lv-filters">
+        <div class="ftab active" onclick="setFilter('todos',this)">Todos (8)</div>
+        <div class="ftab" onclick="setFilter('conv',this)">Convênio (6)</div>
+        <div class="ftab" onclick="setFilter('part',this)">Particular (2)</div>
+        <div class="ftab" onclick="setFilter('ativo',this)">Ativos (7)</div>
+        <div class="lv-filter-spc"></div>
+        <div class="lv-sort">
+          Ordenar por
+          <select><option>Nome A–Z</option><option>Última consulta</option><option>Data de cadastro</option></select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>CPF</th>
+              <th>WhatsApp</th>
+              <th>Convênio</th>
+              <th>Status</th>
+              <th>Última consulta</th>
+              <th>Total consultas</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="patientTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ RECORD VIEW ══ -->
+    <div id="recordView">
+      <div class="rv-hd">
+        <div class="rv-hd-top">
+          <button class="btn-back" onclick="showList()">← Voltar</button>
+          <div class="rv-name" id="rvName"></div>
+          <div class="rv-hd-spc"></div>
+          <button class="btn-agendar">📅 Agendar consulta</button>
+          <button class="btn-edit-pat" onclick="toggleEdit()">✏️ Editar ficha</button>
+        </div>
+        <div class="pat-summary" id="patSummary"></div>
+        <div class="rv-tabs">
+          <div class="rv-tab active" onclick="showTab('dados',this)">Dados pessoais</div>
+          <div class="rv-tab" onclick="showTab('contato',this)">Contato</div>
+          <div class="rv-tab" onclick="showTab('convenio',this)">Convênio</div>
+          <div class="rv-tab" onclick="showTab('endereco',this)">Endereço</div>
+          <div class="rv-tab" onclick="showTab('obs',this)">Observações</div>
+          <div class="rv-tab" onclick="showTab('historico',this)">Histórico de consultas</div>
+        </div>
+      </div>
+
+      <div class="rv-body">
+
+        <!-- DADOS PESSOAIS -->
+        <div class="tab-panel active" id="tab-dados">
+          <div class="section">
+            <div class="sec-hd"><div class="sec-title">Dados pessoais</div><div class="sec-edit" onclick="toggleEdit()">Editar</div></div>
+            <div class="fg3" id="dados-view">
+              <div><div class="fld-label">Nome completo</div><div class="fld-value bold" id="fv-nome"></div></div>
+              <div><div class="fld-label">CPF</div><div class="fld-value" id="fv-cpf"></div></div>
+              <div><div class="fld-label">RG</div><div class="fld-value" id="fv-rg"></div></div>
+              <div><div class="fld-label">Data de nascimento</div><div class="fld-value" id="fv-nasc"></div></div>
+              <div><div class="fld-label">Idade</div><div class="fld-value" id="fv-idade"></div></div>
+              <div><div class="fld-label">Sexo</div><div class="fld-value" id="fv-sexo"></div></div>
+              <div><div class="fld-label">Estado civil</div><div class="fld-value" id="fv-civil"></div></div>
+              <div><div class="fld-label">Profissão</div><div class="fld-value" id="fv-prof"></div></div>
+              <div><div class="fld-label">Naturalidade</div><div class="fld-value" id="fv-nat"></div></div>
+            </div>
+            <div class="fg3" id="dados-edit" style="display:none">
+              <div><div class="fld-label">Nome completo</div><input class="edit-input" id="ei-nome"/></div>
+              <div><div class="fld-label">CPF</div><input class="edit-input" id="ei-cpf"/></div>
+              <div><div class="fld-label">RG</div><input class="edit-input" id="ei-rg" placeholder="Opcional"/></div>
+              <div><div class="fld-label">Data de nascimento</div><input class="edit-input" type="date" id="ei-nasc"/></div>
+              <div><div class="fld-label">Sexo</div><select class="edit-select" id="ei-sexo"><option>Feminino</option><option>Masculino</option><option>Outro</option></select></div>
+              <div><div class="fld-label">Estado civil</div><select class="edit-select" id="ei-civil"><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option></select></div>
+              <div><div class="fld-label">Profissão</div><input class="edit-input" id="ei-prof" placeholder="Opcional"/></div>
+              <div><div class="fld-label">Naturalidade</div><input class="edit-input" id="ei-nat" placeholder="Opcional"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTATO -->
+        <div class="tab-panel" id="tab-contato">
+          <div class="section">
+            <div class="sec-hd"><div class="sec-title">Contato</div><div class="sec-edit" onclick="toggleEdit()">Editar</div></div>
+            <div class="fg2" id="contato-view">
+              <div><div class="fld-label">WhatsApp</div><div class="fld-value" id="fv-wpp"></div></div>
+              <div><div class="fld-label">Telefone fixo</div><div class="fld-value" id="fv-tel"></div></div>
+              <div><div class="fld-label">E-mail</div><div class="fld-value" id="fv-email"></div></div>
+            </div>
+            <div class="fg2" id="contato-edit" style="display:none">
+              <div><div class="fld-label">WhatsApp</div><input class="edit-input" id="ei-wpp"/></div>
+              <div><div class="fld-label">Telefone fixo</div><input class="edit-input" id="ei-tel" placeholder="Opcional"/></div>
+              <div><div class="fld-label">E-mail</div><input class="edit-input" id="ei-email"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONVÊNIO -->
+        <div class="tab-panel" id="tab-convenio">
+          <div class="section">
+            <div class="sec-hd"><div class="sec-title">Convênio</div><div class="sec-edit" onclick="toggleEdit()">Editar</div></div>
+            <div class="fg2" id="conv-view">
+              <div><div class="fld-label">Convênio</div><div class="fld-value bold" id="fv-conv"></div></div>
+              <div><div class="fld-label">Nº da carteirinha</div><div class="fld-value" id="fv-cart"></div></div>
+              <div><div class="fld-label">Validade</div><div class="fld-value" id="fv-val"></div></div>
+              <div><div class="fld-label">Titular</div><div class="fld-value" id="fv-tit"></div></div>
+            </div>
+            <div class="fg2" id="conv-edit" style="display:none">
+              <div><div class="fld-label">Convênio</div>
+                <select class="edit-select" id="ei-conv">
+                  <option value="">Particular</option>
+                  <option>HAPVIDA NOTREDAME SP/RJ</option>
+                  <option>BRADESCO SAÚDE</option>
+                  <option>PREVENT SENIOR</option>
+                  <option>PORTO SEGURO</option>
+                  <option>TOTAL MEDCARE</option>
+                  <option>CARE PLUS</option>
+                  <option>MEDISERVICE</option>
+                  <option>VIVEST</option>
+                  <option>BRADESCO SAÚDE - OPERADORA DE PLANOS S/A</option>
+                  <option>OMINT SAÚDE</option>
+                  <option>FUNDAÇÃO SAÚDE ITAÚ</option>
+                </select>
+              </div>
+              <div><div class="fld-label">Nº da carteirinha</div><input class="edit-input" id="ei-cart"/></div>
+              <div><div class="fld-label">Validade</div><input class="edit-input" type="date" id="ei-val"/></div>
+              <div><div class="fld-label">Titular</div><input class="edit-input" id="ei-tit" placeholder="Nome do titular"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENDEREÇO -->
+        <div class="tab-panel" id="tab-endereco">
+          <div class="section">
+            <div class="sec-hd"><div class="sec-title">Endereço</div><div class="sec-edit" onclick="toggleEdit()">Editar</div></div>
+            <div class="fg3" id="end-view">
+              <div><div class="fld-label">CEP</div><div class="fld-value" id="fv-cep"></div></div>
+              <div><div class="fld-label">Logradouro</div><div class="fld-value" id="fv-rua"></div></div>
+              <div><div class="fld-label">Número</div><div class="fld-value" id="fv-num"></div></div>
+              <div><div class="fld-label">Complemento</div><div class="fld-value" id="fv-comp"></div></div>
+              <div><div class="fld-label">Bairro</div><div class="fld-value" id="fv-bairro"></div></div>
+              <div><div class="fld-label">Cidade / UF</div><div class="fld-value" id="fv-cidade"></div></div>
+            </div>
+            <div class="fg3" id="end-edit" style="display:none">
+              <div><div class="fld-label">CEP</div><input class="edit-input" id="ei-cep" placeholder="00000-000"/></div>
+              <div><div class="fld-label">Logradouro</div><input class="edit-input" id="ei-rua"/></div>
+              <div><div class="fld-label">Número</div><input class="edit-input" id="ei-num"/></div>
+              <div><div class="fld-label">Complemento</div><input class="edit-input" id="ei-comp" placeholder="Apto, sala…"/></div>
+              <div><div class="fld-label">Bairro</div><input class="edit-input" id="ei-bairro"/></div>
+              <div><div class="fld-label">Cidade</div><input class="edit-input" id="ei-cidade"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OBSERVAÇÕES -->
+        <div class="tab-panel" id="tab-obs">
+          <div class="section">
+            <div class="sec-hd"><div class="sec-title">Observações clínicas</div><div class="sec-edit" onclick="toggleEdit()">Editar</div></div>
+            <div id="obs-view"><div class="obs-box" id="fv-obs"></div></div>
+            <div id="obs-edit" style="display:none">
+              <textarea class="edit-textarea" id="ei-obs" style="height:120px;width:100%" placeholder="Observações relevantes sobre o paciente…"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTÓRICO -->
+        <div class="tab-panel" id="tab-historico">
+          <div class="section">
+            <div class="sec-hd">
+              <div class="sec-title">Histórico de consultas</div>
+              <div style="font-size:11px;color:var(--text-soft)" id="histCount"></div>
+            </div>
+            <table class="hist-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Horário</th>
+                  <th>Especialidade</th>
+                  <th>Profissional</th>
+                  <th>Cobertura</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="histTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- save bar -->
+        <div class="save-bar" id="saveBar">
+          <div class="save-bar-msg">✏️ Modo edição ativo</div>
+          <div class="save-spc"></div>
+          <button class="btn-discard" onclick="discardEdit()">Descartar</button>
+          <button class="btn-save-pat" onclick="saveEdit()">Salvar alterações</button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ══ DATA ══
+var PATIENTS = [
+  { id:1,  name:'João Pereira',    ini:'JP', cpf:'123.456.789-00', rg:'12.345.678-9', nasc:'1985-03-12', sexo:'Masculino',  civil:'Casado',      prof:'Engenheiro',    nat:'Santo André, SP',
+    wpp:'(11) 99123-4567', tel:'(11) 3456-7890', email:'joao@email.com',
+    conv:'Unimed', cart:'000123456789', val:'2027-12-31', tit:'João Pereira',
+    cep:'09010-000', rua:'Rua das Flores', num:'123', comp:'Apto 42', bairro:'Centro', cidade:'Santo André / SP',
+    obs:'Paciente com histórico de ansiedade. Prefere horários matutinos. Alérgico a dipirona.',
+    status:'ativo', total:12, ultima:'02/05/2026',
+    historico:[
+      {data:'02/05/2026',hora:'09:00',spec:'psico',prof:'Dra. Ana Costa',conv:'Unimed',status:'realizada'},
+      {data:'18/04/2026',hora:'09:00',spec:'psico',prof:'Dra. Ana Costa',conv:'Unimed',status:'realizada'},
+      {data:'04/04/2026',hora:'09:00',spec:'psico',prof:'Dra. Ana Costa',conv:'Unimed',status:'realizada'},
+      {data:'21/03/2026',hora:'09:00',spec:'psico',prof:'Dra. Ana Costa',conv:'Unimed',status:'cancelada'},
+      {data:'07/03/2026',hora:'09:00',spec:'psico',prof:'Dra. Ana Costa',conv:'Unimed',status:'realizada'},
+    ]
+  },
+  { id:2,  name:'Fernanda Souza',  ini:'FS', cpf:'987.654.321-00', rg:'98.765.432-1', nasc:'1992-07-24', sexo:'Feminino',   civil:'Solteira',    prof:'Professora',    nat:'São Paulo, SP',
+    wpp:'(11) 98765-4321', tel:'', email:'fernanda@email.com',
+    conv:'Bradesco Saúde', cart:'111222333444', val:'2026-06-30', tit:'Fernanda Souza',
+    cep:'09020-000', rua:'Av. Paulista', num:'456', comp:'', bairro:'Bairro Verde', cidade:'Santo André / SP',
+    obs:'', status:'ativo', total:7, ultima:'01/05/2026',
+    historico:[
+      {data:'01/05/2026',hora:'14:00',spec:'nutri',prof:'Dra. Karen Alves',conv:'Bradesco Saúde',status:'realizada'},
+      {data:'17/04/2026',hora:'14:00',spec:'nutri',prof:'Dra. Karen Alves',conv:'Bradesco Saúde',status:'realizada'},
+      {data:'03/04/2026',hora:'14:00',spec:'nutri',prof:'Dra. Karen Alves',conv:'Bradesco Saúde',status:'agendada'},
+    ]
+  },
+  { id:3,  name:'Ricardo Alves',   ini:'RA', cpf:'456.789.123-00', rg:'',             nasc:'1978-11-05', sexo:'Masculino',  civil:'Divorciado',  prof:'Advogado',      nat:'Mauá, SP',
+    wpp:'(11) 97456-1230', tel:'', email:'ricardo@email.com',
+    conv:'', cart:'', val:'', tit:'',
+    cep:'09030-000', rua:'Rua dos Ipês', num:'789', comp:'Casa', bairro:'Jardim', cidade:'Santo André / SP',
+    obs:'Paciente particular. Prefere atendimento à tarde.', status:'ativo', total:4, ultima:'28/04/2026',
+    historico:[
+      {data:'28/04/2026',hora:'16:00',spec:'psico',prof:'Dr. Bruno Silva',conv:'Particular',status:'realizada'},
+      {data:'14/04/2026',hora:'16:00',spec:'psico',prof:'Dr. Bruno Silva',conv:'Particular',status:'realizada'},
+    ]
+  },
+  { id:4,  name:'Luciana Martins', ini:'LM', cpf:'321.654.987-00', rg:'32.165.498-7', nasc:'1990-01-30', sexo:'Feminino',   civil:'Casada',      prof:'Designer',      nat:'São Bernardo, SP',
+    wpp:'(11) 96321-6549', tel:'(11) 4567-8901', email:'luciana@email.com',
+    conv:'HAPVIDA NOTREDAME SP/RJ', cart:'555666777888', val:'2027-03-31', tit:'Luciana Martins',
+    cep:'09040-000', rua:'Rua Boa Vista', num:'321', comp:'', bairro:'Alto da Boa Vista', cidade:'Santo André / SP',
+    obs:'', status:'ativo', total:9, ultima:'25/04/2026',
+    historico:[
+      {data:'25/04/2026',hora:'10:00',spec:'fono',prof:'Dr. Paulo Ribeiro',conv:'Hapvida',status:'realizada'},
+      {data:'11/04/2026',hora:'10:00',spec:'fono',prof:'Dr. Paulo Ribeiro',conv:'Hapvida',status:'realizada'},
+    ]
+  },
+  { id:5,  name:'Carlos Nunes',    ini:'CN', cpf:'789.123.456-00', rg:'78.912.345-6', nasc:'1965-08-17', sexo:'Masculino',  civil:'Casado',      prof:'Aposentado',    nat:'Rio de Janeiro, RJ',
+    wpp:'(11) 95789-1234', tel:'(11) 5678-9012', email:'carlos@email.com',
+    conv:'PREVENT SENIOR', cart:'999000111222', val:'2028-01-31', tit:'Carlos Nunes',
+    cep:'09050-000', rua:'Rua das Acácias', num:'654', comp:'', bairro:'Vila das Flores', cidade:'Santo André / SP',
+    obs:'Paciente idoso. Necessita de atenção especial na mobilidade.', status:'ativo', total:18, ultima:'20/04/2026',
+    historico:[
+      {data:'20/04/2026',hora:'08:00',spec:'nutri',prof:'Dr. Lucas Pinto',conv:'Prevent Senior',status:'realizada'},
+      {data:'06/04/2026',hora:'08:00',spec:'nutri',prof:'Dr. Lucas Pinto',conv:'Prevent Senior',status:'realizada'},
+      {data:'23/03/2026',hora:'08:00',spec:'nutri',prof:'Dr. Lucas Pinto',conv:'Prevent Senior',status:'realizada'},
+    ]
+  },
+  { id:6,  name:'Patrícia Gomes',  ini:'PG', cpf:'654.321.987-00', rg:'65.432.198-7', nasc:'1988-05-22', sexo:'Feminino',   civil:'Casada',      prof:'Médica',        nat:'São Paulo, SP',
+    wpp:'(11) 94654-3219', tel:'', email:'patricia@email.com',
+    conv:'Unimed', cart:'333444555666', val:'2027-06-30', tit:'Patrícia Gomes',
+    cep:'09060-000', rua:'Rua Primavera', num:'987', comp:'Apto 101', bairro:'Jardim Primavera', cidade:'Santo André / SP',
+    obs:'', status:'ativo', total:5, ultima:'18/04/2026',
+    historico:[
+      {data:'18/04/2026',hora:'11:00',spec:'psico',prof:'Dra. Carla Mendes',conv:'Unimed',status:'realizada'},
+    ]
+  },
+  { id:7,  name:'Amanda Ferreira', ini:'AF', cpf:'111.222.333-00', rg:'',             nasc:'2001-12-03', sexo:'Feminino',   civil:'Solteira',    prof:'Estudante',     nat:'Diadema, SP',
+    wpp:'(11) 93111-2233', tel:'', email:'amanda@email.com',
+    conv:'', cart:'', val:'', tit:'',
+    cep:'09070-000', rua:'Rua dos Pinheiros', num:'111', comp:'', bairro:'Pinheiros', cidade:'Santo André / SP',
+    obs:'Paciente jovem. Primeira vez em acompanhamento psicológico.', status:'ativo', total:2, ultima:'15/04/2026',
+    historico:[
+      {data:'15/04/2026',hora:'15:00',spec:'psico',prof:'Dra. Elisa Torres',conv:'Particular',status:'realizada'},
+      {data:'29/04/2026',hora:'15:00',spec:'psico',prof:'Dra. Elisa Torres',conv:'Particular',status:'agendada'},
+    ]
+  },
+  { id:8,  name:'Marcos Ribeiro',  ini:'MR', cpf:'444.555.666-00', rg:'44.455.566-6', nasc:'1975-09-11', sexo:'Masculino',  civil:'Casado',      prof:'Comerciante',   nat:'Santo André, SP',
+    wpp:'(11) 92444-5566', tel:'(11) 4444-5566', email:'marcos@email.com',
+    conv:'Bradesco Saúde', cart:'777888999000', val:'2026-09-30', tit:'Marcos Ribeiro',
+    cep:'09080-000', rua:'Av. dos Comerciantes', num:'222', comp:'Sala 5', bairro:'Centro', cidade:'Santo André / SP',
+    obs:'', status:'inativo', total:3, ultima:'10/04/2026',
+    historico:[
+      {data:'10/04/2026',hora:'13:30',spec:'fono',prof:'Dra. Quésia Moreira',conv:'Bradesco Saúde',status:'realizada'},
+    ]
+  },
+];
+
+var editMode = false;
+var currentPat = null;
+var activeFilter = 'todos';
+var searchQ = '';
+
+// ── UTILS ──
+function calcAge(nasc) {
+  if (!nasc) return '—';
+  var d = new Date(nasc+'T12:00'), n = new Date();
+  var age = n.getFullYear()-d.getFullYear();
+  if (n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate())) age--;
+  return age+' anos';
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  var p=d.split('-'); return p[2]+'/'+p[1]+'/'+p[0];
+}
+function specLabel(s) { return s==='psico'?'Psicologia':s==='nutri'?'Nutrição':'Fonoaudiologia'; }
+
+// ── LIST ──
+function renderTable() {
+  var list = PATIENTS.filter(function(p) {
+    if (activeFilter==='conv' && !p.conv) return false;
+    if (activeFilter==='part' && p.conv) return false;
+    if (activeFilter==='ativo' && p.status!=='ativo') return false;
+    if (searchQ && p.name.toLowerCase().indexOf(searchQ)<0 && p.cpf.indexOf(searchQ)<0 && p.wpp.indexOf(searchQ)<0) return false;
+    return true;
+  });
+  var tbody = document.getElementById('patientTable');
+  tbody.innerHTML = '';
+  if (list.length===0) {
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td colspan="8" style="text-align:center;padding:40px;color:var(--text-soft);font-style:italic">Nenhum paciente encontrado</td>';
+    tbody.appendChild(tr); return;
+  }
+  list.forEach(function(p) {
+    var tr=document.createElement('tr');
+    tr.innerHTML =
+      '<td><div class="td-pat"><div class="td-av">'+p.ini+'</div><div><div class="td-name">'+p.name+'</div><div class="td-sub">'+p.email+'</div></div></div></td>'+
+      '<td>'+p.cpf+'</td>'+
+      '<td>'+p.wpp+'</td>'+
+      '<td>'+(p.conv?'<span class="tag conv">'+p.conv.split(' ')[0]+'</span>':'<span class="tag part">Particular</span>')+'</td>'+
+      '<td><span class="tag '+(p.status==='ativo'?'active':'inactive')+'">'+(p.status==='ativo'?'Ativo':'Inativo')+'</span></td>'+
+      '<td>'+p.ultima+'</td>'+
+      '<td style="text-align:center">'+p.total+'</td>'+
+      '<td><div class="td-actions"><button class="act-btn" title="Editar" onclick="event.stopPropagation();openRecord('+p.id+')">✏️</button><button class="act-btn" title="Agendar">📅</button></div></td>';
+    tr.onclick=function(){ openRecord(p.id); };
+    tbody.appendChild(tr);
+  });
+}
+
+function filterPatients(q) { searchQ=q.toLowerCase(); renderTable(); }
+function setFilter(f,el) {
+  activeFilter=f;
+  document.querySelectorAll('.ftab').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  renderTable();
+}
+
+// ── RECORD ──
+function openRecord(id) {
+  currentPat = PATIENTS.find(function(p){ return p.id===id; });
+  if (!currentPat) return;
+  editMode=false;
+  document.getElementById('listView').style.display='none';
+  document.getElementById('recordView').style.display='flex';
+  fillRecord(currentPat);
+  showTab('dados', document.querySelector('.rv-tab'));
+}
+
+function showList() {
+  document.getElementById('recordView').style.display='none';
+  document.getElementById('listView').style.display='flex';
+  editMode=false;
+  document.getElementById('saveBar').classList.remove('show');
+}
+
+function fillRecord(p) {
+  document.getElementById('rvName').textContent = p.name;
+
+  // summary
+  document.getElementById('patSummary').innerHTML =
+    '<div class="ps-av">'+p.ini+'</div>'+
+    '<div><div class="ps-name">'+p.name+'</div>'+
+    '<div class="ps-info">'+
+      '<span>📋 '+p.cpf+'</span>'+
+      '<span>📅 '+calcAge(p.nasc)+'</span>'+
+      '<span>💬 '+p.wpp+'</span>'+
+      '<span>🏥 '+(p.conv||'Particular')+'</span>'+
+    '</div></div>'+
+    '<div class="ps-stats">'+
+      '<div class="ps-stat"><div class="ps-stat-n">'+p.total+'</div><div class="ps-stat-l">Consultas</div></div>'+
+      '<div class="ps-stat"><div class="ps-stat-n">'+p.historico.filter(function(h){return h.status==='realizada'}).length+'</div><div class="ps-stat-l">Realizadas</div></div>'+
+      '<div class="ps-stat"><div class="ps-stat-n">'+p.historico.filter(function(h){return h.status==='agendada'}).length+'</div><div class="ps-stat-l">Agendadas</div></div>'+
+    '</div>';
+
+  // dados
+  document.getElementById('fv-nome').textContent  = p.name||'—';
+  document.getElementById('fv-cpf').textContent   = p.cpf||'—';
+  document.getElementById('fv-rg').textContent    = p.rg||'—';
+  document.getElementById('fv-nasc').textContent  = fmtDate(p.nasc);
+  document.getElementById('fv-idade').textContent = calcAge(p.nasc);
+  document.getElementById('fv-sexo').textContent  = p.sexo||'—';
+  document.getElementById('fv-civil').textContent = p.civil||'—';
+  document.getElementById('fv-prof').textContent  = p.prof||'—';
+  document.getElementById('fv-nat').textContent   = p.nat||'—';
+
+  // contato
+  document.getElementById('fv-wpp').textContent   = p.wpp||'—';
+  document.getElementById('fv-tel').textContent   = p.tel||'—';
+  document.getElementById('fv-email').textContent = p.email||'—';
+
+  // convênio
+  document.getElementById('fv-conv').textContent  = p.conv||'Particular';
+  document.getElementById('fv-cart').textContent  = p.cart||'—';
+  document.getElementById('fv-val').textContent   = fmtDate(p.val);
+  document.getElementById('fv-tit').textContent   = p.tit||'—';
+
+  // endereço
+  document.getElementById('fv-cep').textContent    = p.cep||'—';
+  document.getElementById('fv-rua').textContent    = p.rua||'—';
+  document.getElementById('fv-num').textContent    = p.num||'—';
+  document.getElementById('fv-comp').textContent   = p.comp||'—';
+  document.getElementById('fv-bairro').textContent = p.bairro||'—';
+  document.getElementById('fv-cidade').textContent = p.cidade||'—';
+
+  // obs
+  document.getElementById('fv-obs').textContent = p.obs||'Nenhuma observação registrada.';
+
+  // histórico
+  var hist = p.historico;
+  document.getElementById('histCount').textContent = hist.length+' registros';
+  var htb = document.getElementById('histTable'); htb.innerHTML='';
+  hist.forEach(function(h) {
+    var tr=document.createElement('tr');
+    tr.innerHTML =
+      '<td>'+h.data+'</td>'+
+      '<td>'+h.hora+'</td>'+
+      '<td><div class="hist-spec"><div class="hist-dot '+h.spec+'"></div>'+specLabel(h.spec)+'</div></td>'+
+      '<td>'+h.prof+'</td>'+
+      '<td>'+h.conv+'</td>'+
+      '<td><span class="hist-status '+h.status+'">'+h.status.charAt(0).toUpperCase()+h.status.slice(1)+'</span></td>';
+    htb.appendChild(tr);
+  });
+
+  // fill edit fields
+  document.getElementById('ei-nome').value  = p.name||'';
+  document.getElementById('ei-cpf').value   = p.cpf||'';
+  document.getElementById('ei-rg').value    = p.rg||'';
+  document.getElementById('ei-nasc').value  = p.nasc||'';
+  document.getElementById('ei-prof').value  = p.prof||'';
+  document.getElementById('ei-nat').value   = p.nat||'';
+  document.getElementById('ei-wpp').value   = p.wpp||'';
+  document.getElementById('ei-tel').value   = p.tel||'';
+  document.getElementById('ei-email').value = p.email||'';
+  document.getElementById('ei-cart').value  = p.cart||'';
+  document.getElementById('ei-val').value   = p.val||'';
+  document.getElementById('ei-tit').value   = p.tit||'';
+  document.getElementById('ei-cep').value   = p.cep||'';
+  document.getElementById('ei-rua').value   = p.rua||'';
+  document.getElementById('ei-num').value   = p.num||'';
+  document.getElementById('ei-comp').value  = p.comp||'';
+  document.getElementById('ei-bairro').value = p.bairro||'';
+  document.getElementById('ei-cidade').value = p.cidade||'';
+  document.getElementById('ei-obs').value   = p.obs||'';
+}
+
+function showTab(tab, el) {
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.rv-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('tab-'+tab).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+// ── EDIT ──
+function toggleEdit() {
+  editMode = !editMode;
+  var views  = ['dados-view','contato-view','conv-view','end-view','obs-view'];
+  var edits  = ['dados-edit','contato-edit','conv-edit','end-edit','obs-edit'];
+  views.forEach(function(v){ document.getElementById(v).style.display=editMode?'none':'grid'; });
+  edits.forEach(function(e){ document.getElementById(e).style.display=editMode?'grid':'none'; });
+  document.getElementById('obs-view').style.display = editMode?'none':'block';
+  document.getElementById('obs-edit').style.display = editMode?'block':'none';
+  document.getElementById('saveBar').classList.toggle('show',editMode);
+}
+
+function discardEdit() { editMode=false; toggleEdit(); fillRecord(currentPat); }
+
+function saveEdit() {
+  if (!currentPat) return;
+  currentPat.name   = document.getElementById('ei-nome').value;
+  currentPat.cpf    = document.getElementById('ei-cpf').value;
+  currentPat.rg     = document.getElementById('ei-rg').value;
+  currentPat.nasc   = document.getElementById('ei-nasc').value;
+  currentPat.prof   = document.getElementById('ei-prof').value;
+  currentPat.nat    = document.getElementById('ei-nat').value;
+  currentPat.wpp    = document.getElementById('ei-wpp').value;
+  currentPat.tel    = document.getElementById('ei-tel').value;
+  currentPat.email  = document.getElementById('ei-email').value;
+  currentPat.conv   = document.getElementById('ei-conv').value;
+  currentPat.cart   = document.getElementById('ei-cart').value;
+  currentPat.val    = document.getElementById('ei-val').value;
+  currentPat.tit    = document.getElementById('ei-tit').value;
+  currentPat.cep    = document.getElementById('ei-cep').value;
+  currentPat.rua    = document.getElementById('ei-rua').value;
+  currentPat.num    = document.getElementById('ei-num').value;
+  currentPat.comp   = document.getElementById('ei-comp').value;
+  currentPat.bairro = document.getElementById('ei-bairro').value;
+  currentPat.cidade = document.getElementById('ei-cidade').value;
+  currentPat.obs    = document.getElementById('ei-obs').value;
+  editMode=false;
+  fillRecord(currentPat);
+  toggleEdit();
+  renderTable();
+}
+
+function openNewPatient() {
+  // Opens a blank record
+  var blank = {id:Date.now(),name:'Novo Paciente',ini:'NP',cpf:'',rg:'',nasc:'',sexo:'Feminino',civil:'Solteiro(a)',prof:'',nat:'',wpp:'',tel:'',email:'',conv:'',cart:'',val:'',tit:'',cep:'',rua:'',num:'',comp:'',bairro:'',cidade:'',obs:'',status:'ativo',total:0,ultima:'—',historico:[]};
+  PATIENTS.push(blank);
+  currentPat=blank;
+  document.getElementById('listView').style.display='none';
+  document.getElementById('recordView').style.display='flex';
+  fillRecord(blank);
+  showTab('dados',document.querySelector('.rv-tab'));
+  // auto enter edit mode
+  editMode=false; toggleEdit();
+}
+
+// ── INIT ──
+document.getElementById('recordView').style.display='none';
+renderTable();
+</script>
+</body>
+</html>
