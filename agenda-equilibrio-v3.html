@@ -533,14 +533,42 @@
 
 <!-- MODAL -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
+  <div class="modal" style="width:500px;max-width:96vw;max-height:90vh;overflow-y:auto">
     <div class="m-hd">
-      <div class="m-title">Novo Agendamento</div>
+      <div>
+        <div class="m-title">Novo Agendamento</div>
+        <div style="font-size:10px;color:var(--text-soft);margin-top:2px" id="mPrefillInfo"></div>
+      </div>
       <button class="m-close" onclick="closeModal()">✕</button>
     </div>
-    <div class="m-prefill" id="mPrefill"></div>
     <div class="m-body">
-      <div class="mf"><label>Paciente</label><input type="text" placeholder="Buscar por nome ou CPF…"/></div>
+
+      <!-- Patient search -->
+      <div class="mf">
+        <label>Paciente</label>
+        <div style="position:relative">
+          <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--sky-light);pointer-events:none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="mPatInput" style="padding-left:34px" placeholder="Digite nome ou CPF… ex: João, Fernanda, 123.456" oninput="searchModalPat(this.value)"/>
+        </div>
+        <!-- search results -->
+        <div id="mPatResults" style="display:none;border:1.5px solid var(--border);border-radius:8px;background:#fff;margin-top:5px;overflow:hidden;box-shadow:0 4px 14px rgba(27,58,92,.1)"></div>
+        <!-- selected patient card -->
+        <div id="mPatCard" style="display:none;margin-top:8px;padding:10px 12px;background:var(--green-pale,#EDFAF3);border:1.5px solid #8DD5AA;border-radius:8px;display:flex;align-items:center;gap:10px">
+          <div id="mPatAv" style="width:32px;height:32px;border-radius:50%;background:#fff;border:2px solid #8DD5AA;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--navy);flex-shrink:0"></div>
+          <div style="flex:1">
+            <div id="mPatName" style="font-size:13px;font-weight:700;color:var(--navy)"></div>
+            <div id="mPatInfo" style="font-size:10px;color:var(--text-soft)"></div>
+          </div>
+          <div onclick="clearModalPat()" style="font-size:11px;color:var(--sky);cursor:pointer;font-weight:700">Trocar</div>
+        </div>
+        <!-- not found -->
+        <div id="mPatNotFound" style="display:none;margin-top:8px;padding:11px 13px;background:#FBF5EA;border:1.5px solid #C9A96E;border-radius:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px">Paciente não encontrado</div>
+          <div style="font-size:11px;color:var(--text-soft);margin-bottom:8px">Deseja cadastrar agora?</div>
+          <a href="cadastro-pacientes.html" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border:none;border-radius:7px;background:var(--navy);color:#fff;font-size:11px;font-weight:700;text-decoration:none">+ Cadastrar paciente</a>
+        </div>
+      </div>
+
       <div class="m-row">
         <div class="mf"><label>Especialidade</label>
           <select id="mEsp" onchange="filterModalProfs(this.value)">
@@ -561,19 +589,15 @@
           <select><option>30 min</option><option selected>50 min</option><option>1h</option><option>1h 30min</option></select>
         </div>
       </div>
-      <div class="mf"><label>Tipo</label>
-        <div class="type-btns">
-          <button class="tbtn active conv" onclick="setType(this,'conv')">Convênio</button>
-          <button class="tbtn part" onclick="setType(this,'part')">Particular</button>
+      <div class="mf"><label>Cobertura</label>
+        <div id="mCobInfo" style="padding:10px 12px;background:var(--sky-mist);border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text-soft);font-style:italic">
+          Selecione um paciente para ver a cobertura
         </div>
-      </div>
-      <div class="mf" id="mConvF"><label>Convênio</label>
-        <select><option>Unimed</option><option>Bradesco Saúde</option><option>Amil</option><option>SulAmérica</option></select>
       </div>
     </div>
     <div class="m-foot">
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-      <button class="btn-save">Confirmar Agendamento</button>
+      <button class="btn-save" onclick="confirmModalAppt()">Confirmar Agendamento</button>
     </div>
   </div>
 </div>
