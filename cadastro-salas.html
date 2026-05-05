@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Salas — Clínica Equilíbrio Ideal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA; --sky-mist:#F4F9FC;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-pale:#FBF5EA;
+      --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
+      --red:#E05252; --red-pale:#FEF0F0;
+      --sidebar-w:208px;
+    }
+    html, body { height:100%; overflow:hidden; font-family:'Lato',sans-serif; background:var(--sky-mist); color:var(--text); font-size:13px; }
+    .app { display:flex; height:100vh; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { width:var(--sidebar-w); background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+    .sb-brand { padding:13px 14px 11px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .sb-icon  { width:31px; height:31px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sb-icon span { color:#fff; font-size:13px; font-family:'Playfair Display',serif; }
+    .sb-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .sb-sub  { font-size:10px; color:var(--text-soft); }
+    .sb-nav  { padding:9px 7px; flex:1; overflow-y:auto; }
+    .sb-nav::-webkit-scrollbar { display:none; }
+    .nav-lbl  { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-soft); padding:6px 6px 3px; }
+    .nav-item { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:7px; cursor:pointer; color:var(--text-soft); font-size:12px; transition:all .15s; margin-bottom:1px; text-decoration:none; }
+    .nav-item:hover  { background:var(--sky-pale); color:var(--navy); }
+    .nav-item.active { background:var(--sky-pale); color:var(--navy); font-weight:700; }
+    .nav-icon { font-size:14px; width:18px; text-align:center; }
+    .nav-badge { margin-left:auto; background:var(--sky); color:#fff; font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px; }
+    .sb-foot { padding:10px 13px; border-top:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .u-av   { width:28px; height:28px; border-radius:50%; background:var(--sky-light); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .u-name { font-size:11px; font-weight:700; color:var(--navy); }
+    .u-role { font-size:9px; color:var(--text-soft); }
+    .u-out  { margin-left:auto; color:var(--text-soft); cursor:pointer; font-size:12px; }
+
+    /* ═══ MAIN ═══ */
+    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+    /* header */
+    .top-hd { height:56px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:12px; flex-shrink:0; }
+    .hd-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .hd-spc { flex:1; }
+    .btn-new-sala { display:flex; align-items:center; gap:6px; padding:8px 16px; border:none; border-radius:8px; background:var(--navy); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:background .15s; }
+    .btn-new-sala:hover { background:var(--navy-mid); }
+
+    /* stats bar */
+    .stats-bar { padding:14px 24px; background:var(--white); border-bottom:1px solid var(--border); display:flex; gap:12px; flex-shrink:0; }
+    .stat-card { flex:1; background:var(--sky-mist); border:1.5px solid var(--border); border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
+    .stat-icon { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+    .stat-icon.blue  { background:var(--sky-pale); }
+    .stat-icon.green { background:var(--green-pale); }
+    .stat-icon.red   { background:var(--red-pale); }
+    .stat-n { font-family:'Playfair Display',serif; font-size:22px; color:var(--navy); line-height:1; }
+    .stat-l { font-size:10px; color:var(--text-soft); margin-top:2px; }
+
+    /* filter bar */
+    .filter-bar { padding:10px 24px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .ftab { padding:5px 13px; border:1.5px solid var(--border); border-radius:18px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); transition:all .15s; white-space:nowrap; }
+    .ftab:hover { border-color:var(--sky); color:var(--navy); }
+    .ftab.active { background:var(--navy); border-color:var(--navy); color:#fff; }
+    .f-spc { flex:1; }
+    .f-search { position:relative; }
+    .f-search svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--sky-light); pointer-events:none; }
+    .f-search input { width:200px; height:32px; padding:0 12px 0 28px; border:1.5px solid var(--border); border-radius:8px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .f-search input:focus { border-color:var(--sky); background:#fff; }
+    .f-search input::placeholder { color:var(--sky-light); }
+
+    /* grid */
+    .grid-wrap { flex:1; overflow-y:auto; padding:20px 24px; }
+    .grid-wrap::-webkit-scrollbar { width:5px; }
+    .grid-wrap::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:3px; }
+    .rooms-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
+
+    /* room card */
+    .room-card {
+      background:var(--white); border:1.5px solid var(--border);
+      border-radius:12px; padding:16px;
+      display:flex; flex-direction:column; gap:10px;
+      transition:all .18s; cursor:pointer; position:relative;
+    }
+    .room-card:hover { border-color:var(--sky); box-shadow:0 4px 16px rgba(27,58,92,.08); transform:translateY(-1px); }
+    .room-card.inactive { opacity:.55; }
+
+    .room-number {
+      width:44px; height:44px; border-radius:10px;
+      background:var(--sky-pale); border:1.5px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Playfair Display',serif; font-size:18px; font-weight:500; color:var(--navy);
+      flex-shrink:0;
+    }
+    .room-card.inactive .room-number { background:#F5F5F5; color:#999; border-color:#DDD; }
+    .room-name { font-size:13px; font-weight:700; color:var(--navy); }
+    .room-flex { font-size:10px; color:var(--text-soft); display:flex; align-items:center; gap:4px; }
+    .room-flex-dot { width:5px; height:5px; border-radius:50%; background:var(--sky); flex-shrink:0; }
+
+    .room-status { display:flex; align-items:center; justify-content:space-between; margin-top:4px; }
+    .status-tag { font-size:10px; font-weight:700; padding:2px 8px; border-radius:6px; }
+    .status-tag.ativa    { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .status-tag.inativa  { background:#F5F5F5; color:#999; border:1px solid #DDD; }
+    .status-tag.ocupada  { background:var(--sky-pale); color:#1E6FA3; border:1px solid var(--sky-light); }
+
+    .room-menu { font-size:16px; color:var(--text-soft); cursor:pointer; opacity:0; transition:opacity .15s; }
+    .room-card:hover .room-menu { opacity:1; }
+
+    /* today indicator */
+    .room-today { font-size:10px; color:var(--text-soft); display:flex; align-items:center; gap:4px; }
+    .room-today-prof { font-weight:700; color:var(--navy); }
+
+    /* ═══ MODAL ═══ */
+    .overlay { position:fixed; inset:0; background:rgba(15,35,56,.4); z-index:99999; display:none; align-items:center; justify-content:center; backdrop-filter:blur(2px); }
+    .overlay.open { display:flex; }
+    .modal { background:#fff; border-radius:14px; width:400px; max-width:95vw; box-shadow:0 20px 60px rgba(0,0,0,.18); overflow:hidden; animation:mIn .2s ease; position:relative; z-index:100000; }
+    @keyframes mIn { from{opacity:0;transform:translateY(10px) scale(.98)} to{opacity:1;transform:none} }
+    .m-hd { padding:18px 22px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .m-title { font-family:'Playfair Display',serif; font-size:19px; color:var(--navy); }
+    .m-close { width:28px; height:28px; border:none; background:var(--sky-mist); border-radius:7px; cursor:pointer; font-size:14px; color:var(--text-soft); display:flex; align-items:center; justify-content:center; position:relative; z-index:100001; }
+    .m-close:hover { background:var(--sky-pale); }
+    .m-body { padding:18px 22px; display:flex; flex-direction:column; gap:14px; }
+    .mf label { display:block; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:6px; }
+    .mf input, .mf select { width:100%; height:42px; padding:0 12px; border:1.5px solid var(--border); border-radius:8px; font-family:'Lato',sans-serif; font-size:13px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .mf input:focus, .mf select:focus { border-color:var(--sky); background:#fff; }
+    .m-f2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .m-foot { padding:14px 22px; border-top:1px solid var(--border); display:flex; gap:9px; justify-content:flex-end; position:relative; z-index:100001; }
+    .btn-cancel { padding:8px 16px; border:1.5px solid var(--border); border-radius:7px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; color:var(--text-soft); }
+    .btn-cancel:hover { border-color:var(--sky); color:var(--navy); }
+    .btn-save { padding:8px 20px; border:none; border-radius:7px; background:var(--navy); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; }
+    .btn-save:hover { background:var(--navy-mid); }
+
+    /* confirm modal */
+    .confirm-body { padding:18px 22px; }
+    .confirm-msg  { font-size:13px; color:var(--text); line-height:1.6; margin-bottom:4px; }
+    .confirm-sub  { font-size:11px; color:var(--text-soft); }
+    .btn-inativar { padding:8px 16px; border:none; border-radius:7px; background:var(--red); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; }
+    .btn-reativar { padding:8px 16px; border:none; border-radius:7px; background:var(--green); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .rooms-grid { animation:fadeUp .4s ease; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-icon"><span>Ψ</span></div>
+      <div><div class="sb-name">Equilíbrio Ideal</div><div class="sb-sub">Clínica Multidisciplinar</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-lbl">Principal</div>
+      <a class="nav-item" href="agenda-equilibrio-v3.html"><span class="nav-icon">📅</span>Agenda</a>
+      <a class="nav-item" href="cadastro-pacientes.html"><span class="nav-icon">👥</span>Pacientes</a>
+      <div class="nav-item"><span class="nav-icon">🔢</span>Painel de Senhas</div>
+      <div class="nav-lbl" style="margin-top:5px">Clínica</div>
+      <div class="nav-item"><span class="nav-icon">🧠</span>Profissionais</div>
+      <div class="nav-item active"><span class="nav-icon">🏥</span>Salas<span class="nav-badge">20</span></div>
+      <div class="nav-lbl" style="margin-top:5px">Sistema</div>
+      <div class="nav-item"><span class="nav-icon">⚙️</span>Configurações</div>
+    </nav>
+    <div class="sb-foot">
+      <div class="u-av">MR</div>
+      <div><div class="u-name">Maria Recepção</div><div class="u-role">Recepção</div></div>
+      <div class="u-out">↩</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="top-hd">
+      <div class="hd-title">Salas</div>
+      <div class="hd-spc"></div>
+      <button class="btn-new-sala" onclick="openModal()">+ Nova Sala</button>
+    </div>
+
+    <!-- stats -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-icon blue">🏥</div>
+        <div><div class="stat-n" id="statTotal">20</div><div class="stat-l">Total de salas</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div><div class="stat-n" id="statAtivas">18</div><div class="stat-l">Salas ativas</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">⊘</div>
+        <div><div class="stat-n" id="statInativas">2</div><div class="stat-l">Inativas</div></div>
+      </div>
+    </div>
+
+    <!-- filters -->
+    <div class="filter-bar">
+      <div class="ftab active" onclick="setFilter('todas',this)">Todas (20)</div>
+      <div class="ftab" onclick="setFilter('ativa',this)">Ativas (18)</div>
+      <div class="ftab" onclick="setFilter('inativa',this)">Inativas (2)</div>
+      <div class="f-spc"></div>
+      <div class="f-search">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Buscar sala…" oninput="searchRoom(this.value)"/>
+      </div>
+    </div>
+
+    <!-- grid -->
+    <div class="grid-wrap">
+      <div class="rooms-grid" id="roomsGrid"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL NOVA/EDITAR SALA -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="m-hd">
+      <div class="m-title" id="modalTitle">Nova Sala</div>
+      <button class="m-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="m-f2">
+        <div class="mf">
+          <label>Número da sala</label>
+          <input type="number" id="mNum" placeholder="Ex: 21" min="1"/>
+        </div>
+        <div class="mf">
+          <label>Nome</label>
+          <input type="text" id="mNome" placeholder="Ex: Sala 21"/>
+        </div>
+      </div>
+      <div class="mf">
+        <label>Status</label>
+        <select id="mStatus">
+          <option value="ativa">✅ Ativa</option>
+          <option value="inativa">⊘ Inativa</option>
+        </select>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveRoom()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR STATUS -->
+<div class="overlay" id="overlayConfirm" onclick="if(event.target===this)closeConfirm()">
+  <div class="modal">
+    <div class="m-hd">
+      <div class="m-title" id="confirmTitle">Inativar sala?</div>
+      <button class="m-close" onclick="closeConfirm()">✕</button>
+    </div>
+    <div class="confirm-body">
+      <div class="confirm-msg" id="confirmMsg"></div>
+      <div class="confirm-sub" id="confirmSub"></div>
+    </div>
+    <div class="m-foot">
+      <button class="btn-cancel" onclick="closeConfirm()">Cancelar</button>
+      <button id="confirmActionBtn" onclick="confirmStatus()"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ DATA ══
+var ROOMS = [
+  {id:1,  num:1,  nome:'Sala 01', status:'ativa',   profHoje:'Dra. Ana Costa'},
+  {id:2,  num:2,  nome:'Sala 02', status:'ativa',   profHoje:'Dr. Bruno Silva'},
+  {id:3,  num:3,  nome:'Sala 03', status:'ativa',   profHoje:'Dra. Carla Mendes'},
+  {id:4,  num:4,  nome:'Sala 04', status:'ativa',   profHoje:'Dr. Diego Ramos'},
+  {id:5,  num:5,  nome:'Sala 05', status:'ativa',   profHoje:'Dra. Elisa Torres'},
+  {id:6,  num:6,  nome:'Sala 06', status:'ativa',   profHoje:'Dr. Fábio Nunes'},
+  {id:7,  num:7,  nome:'Sala 07', status:'ativa',   profHoje:'Dra. Gisele Lima'},
+  {id:8,  num:8,  nome:'Sala 08', status:'ativa',   profHoje:'Dr. Henrique Melo'},
+  {id:9,  num:9,  nome:'Sala 09', status:'ativa',   profHoje:'Dra. Isabela Costa'},
+  {id:10, num:10, nome:'Sala 10', status:'ativa',   profHoje:'Dr. Jonas Ferreira'},
+  {id:11, num:11, nome:'Sala 11', status:'ativa',   profHoje:'Dra. Karen Alves'},
+  {id:12, num:12, nome:'Sala 12', status:'ativa',   profHoje:'Dr. Lucas Pinto'},
+  {id:13, num:13, nome:'Sala 13', status:'ativa',   profHoje:'Dra. Marina Rocha'},
+  {id:14, num:14, nome:'Sala 14', status:'ativa',   profHoje:'Dr. Nelson Braga'},
+  {id:15, num:15, nome:'Sala 15', status:'ativa',   profHoje:'Dra. Olívia Santos'},
+  {id:16, num:16, nome:'Sala 16', status:'ativa',   profHoje:'Dr. Paulo Ribeiro'},
+  {id:17, num:17, nome:'Sala 17', status:'ativa',   profHoje:'Dra. Quésia Moreira'},
+  {id:18, num:18, nome:'Sala 18', status:'ativa',   profHoje:'Dr. Rafael Duarte'},
+  {id:19, num:19, nome:'Sala 19', status:'inativa',  profHoje:null},
+  {id:20, num:20, nome:'Sala 20', status:'inativa',  profHoje:null},
+];
+
+var activeFilter = 'todas';
+var searchQ = '';
+var editingId = null;
+var confirmingId = null;
+
+// ══ RENDER ══
+function getFiltered() {
+  return ROOMS.filter(function(r) {
+    if (activeFilter === 'ativa'   && r.status !== 'ativa')   return false;
+    if (activeFilter === 'inativa' && r.status !== 'inativa') return false;
+    if (searchQ && r.nome.toLowerCase().indexOf(searchQ) < 0) return false;
+    return true;
+  });
+}
+
+function renderGrid() {
+  var list = getFiltered();
+  var grid = document.getElementById('roomsGrid');
+  grid.innerHTML = '';
+
+  // update stats
+  var atv = ROOMS.filter(function(r){ return r.status==='ativa'; }).length;
+  var ina = ROOMS.filter(function(r){ return r.status==='inativa'; }).length;
+  document.getElementById('statTotal').textContent   = ROOMS.length;
+  document.getElementById('statAtivas').textContent  = atv;
+  document.getElementById('statInativas').textContent = ina;
+
+  if (list.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-soft);font-style:italic">Nenhuma sala encontrada</div>';
+    return;
+  }
+
+  list.forEach(function(r) {
+    var card = document.createElement('div');
+    card.className = 'room-card' + (r.status==='inativa'?' inactive':'');
+
+    card.innerHTML =
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between">'+
+        '<div class="room-number">'+String(r.num).padStart(2,'0')+'</div>'+
+        '<div class="room-menu" onclick="event.stopPropagation();openMenu('+r.id+',this)">⋯</div>'+
+      '</div>'+
+      '<div>'+
+        '<div class="room-name">'+r.nome+'</div>'+
+        '<div class="room-flex"><div class="room-flex-dot"></div>Flexível</div>'+
+      '</div>'+
+      '<div class="room-status">'+
+        '<span class="status-tag '+(r.status==='ativa'?'ativa':'inativa')+'">'+
+          (r.status==='ativa'?'✅ Ativa':'⊘ Inativa')+
+        '</span>'+
+      '</div>'+
+      (r.profHoje ?
+        '<div class="room-today">Hoje: <span class="room-today-prof">'+r.profHoje.split(' ').slice(0,2).join(' ')+'</span></div>'
+        : '<div class="room-today" style="opacity:.4">Sem uso hoje</div>'
+      );
+
+    card.onclick = function(){ openEdit(r.id); };
+    grid.appendChild(card);
+  });
+}
+
+// ══ MENU ══
+var menuOpen = null;
+function openMenu(id, el) {
+  var r = ROOMS.find(function(x){ return x.id===id; });
+  if (!r) return;
+
+  // remove existing menu
+  var existing = document.getElementById('floatMenu');
+  if (existing) existing.remove();
+  if (menuOpen === id) { menuOpen = null; return; }
+  menuOpen = id;
+
+  var menu = document.createElement('div');
+  menu.id = 'floatMenu';
+  menu.style.cssText = 'position:fixed;background:#fff;border:1.5px solid var(--border);border-radius:9px;box-shadow:0 8px 24px rgba(27,58,92,.12);z-index:500;min-width:160px;overflow:hidden;animation:mIn .15s ease';
+  menu.innerHTML =
+    '<div onclick="openEdit('+id+');removeMenu()" style="padding:10px 14px;cursor:pointer;font-size:12px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;transition:background .1s" onmouseover="this.style.background=\'var(--sky-pale)\'" onmouseout="this.style.background=\'\'">✏️ Editar</div>'+
+    (r.status==='ativa'
+      ? '<div onclick="openConfirm('+id+');removeMenu()" style="padding:10px 14px;cursor:pointer;font-size:12px;font-weight:700;color:var(--red);display:flex;align-items:center;gap:8px;border-top:1px solid var(--border);transition:background .1s" onmouseover="this.style.background=\'var(--red-pale)\'" onmouseout="this.style.background=\'\'">⊘ Inativar</div>'
+      : '<div onclick="openConfirm('+id+');removeMenu()" style="padding:10px 14px;cursor:pointer;font-size:12px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:8px;border-top:1px solid var(--border);transition:background .1s" onmouseover="this.style.background=\'var(--green-pale)\'" onmouseout="this.style.background=\'\'">✓ Reativar</div>'
+    );
+
+  var rect = el.getBoundingClientRect();
+  menu.style.top  = (rect.bottom + 4) + 'px';
+  menu.style.left = (rect.left - 120) + 'px';
+  document.body.appendChild(menu);
+
+  setTimeout(function(){
+    document.addEventListener('click', function handler(){
+      removeMenu(); document.removeEventListener('click', handler);
+    });
+  }, 10);
+}
+function removeMenu() {
+  var m = document.getElementById('floatMenu');
+  if (m) m.remove();
+  menuOpen = null;
+}
+
+// ══ MODAL EDIT ══
+function openModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Nova Sala';
+  document.getElementById('mNum').value  = '';
+  document.getElementById('mNome').value = '';
+  document.getElementById('mStatus').value = 'ativa';
+  document.getElementById('overlay').classList.add('open');
+}
+
+function openEdit(id) {
+  var r = ROOMS.find(function(x){ return x.id===id; });
+  if (!r) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Editar '+r.nome;
+  document.getElementById('mNum').value   = r.num;
+  document.getElementById('mNome').value  = r.nome;
+  document.getElementById('mStatus').value = r.status;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  editingId = null;
+}
+
+function saveRoom() {
+  var num    = parseInt(document.getElementById('mNum').value);
+  var nome   = document.getElementById('mNome').value.trim() || 'Sala '+String(num).padStart(2,'0');
+  var status = document.getElementById('mStatus').value;
+
+  if (!num || num < 1) { alert('Informe o número da sala'); return; }
+
+  if (editingId) {
+    var r = ROOMS.find(function(x){ return x.id===editingId; });
+    if (r) { r.num=num; r.nome=nome; r.status=status; }
+  } else {
+    ROOMS.push({ id:Date.now(), num:num, nome:nome, status:status, profHoje:null });
+    ROOMS.sort(function(a,b){ return a.num-b.num; });
+  }
+  closeModal();
+  renderGrid();
+}
+
+// ══ CONFIRM STATUS ══
+function openConfirm(id) {
+  var r = ROOMS.find(function(x){ return x.id===id; });
+  if (!r) return;
+  confirmingId = id;
+  var isAtiva = r.status === 'ativa';
+  document.getElementById('confirmTitle').textContent = isAtiva ? 'Inativar sala?' : 'Reativar sala?';
+  document.getElementById('confirmMsg').textContent   = (isAtiva ? 'Deseja inativar a ' : 'Deseja reativar a ') + r.nome + '?';
+  document.getElementById('confirmSub').textContent   = isAtiva ? 'A sala não aparecerá nos novos agendamentos.' : 'A sala voltará a ficar disponível para agendamentos.';
+  var btn = document.getElementById('confirmActionBtn');
+  btn.textContent  = isAtiva ? '⊘ Inativar' : '✓ Reativar';
+  btn.className    = isAtiva ? 'btn-inativar' : 'btn-reativar';
+  document.getElementById('overlayConfirm').classList.add('open');
+}
+
+function closeConfirm() {
+  document.getElementById('overlayConfirm').classList.remove('open');
+  confirmingId = null;
+}
+
+function confirmStatus() {
+  var r = ROOMS.find(function(x){ return x.id===confirmingId; });
+  if (r) {
+    r.status = r.status === 'ativa' ? 'inativa' : 'ativa';
+    if (r.status === 'inativa') r.profHoje = null;
+  }
+  closeConfirm();
+  renderGrid();
+}
+
+// ══ FILTERS ══
+function setFilter(f, el) {
+  activeFilter = f;
+  document.querySelectorAll('.ftab').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  renderGrid();
+}
+function searchRoom(q) { searchQ = q.toLowerCase(); renderGrid(); }
+
+// ══ INIT ══
+renderGrid();
+</script>
+</body>
+</html>

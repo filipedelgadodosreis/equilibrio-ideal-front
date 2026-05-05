@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Controle de Senhas — Clínica Equilíbrio Ideal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA; --sky-mist:#F4F9FC;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-pale:#FBF5EA;
+      --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
+      --red:#E05252; --red-pale:#FEF0F0;
+      --psico:#5A9EC9; --psico-bg:#EBF4FA;
+      --nutri:#5AAE82; --nutri-bg:#EDFAF3;
+      --fono:#C9A96E;  --fono-bg:#FBF5EA;
+      --sidebar-w:208px;
+    }
+    html, body { height:100%; overflow:hidden; font-family:'Lato',sans-serif; background:var(--sky-mist); color:var(--text); font-size:13px; }
+    .app { display:flex; height:100vh; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { width:var(--sidebar-w); background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+    .sb-brand { padding:13px 14px 11px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .sb-icon  { width:31px; height:31px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sb-icon span { color:#fff; font-size:13px; font-family:'Playfair Display',serif; }
+    .sb-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .sb-sub  { font-size:10px; color:var(--text-soft); }
+    .sb-nav  { padding:9px 7px; flex:1; overflow-y:auto; }
+    .sb-nav::-webkit-scrollbar { display:none; }
+    .nav-lbl  { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-soft); padding:6px 6px 3px; }
+    .nav-item { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:7px; cursor:pointer; color:var(--text-soft); font-size:12px; transition:all .15s; margin-bottom:1px; text-decoration:none; }
+    .nav-item:hover  { background:var(--sky-pale); color:var(--navy); }
+    .nav-item.active { background:var(--sky-pale); color:var(--navy); font-weight:700; }
+    .nav-icon { font-size:14px; width:18px; text-align:center; }
+    .sb-foot { padding:10px 13px; border-top:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .u-av   { width:28px; height:28px; border-radius:50%; background:var(--sky-light); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .u-name { font-size:11px; font-weight:700; color:var(--navy); }
+    .u-role { font-size:9px; color:var(--text-soft); }
+    .u-out  { margin-left:auto; color:var(--text-soft); cursor:pointer; }
+
+    /* ═══ MAIN ═══ */
+    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+    /* header */
+    .top-hd { height:56px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:12px; flex-shrink:0; }
+    .hd-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .hd-spc { flex:1; }
+    .btn-tv { display:flex; align-items:center; gap:6px; padding:7px 14px; border:1.5px solid var(--sky); border-radius:8px; background:var(--sky-pale); color:var(--navy); cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; text-decoration:none; transition:all .15s; }
+    .btn-tv:hover { background:var(--sky); color:#fff; }
+    .btn-reset { display:flex; align-items:center; gap:6px; padding:7px 14px; border:1.5px solid var(--border); border-radius:8px; background:#fff; color:var(--text-soft); cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:all .15s; }
+    .btn-reset:hover { border-color:var(--red); color:var(--red); }
+
+    /* body layout */
+    .body { flex:1; display:grid; grid-template-columns:1fr 380px; overflow:hidden; gap:0; }
+
+    /* ── LEFT: queue management ── */
+    .left-panel { display:flex; flex-direction:column; overflow:hidden; border-right:1px solid var(--border); }
+
+    /* current call banner */
+    .current-banner {
+      padding:16px 24px; background:var(--navy);
+      display:flex; align-items:center; gap:16px; flex-shrink:0;
+    }
+    .cb-label { font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:4px; }
+    .cb-number { font-family:'Playfair Display',serif; font-size:32px; color:var(--white); line-height:1; }
+    .cb-info { flex:1; }
+    .cb-name { font-size:14px; font-weight:700; color:var(--white); }
+    .cb-prof { font-size:12px; color:rgba(255,255,255,.55); margin-top:2px; }
+    .cb-sala { font-size:11px; color:var(--gold); margin-top:2px; }
+    .btn-recall {
+      padding:9px 18px; border:1.5px solid rgba(255,255,255,.2); border-radius:8px;
+      background:rgba(255,255,255,.1); color:var(--white); cursor:pointer;
+      font-family:'Lato',sans-serif; font-size:11px; font-weight:700; transition:all .15s;
+      white-space:nowrap;
+    }
+    .btn-recall:hover { background:rgba(255,255,255,.2); }
+
+    /* queue list */
+    .queue-hd { padding:12px 24px; border-bottom:1px solid var(--border); background:var(--white); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .queue-hd-title { font-size:12px; font-weight:700; color:var(--navy); }
+    .queue-hd-count { font-size:11px; color:var(--text-soft); }
+
+    .queue-wrap { flex:1; overflow-y:auto; }
+    .queue-wrap::-webkit-scrollbar { width:4px; }
+    .queue-wrap::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:2px; }
+
+    .queue-item {
+      display:flex; align-items:center; gap:14px;
+      padding:13px 24px; border-bottom:1px solid rgba(212,232,242,.5);
+      transition:background .12s;
+    }
+    .queue-item:hover { background:var(--sky-pale); }
+    .qi-pos { width:26px; height:26px; border-radius:50%; background:var(--sky-pale); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--text-soft); flex-shrink:0; }
+    .qi-pos.first { background:var(--gold); border-color:var(--gold); color:var(--navy); }
+    .qi-number { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--navy); min-width:80px; }
+    .qi-info { flex:1; }
+    .qi-name { font-size:13px; font-weight:700; color:var(--navy); }
+    .qi-prof { font-size:11px; color:var(--text-soft); margin-top:1px; }
+    .qi-time { font-size:10px; color:var(--text-soft); }
+    .qi-spec-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .qi-spec-dot.psico { background:var(--psico); }
+    .qi-spec-dot.nutri { background:var(--nutri); }
+    .qi-spec-dot.fono  { background:var(--fono); }
+    .btn-call {
+      padding:7px 16px; border:none; border-radius:8px;
+      background:var(--navy); color:#fff; cursor:pointer;
+      font-family:'Lato',sans-serif; font-size:11px; font-weight:700;
+      transition:all .15s; white-space:nowrap;
+    }
+    .btn-call:hover { background:var(--navy-mid); }
+    .btn-call.first { background:var(--green); }
+    .btn-call.first:hover { background:#3A9468; }
+    .btn-remove { width:26px; height:26px; border:1.5px solid var(--border); border-radius:6px; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--text-soft); transition:all .12s; flex-shrink:0; }
+    .btn-remove:hover { border-color:var(--red); color:var(--red); }
+
+    /* empty */
+    .queue-empty { padding:60px 24px; text-align:center; color:var(--text-soft); }
+    .queue-empty-icon { font-size:36px; margin-bottom:12px; }
+    .queue-empty-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); margin-bottom:6px; }
+    .queue-empty-sub { font-size:12px; }
+
+    /* ── RIGHT: add to queue ── */
+    .right-panel { display:flex; flex-direction:column; overflow:hidden; background:var(--white); }
+
+    .rp-hd { padding:14px 20px 12px; border-bottom:1px solid var(--border); }
+    .rp-title { font-family:'Playfair Display',serif; font-size:17px; color:var(--navy); }
+    .rp-sub   { font-size:11px; color:var(--text-soft); margin-top:3px; }
+
+    .rp-body { flex:1; overflow-y:auto; padding:16px 20px; }
+    .rp-body::-webkit-scrollbar { display:none; }
+
+    /* search patient */
+    .field { margin-bottom:14px; }
+    .field label { display:block; font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:5px; }
+    .srch-wrap { position:relative; }
+    .srch-wrap svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--sky-light); pointer-events:none; }
+    .srch-input { width:100%; height:40px; padding:0 12px 0 32px; border:1.5px solid var(--border); border-radius:8px; font-family:'Lato',sans-serif; font-size:13px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .srch-input:focus { border-color:var(--sky); background:#fff; }
+    .srch-input::placeholder { color:var(--sky-light); }
+
+    .srch-results { display:none; border:1.5px solid var(--border); border-radius:8px; background:#fff; margin-top:5px; overflow:hidden; box-shadow:0 4px 14px rgba(27,58,92,.08); }
+    .srch-results.show { display:block; }
+    .sr-item { display:flex; align-items:center; gap:9px; padding:9px 12px; cursor:pointer; border-bottom:1px solid var(--border); transition:background .12s; }
+    .sr-item:last-child { border-bottom:none; }
+    .sr-item:hover { background:var(--sky-pale); }
+    .sr-av { width:30px; height:30px; border-radius:50%; background:var(--sky-pale); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .sr-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .sr-info { font-size:10px; color:var(--text-soft); }
+
+    /* selected patient */
+    .sel-pat { display:none; padding:10px 12px; background:var(--green-pale); border:1.5px solid var(--green-bdr); border-radius:8px; margin-top:6px; align-items:center; gap:10px; }
+    .sel-pat.show { display:flex; }
+    .sp-av { width:30px; height:30px; border-radius:50%; background:#fff; border:2px solid var(--green-bdr); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .sp-name { font-size:12px; font-weight:700; color:var(--navy); flex:1; }
+    .sp-clear { font-size:11px; color:var(--sky); cursor:pointer; font-weight:700; }
+
+    /* form fields */
+    .f2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .mf-select { width:100%; height:40px; padding:0 11px; border:1.5px solid var(--border); border-radius:8px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .mf-select:focus { border-color:var(--sky); background:#fff; }
+
+    /* next number preview */
+    .next-preview { padding:12px 14px; background:var(--sky-mist); border:1.5px solid var(--border); border-radius:8px; display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .np-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:3px; }
+    .np-number { font-family:'Playfair Display',serif; font-size:24px; font-weight:700; color:var(--navy); }
+
+    /* add button */
+    .btn-add-queue { width:100%; height:46px; border:none; border-radius:9px; background:var(--navy); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:13px; font-weight:700; transition:background .15s; }
+    .btn-add-queue:hover { background:var(--navy-mid); }
+
+    /* history */
+    .history-title { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-soft); margin:16px 0 10px; }
+    .hist-item { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid rgba(212,232,242,.5); font-size:11px; }
+    .hist-item:last-child { border-bottom:none; }
+    .hist-num { font-weight:700; color:var(--navy); min-width:70px; }
+    .hist-name { color:var(--text-soft); flex:1; }
+    .hist-time { color:var(--text-soft); font-size:10px; }
+    .hist-tag { padding:1px 6px; border-radius:4px; font-size:9px; font-weight:700; }
+    .hist-tag.chamado  { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .hist-tag.removido { background:var(--red-pale); color:var(--red); border:1px solid #F5B8B8; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .body { animation:fadeUp .4s ease; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-icon"><span>Ψ</span></div>
+      <div><div class="sb-name">Equilíbrio Ideal</div><div class="sb-sub">Clínica Multidisciplinar</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-lbl">Principal</div>
+      <a class="nav-item" href="agenda-equilibrio-v3.html"><span class="nav-icon">📅</span>Agenda</a>
+      <a class="nav-item" href="cadastro-pacientes.html"><span class="nav-icon">👥</span>Pacientes</a>
+      <div class="nav-item active"><span class="nav-icon">🔢</span>Painel de Senhas</div>
+      <div class="nav-lbl" style="margin-top:5px">Clínica</div>
+      <a class="nav-item" href="cadastro-profissionais.html"><span class="nav-icon">🧠</span>Profissionais</a>
+      <a class="nav-item" href="cadastro-salas.html"><span class="nav-icon">🏥</span>Salas</a>
+      <div class="nav-lbl" style="margin-top:5px">Sistema</div>
+      <div class="nav-item"><span class="nav-icon">⚙️</span>Configurações</div>
+    </nav>
+    <div class="sb-foot">
+      <div class="u-av">MR</div>
+      <div><div class="u-name">Maria Recepção</div><div class="u-role">Recepção</div></div>
+      <div class="u-out">↩</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="top-hd">
+      <div class="hd-title">Painel de Senhas</div>
+      <div class="hd-spc"></div>
+      <a class="btn-tv" href="painel-tv.html" target="_blank">📺 Abrir painel da TV</a>
+      <button class="btn-reset" onclick="resetQueue()">🔄 Reiniciar fila</button>
+    </div>
+
+    <div class="body">
+
+      <!-- LEFT -->
+      <div class="left-panel">
+
+        <!-- current -->
+        <div class="current-banner">
+          <div>
+            <div class="cb-label">Chamando agora</div>
+            <div class="cb-number" id="cbNumber">PSI-007</div>
+          </div>
+          <div class="cb-info">
+            <div class="cb-name" id="cbName">João Pereira</div>
+            <div class="cb-prof" id="cbProf">Dra. Ana Costa</div>
+            <div class="cb-sala" id="cbSala">🏥 Sala 01</div>
+          </div>
+          <button class="btn-recall" onclick="recall()">🔁 Chamar novamente</button>
+        </div>
+
+        <!-- queue header -->
+        <div class="queue-hd">
+          <div class="queue-hd-title">Fila de espera</div>
+          <div class="queue-hd-count" id="qhdCount">0 aguardando</div>
+        </div>
+
+        <!-- queue list -->
+        <div class="queue-wrap" id="queueWrap"></div>
+
+      </div>
+
+      <!-- RIGHT -->
+      <div class="right-panel">
+        <div class="rp-hd">
+          <div class="rp-title">Adicionar à fila</div>
+          <div class="rp-sub">Busque o paciente e selecione o profissional</div>
+        </div>
+        <div class="rp-body">
+
+          <!-- patient search -->
+          <div class="field">
+            <label>Paciente</label>
+            <div class="srch-wrap">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input class="srch-input" type="text" id="addPatInput" placeholder="Nome ou CPF…" oninput="searchAddPat(this.value)"/>
+            </div>
+            <div class="srch-results" id="addPatResults"></div>
+            <div class="sel-pat" id="selPat">
+              <div class="sp-av" id="spAv"></div>
+              <div class="sp-name" id="spName"></div>
+              <div class="sp-clear" onclick="clearAddPat()">Trocar</div>
+            </div>
+          </div>
+
+          <div class="f2">
+            <div class="field">
+              <label>Profissional</label>
+              <select class="mf-select" id="addProfSel" onchange="updateNextNumber()">
+                <option value="psico|Dra. Ana Costa|AC|Sala 01">Dra. Ana Costa</option>
+                <option value="psico|Dr. Bruno Silva|BS|Sala 02">Dr. Bruno Silva</option>
+                <option value="psico|Dra. Carla Mendes|CM|Sala 03">Dra. Carla Mendes</option>
+                <option value="nutri|Dra. Karen Alves|KA|Sala 11">Dra. Karen Alves</option>
+                <option value="nutri|Dr. Lucas Pinto|LP|Sala 12">Dr. Lucas Pinto</option>
+                <option value="fono|Dr. Paulo Ribeiro|PR|Sala 16">Dr. Paulo Ribeiro</option>
+                <option value="fono|Dra. Quésia Moreira|QM|Sala 17">Dra. Quésia Moreira</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Horário</label>
+              <select class="mf-select" id="addTime">
+                <option>08:00</option><option>08:30</option><option>09:00</option>
+                <option selected>09:30</option><option>10:00</option><option>10:30</option>
+                <option>11:00</option><option>11:30</option><option>13:00</option>
+                <option>13:30</option><option>14:00</option><option>14:30</option>
+                <option>15:00</option><option>15:30</option><option>16:00</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- next number preview -->
+          <div class="next-preview">
+            <div>
+              <div class="np-label">Próxima senha</div>
+              <div class="np-number" id="npNumber">PSI-010</div>
+            </div>
+            <div style="font-size:11px;color:var(--text-soft);line-height:1.5">Será atribuída<br>ao paciente</div>
+          </div>
+
+          <button class="btn-add-queue" onclick="addToQueue()">➕ Adicionar à fila</button>
+
+          <!-- history -->
+          <div class="history-title">Histórico do dia</div>
+          <div id="historyList"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+// ══ DATA ══
+var PATIENTS_DB = [
+  {id:1, name:'João Pereira',    ini:'JP', cpf:'123.456.789-00'},
+  {id:2, name:'Fernanda Souza',  ini:'FS', cpf:'987.654.321-00'},
+  {id:3, name:'Ricardo Alves',   ini:'RA', cpf:'456.789.123-00'},
+  {id:4, name:'Luciana Martins', ini:'LM', cpf:'321.654.987-00'},
+  {id:5, name:'Carlos Nunes',    ini:'CN', cpf:'789.123.456-00'},
+  {id:6, name:'Patrícia Gomes',  ini:'PG', cpf:'654.321.987-00'},
+  {id:7, name:'Amanda Ferreira', ini:'AF', cpf:'111.222.333-00'},
+  {id:8, name:'Marcos Ribeiro',  ini:'MR', cpf:'444.555.666-00'},
+];
+
+var SPEC_PREFIX = {psico:'PSI', nutri:'NUT', fono:'FON'};
+var counters = {psico:7, nutri:3, fono:2};
+
+var state = {
+  current: { number:'PSI-007', name:'João Pereira', prof:'Dra. Ana Costa', sala:'Sala 01', spec:'psico' },
+  queue: [
+    { number:'PSI-008', name:'Fernanda Souza',  prof:'Dr. Bruno Silva',    spec:'psico', time:'09:30' },
+    { number:'NUT-003', name:'Luciana Martins', prof:'Dra. Karen Alves',   spec:'nutri', time:'09:30' },
+    { number:'FON-002', name:'Rafael Santos',   prof:'Dr. Paulo Ribeiro',  spec:'fono',  time:'10:00' },
+    { number:'PSI-009', name:'Carlos Nunes',    prof:'Dra. Carla Mendes',  spec:'psico', time:'10:00' },
+    { number:'NUT-004', name:'Amanda Ferreira', prof:'Dr. Lucas Pinto',    spec:'nutri', time:'10:30' },
+    { number:'FON-003', name:'Patrícia Gomes',  prof:'Dra. Quésia Moreira',spec:'fono',  time:'10:30' },
+  ]
+};
+
+var history = [
+  { number:'PSI-006', name:'Thiago Moreira', time:'08:45', type:'chamado' },
+  { number:'NUT-002', name:'Bianca Oliveira', time:'08:30', type:'chamado' },
+  { number:'PSI-005', name:'Eduardo Lima', time:'08:15', type:'chamado' },
+];
+
+var selPatient = null;
+
+// ══ SAVE / SYNC ══
+function saveState() {
+  try { localStorage.setItem('eq_painel_state', JSON.stringify(state)); } catch(e){}
+}
+
+// ══ RENDER ══
+function render() {
+  // current banner
+  document.getElementById('cbNumber').textContent = state.current.number;
+  document.getElementById('cbName').textContent   = state.current.name;
+  document.getElementById('cbProf').textContent   = state.current.prof;
+  document.getElementById('cbSala').textContent   = '🏥 '+state.current.sala;
+
+  // queue
+  var wrap  = document.getElementById('queueWrap');
+  var count = document.getElementById('qhdCount');
+  wrap.innerHTML = '';
+  count.textContent = state.queue.length+' aguardando';
+
+  if (state.queue.length === 0) {
+    wrap.innerHTML = '<div class="queue-empty"><div class="queue-empty-icon">✅</div><div class="queue-empty-title">Fila vazia</div><div class="queue-empty-sub">Todos os pacientes foram atendidos</div></div>';
+  } else {
+    state.queue.forEach(function(q, i) {
+      var item = document.createElement('div');
+      item.className = 'queue-item';
+      item.innerHTML =
+        '<div class="qi-pos'+(i===0?' first':'')+'">'+( i===0?'★':(i+1))+'</div>'+
+        '<div class="qi-number">'+q.number+'</div>'+
+        '<div class="qi-info"><div class="qi-name">'+q.name+'</div><div class="qi-prof">'+q.prof+'</div></div>'+
+        '<div class="qi-spec-dot '+q.spec+'"></div>'+
+        '<div class="qi-time">'+q.time+'</div>'+
+        '<button class="btn-call'+(i===0?' first':'')+'" onclick="callTicket('+i+')">'+( i===0?'📢 Chamar':'Chamar')+'</button>'+
+        '<button class="btn-remove" onclick="removeFromQueue('+i+')" title="Remover">✕</button>';
+      wrap.appendChild(item);
+    });
+  }
+
+  // history
+  var hl = document.getElementById('historyList');
+  hl.innerHTML = '';
+  history.slice(0,8).forEach(function(h) {
+    var d=document.createElement('div'); d.className='hist-item';
+    d.innerHTML='<div class="hist-num">'+h.number+'</div><div class="hist-name">'+h.name+'</div><div class="hist-time">'+h.time+'</div><div class="hist-tag '+h.type+'">'+(h.type==='chamado'?'✅ Chamado':'✕ Removido')+'</div>';
+    hl.appendChild(d);
+  });
+
+  saveState();
+}
+
+// ══ ACTIONS ══
+function callTicket(idx) {
+  var ticket = state.queue[idx];
+  // move current to history
+  var now=new Date(); var t=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  history.unshift({ number:state.current.number, name:state.current.name, time:t, type:'chamado' });
+  // set new current
+  state.current = { number:ticket.number, name:ticket.name, prof:ticket.prof, sala:ticket.sala||'—', spec:ticket.spec };
+  // remove from queue
+  state.queue.splice(idx,1);
+  render();
+  // flash effect
+  flashBanner();
+}
+
+function recall() {
+  // just flash
+  flashBanner();
+}
+
+function removeFromQueue(idx) {
+  var ticket = state.queue[idx];
+  var now=new Date(); var t=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  history.unshift({ number:ticket.number, name:ticket.name, time:t, type:'removido' });
+  state.queue.splice(idx,1);
+  render();
+}
+
+function flashBanner() {
+  var b=document.querySelector('.current-banner');
+  b.style.background='#2E6FA3';
+  setTimeout(function(){ b.style.background='var(--navy)'; b.style.transition='background .4s'; },400);
+}
+
+function resetQueue() {
+  if (!confirm('Reiniciar a fila? Todos os dados serão apagados.')) return;
+  state.queue=[];
+  history=[];
+  counters={psico:0,nutri:0,fono:0};
+  state.current={number:'—',name:'Aguardando',prof:'—',sala:'—',spec:'psico'};
+  render();
+}
+
+// ══ ADD TO QUEUE ══
+function searchAddPat(val) {
+  var res = document.getElementById('addPatResults');
+  if (val.length<2) { res.classList.remove('show'); return; }
+  var found = PATIENTS_DB.filter(function(p){
+    return p.name.toLowerCase().indexOf(val.toLowerCase())>-1 || p.cpf.indexOf(val)>-1;
+  });
+  res.innerHTML='';
+  if (found.length>0) {
+    found.forEach(function(p){
+      var item=document.createElement('div'); item.className='sr-item';
+      item.innerHTML='<div class="sr-av">'+p.ini+'</div><div><div class="sr-name">'+p.name+'</div><div class="sr-info">'+p.cpf+'</div></div>';
+      item.onclick=function(){ selectAddPat(p); };
+      res.appendChild(item);
+    });
+    res.classList.add('show');
+  } else {
+    res.innerHTML='<div style="padding:12px;font-size:12px;color:var(--text-soft);font-style:italic">Paciente não encontrado</div>';
+    res.classList.add('show');
+  }
+}
+
+function selectAddPat(p) {
+  selPatient=p;
+  document.getElementById('addPatInput').value=p.name;
+  document.getElementById('addPatResults').classList.remove('show');
+  document.getElementById('spAv').textContent=p.ini;
+  document.getElementById('spName').textContent=p.name;
+  document.getElementById('selPat').classList.add('show');
+}
+
+function clearAddPat() {
+  selPatient=null;
+  document.getElementById('addPatInput').value='';
+  document.getElementById('selPat').classList.remove('show');
+}
+
+function updateNextNumber() {
+  var val=document.getElementById('addProfSel').value.split('|');
+  var spec=val[0];
+  var prefix=SPEC_PREFIX[spec]||'A';
+  var next=(counters[spec]||0)+1;
+  document.getElementById('npNumber').textContent=prefix+'-'+String(next).padStart(3,'0');
+}
+
+function addToQueue() {
+  if (!selPatient) { alert('Selecione um paciente'); return; }
+  var val=document.getElementById('addProfSel').value.split('|');
+  var spec=val[0], prof=val[1], sala=val[3];
+  var time=document.getElementById('addTime').value;
+  counters[spec]=(counters[spec]||0)+1;
+  var number=SPEC_PREFIX[spec]+'-'+String(counters[spec]).padStart(3,'0');
+  state.queue.push({ number:number, name:selPatient.name, prof:prof, sala:sala, spec:spec, time:time });
+  // reset form
+  clearAddPat();
+  document.getElementById('addProfSel').selectedIndex=0;
+  updateNextNumber();
+  render();
+}
+
+// ══ INIT ══
+updateNextNumber();
+render();
+</script>
+</body>
+</html>

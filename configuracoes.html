@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Configurações — Clínica Equilíbrio Ideal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA; --sky-mist:#F4F9FC;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-pale:#FBF5EA;
+      --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
+      --red:#E05252; --red-pale:#FEF0F0;
+      --orange:#E8954A; --orange-pale:#FEF4EC;
+      --psico:#5A9EC9; --psico-bg:#EBF4FA;
+      --nutri:#5AAE82; --nutri-bg:#EDFAF3;
+      --fono:#C9A96E;  --fono-bg:#FBF5EA;
+      --sidebar-w:208px;
+    }
+    html, body { height:100%; overflow:hidden; font-family:'Lato',sans-serif; background:var(--sky-mist); color:var(--text); font-size:13px; }
+    .app { display:flex; height:100vh; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { width:var(--sidebar-w); background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+    .sb-brand { padding:13px 14px 11px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .sb-icon  { width:31px; height:31px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sb-icon span { color:#fff; font-size:13px; font-family:'Playfair Display',serif; }
+    .sb-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .sb-sub  { font-size:10px; color:var(--text-soft); }
+    .sb-nav  { padding:9px 7px; flex:1; overflow-y:auto; }
+    .sb-nav::-webkit-scrollbar { display:none; }
+    .nav-lbl  { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-soft); padding:6px 6px 3px; }
+    .nav-item { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:7px; cursor:pointer; color:var(--text-soft); font-size:12px; transition:all .15s; margin-bottom:1px; text-decoration:none; }
+    .nav-item:hover  { background:var(--sky-pale); color:var(--navy); }
+    .nav-item.active { background:var(--sky-pale); color:var(--navy); font-weight:700; }
+    .nav-icon { font-size:14px; width:18px; text-align:center; }
+    .sb-foot { padding:10px 13px; border-top:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .u-av   { width:28px; height:28px; border-radius:50%; background:var(--gold-pale); border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .u-name { font-size:11px; font-weight:700; color:var(--navy); }
+    .u-role { font-size:9px; color:var(--gold); font-weight:700; }
+    .u-out  { margin-left:auto; color:var(--text-soft); cursor:pointer; }
+
+    /* ═══ MAIN ═══ */
+    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .top-hd { height:56px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:12px; flex-shrink:0; }
+    .hd-icon { width:34px; height:34px; background:var(--navy); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+    .hd-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .hd-sub   { font-size:11px; color:var(--text-soft); margin-top:1px; }
+    .hd-spc   { flex:1; }
+    .btn-save-all { display:flex; align-items:center; gap:6px; padding:8px 18px; border:none; border-radius:8px; background:var(--green); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:background .15s; }
+    .btn-save-all:hover { background:#3A9468; }
+
+    /* tabs */
+    .tabs { background:var(--white); border-bottom:1px solid var(--border); display:flex; padding:0 24px; flex-shrink:0; }
+    .tab { padding:12px 18px; font-size:12px; font-weight:700; color:var(--text-soft); cursor:pointer; border-bottom:2.5px solid transparent; transition:all .15s; white-space:nowrap; }
+    .tab:hover  { color:var(--navy); }
+    .tab.active { color:var(--navy); border-bottom-color:var(--navy); }
+
+    /* content */
+    .content { flex:1; overflow-y:auto; padding:24px; }
+    .content::-webkit-scrollbar { width:5px; }
+    .content::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:3px; }
+    .tab-panel { display:none; max-width:820px; }
+    .tab-panel.active { display:block; }
+
+    /* section */
+    .section { background:var(--white); border:1.5px solid var(--border); border-radius:14px; padding:20px; margin-bottom:16px; }
+    .sec-hd  { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:18px; }
+    .sec-title { font-family:'Playfair Display',serif; font-size:17px; color:var(--navy); margin-bottom:3px; }
+    .sec-sub   { font-size:11px; color:var(--text-soft); font-weight:300; }
+    .sec-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:6px; background:var(--gold-pale); color:#8B6A1E; border:1px solid var(--gold); white-space:nowrap; margin-top:2px; }
+
+    /* form grid */
+    .fg2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 20px; }
+    .fg3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 20px; }
+    .fg1 { display:grid; grid-template-columns:1fr; gap:14px; }
+    .mf { }
+    .mf label { display:block; font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:5px; }
+    .mf input, .mf select, .mf textarea { width:100%; height:40px; padding:0 12px; border:1.5px solid var(--border); border-radius:8px; font-family:'Lato',sans-serif; font-size:13px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .mf input:focus, .mf select:focus, .mf textarea:focus { border-color:var(--sky); background:#fff; box-shadow:0 0 0 3px rgba(125,168,201,.1); }
+    .mf textarea { height:80px; padding:10px 12px; resize:vertical; }
+    .mf-hint { font-size:10px; color:var(--text-soft); margin-top:4px; }
+    .mf-hint.ok { color:var(--green); }
+    .mf-hint.warn { color:var(--orange); }
+
+    /* TUSS card */
+    .tuss-card { border:1.5px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:12px; }
+    .tuss-hd { display:flex; align-items:center; gap:12px; padding:14px 16px; }
+    .tuss-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .tuss-icon.psico { background:var(--psico-bg); }
+    .tuss-icon.nutri { background:var(--nutri-bg); }
+    .tuss-icon.fono  { background:var(--fono-bg); }
+    .tuss-spec { font-size:14px; font-weight:700; color:var(--navy); }
+    .tuss-code { font-size:11px; color:var(--text-soft); margin-top:2px; }
+    .tuss-body { padding:0 16px 16px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    .tuss-field { }
+    .tuss-field label { display:block; font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:5px; }
+    .tuss-field input { width:100%; height:38px; padding:0 10px; border:1.5px solid var(--border); border-radius:7px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .tuss-field input:focus { border-color:var(--sky); background:#fff; }
+    .tuss-badge { margin-left:auto; font-size:10px; font-weight:700; padding:3px 10px; border-radius:6px; }
+    .tuss-badge.ok { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+
+    /* convenio ANS table */
+    .conv-table { width:100%; border-collapse:collapse; }
+    .conv-table thead th { padding:9px 12px; text-align:left; font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); border-bottom:1.5px solid var(--border); background:var(--sky-mist); }
+    .conv-table tbody tr { border-bottom:1px solid rgba(212,232,242,.5); }
+    .conv-table tbody tr:last-child { border-bottom:none; }
+    .conv-table tbody td { padding:10px 12px; font-size:12px; }
+    .conv-name { font-weight:700; color:var(--navy); display:flex; align-items:center; gap:8px; }
+    .conv-dot  { width:8px; height:8px; border-radius:50%; background:var(--sky); flex-shrink:0; }
+    .conv-input { width:140px; height:34px; padding:0 10px; border:1.5px solid var(--border); border-radius:7px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .conv-input:focus { border-color:var(--sky); background:#fff; }
+    .conv-status { font-size:10px; font-weight:700; padding:2px 8px; border-radius:5px; }
+    .conv-status.ok      { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .conv-status.pending { background:var(--orange-pale); color:#8B4A1E; border:1px solid var(--orange); }
+
+    /* xml readiness */
+    .readiness-card { background:var(--white); border:1.5px solid var(--border); border-radius:14px; padding:20px; margin-bottom:16px; }
+    .rc-title { font-family:'Playfair Display',serif; font-size:17px; color:var(--navy); margin-bottom:16px; }
+    .rc-items { display:flex; flex-direction:column; gap:10px; }
+    .rc-item { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:10px; border:1.5px solid var(--border); }
+    .rc-item.ok      { background:var(--green-pale); border-color:var(--green-bdr); }
+    .rc-item.warn    { background:var(--orange-pale); border-color:var(--orange); }
+    .rc-item.pending { background:#F5F5F5; border-color:#DDD; }
+    .rc-icon { font-size:18px; flex-shrink:0; }
+    .rc-label { font-size:13px; font-weight:700; color:var(--navy); flex:1; }
+    .rc-sub   { font-size:11px; color:var(--text-soft); margin-top:2px; }
+    .rc-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:6px; white-space:nowrap; flex-shrink:0; }
+    .rc-badge.ok      { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .rc-badge.warn    { background:var(--orange-pale); color:#8B4A1E; border:1px solid var(--orange); }
+    .rc-badge.pending { background:#F5F5F5; color:#999; border:1px solid #DDD; }
+
+    /* toast */
+    .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--navy); color:#fff; padding:12px 20px; border-radius:12px; font-size:13px; font-weight:700; z-index:99999; display:none; white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,.2); }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .tab-panel.active { animation:fadeUp .35s ease; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-icon"><span>Ψ</span></div>
+      <div><div class="sb-name">Equilíbrio Ideal</div><div class="sb-sub">Clínica Multidisciplinar</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-lbl">Principal</div>
+      <a class="nav-item" href="agenda-equilibrio-v3.html"><span class="nav-icon">📅</span>Agenda</a>
+      <a class="nav-item" href="cadastro-pacientes.html"><span class="nav-icon">👥</span>Pacientes</a>
+      <div class="nav-lbl" style="margin-top:5px">Admin</div>
+      <a class="nav-item" href="faturamento.html"><span class="nav-icon">💰</span>Faturamento</a>
+      <a class="nav-item" href="auditoria.html"><span class="nav-icon">🔍</span>Auditoria</a>
+      <div class="nav-lbl" style="margin-top:5px">Clínica</div>
+      <a class="nav-item" href="cadastro-profissionais.html"><span class="nav-icon">🧠</span>Profissionais</a>
+      <a class="nav-item" href="cadastro-salas.html"><span class="nav-icon">🏥</span>Salas</a>
+      <div class="nav-lbl" style="margin-top:5px">Sistema</div>
+      <div class="nav-item active"><span class="nav-icon">⚙️</span>Configurações</div>
+    </nav>
+    <div class="sb-foot">
+      <div class="u-av">RA</div>
+      <div><div class="u-name">Roberto Admin</div><div class="u-role">👑 Admin</div></div>
+      <div class="u-out">↩</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="top-hd">
+      <div class="hd-icon">⚙️</div>
+      <div>
+        <div class="hd-title">Configurações</div>
+        <div class="hd-sub">Dados da clínica, TISS e convênios</div>
+      </div>
+      <div class="hd-spc"></div>
+      <button class="btn-save-all" onclick="saveAll()">💾 Salvar todas as alterações</button>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('clinica',this)">🏥 Dados da Clínica</div>
+      <div class="tab" onclick="showTab('tiss',this)">📄 TISS & Codes TUSS</div>
+      <div class="tab" onclick="showTab('convenios',this)">🏦 Convênios & ANS</div>
+      <div class="tab" onclick="showTab('xml',this)">✅ Prontidão do XML</div>
+    </div>
+
+    <div class="content">
+
+      <!-- ══ CLÍNICA ══ -->
+      <div class="tab-panel active" id="tab-clinica">
+
+        <div class="section">
+          <div class="sec-hd">
+            <div>
+              <div class="sec-title">Dados da Clínica</div>
+              <div class="sec-sub">Informações institucionais usadas no cabeçalho do XML TISS</div>
+            </div>
+            <div class="sec-badge">⚠️ Obrigatório para XML</div>
+          </div>
+          <div class="fg2">
+            <div class="mf">
+              <label>Razão Social</label>
+              <input type="text" value="Clínica Equilíbrio Ideal Ltda"/>
+            </div>
+            <div class="mf">
+              <label>Nome fantasia</label>
+              <input type="text" value="Clínica Equilíbrio Ideal"/>
+            </div>
+            <div class="mf">
+              <label>CNPJ ⚠️</label>
+              <input type="text" id="cnpjInput" placeholder="00.000.000/0001-00" oninput="updateReadiness()"/>
+              <div class="mf-hint warn" id="cnpjHint">⚠️ Obrigatório para geração do XML TISS</div>
+            </div>
+            <div class="mf">
+              <label>CNES — Cadastro Nacional de Estabelecimentos ⚠️</label>
+              <input type="text" id="cnesInput" placeholder="0000000 (7 dígitos)" oninput="updateReadiness()"/>
+              <div class="mf-hint warn" id="cnesHint">⚠️ Obrigatório para geração do XML TISS</div>
+            </div>
+            <div class="mf">
+              <label>Telefone</label>
+              <input type="text" value="(11) 3110-0069"/>
+            </div>
+            <div class="mf">
+              <label>E-mail</label>
+              <input type="text" value="contato@clinicaequilibrioideal.com.br"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="sec-hd">
+            <div>
+              <div class="sec-title">Endereço</div>
+              <div class="sec-sub">Endereço fiscal da clínica</div>
+            </div>
+          </div>
+          <div class="fg3">
+            <div class="mf" style="grid-column:span 2">
+              <label>Logradouro</label>
+              <input type="text" value="Rua Almirante Tamandaré"/>
+            </div>
+            <div class="mf">
+              <label>Número</label>
+              <input type="text" value="411"/>
+            </div>
+            <div class="mf">
+              <label>Bairro</label>
+              <input type="text" value="Bela Vista"/>
+            </div>
+            <div class="mf">
+              <label>Cidade</label>
+              <input type="text" value="Santo André"/>
+            </div>
+            <div class="mf">
+              <label>UF</label>
+              <select><option selected>SP</option><option>RJ</option><option>MG</option></select>
+            </div>
+            <div class="mf">
+              <label>CEP</label>
+              <input type="text" value="09040-000"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="sec-hd">
+            <div>
+              <div class="sec-title">Horário de Funcionamento</div>
+              <div class="sec-sub">Exibido no app do paciente e no painel da TV</div>
+            </div>
+          </div>
+          <div class="fg3">
+            <div class="mf">
+              <label>Segunda a Sexta — Início</label>
+              <input type="time" value="08:00"/>
+            </div>
+            <div class="mf">
+              <label>Segunda a Sexta — Fim</label>
+              <input type="time" value="20:30"/>
+            </div>
+            <div class="mf">
+              <label>Sábado — Início</label>
+              <input type="time" value="08:00"/>
+            </div>
+            <div class="mf">
+              <label>Sábado — Fim</label>
+              <input type="time" value="14:00"/>
+            </div>
+            <div class="mf">
+              <label>Domingo</label>
+              <select><option>Fechado</option><option>Aberto</option></select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ TISS ══ -->
+      <div class="tab-panel" id="tab-tiss">
+
+        <div class="section">
+          <div class="sec-hd">
+            <div>
+              <div class="sec-title">Versão TISS</div>
+              <div class="sec-sub">Versão do padrão ANS utilizada na geração do XML</div>
+            </div>
+            <div class="sec-badge">Versão ativa</div>
+          </div>
+          <div class="fg2">
+            <div class="mf">
+              <label>Versão do padrão TISS</label>
+              <select>
+                <option value="4.02.00" selected>4.02.00 (recomendada)</option>
+                <option value="4.03.00">4.03.00 (mais recente)</option>
+                <option value="4.01.00">4.01.00 (legado)</option>
+              </select>
+              <div class="mf-hint ok">✅ Versão aceita por todos os convênios da clínica</div>
+            </div>
+            <div class="mf">
+              <label>Encoding do arquivo</label>
+              <select>
+                <option selected>UTF-8 (obrigatório ANS)</option>
+              </select>
+              <div class="mf-hint ok">✅ Padrão obrigatório pela ANS</div>
+            </div>
+            <div class="mf">
+              <label>Máximo de guias por lote</label>
+              <input type="number" value="100"/>
+              <div class="mf-hint">Limite da ANS: 100 guias por arquivo XML</div>
+            </div>
+            <div class="mf">
+              <label>Numeração do lote — atual</label>
+              <input type="number" value="1" id="loteNum"/>
+              <div class="mf-hint">Incrementado automaticamente a cada envio</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="sec-hd">
+            <div>
+              <div class="sec-title">Códigos TUSS por Especialidade</div>
+              <div class="sec-sub">Usados automaticamente na geração das guias do XML. A clínica faz apenas consultas ambulatoriais — um código por especialidade.</div>
+            </div>
+            <div class="sec-badge">⚠️ Obrigatório para XML</div>
+          </div>
+
+          <!-- PSICOLOGIA -->
+          <div class="tuss-card">
+            <div class="tuss-hd">
+              <div class="tuss-icon psico">🧠</div>
+              <div>
+                <div class="tuss-spec">Psicologia</div>
+                <div class="tuss-code">Consulta em Psicologia</div>
+              </div>
+              <span class="tuss-badge ok">✅ Configurado</span>
+            </div>
+            <div class="tuss-body">
+              <div class="tuss-field">
+                <label>Código TUSS principal</label>
+                <input type="text" value="50000462" id="tuss-psico-1"/>
+              </div>
+              <div class="tuss-field">
+                <label>Descrição</label>
+                <input type="text" value="Consulta em psicologia"/>
+              </div>
+              <div class="tuss-field">
+                <label>Tabela ANS</label>
+                <input type="text" value="22 — TUSS" readonly style="color:var(--text-soft)"/>
+              </div>
+              <div class="tuss-field">
+                <label>Código alternativo (psicoterapia)</label>
+                <input type="text" value="50000470" id="tuss-psico-2"/>
+              </div>
+              <div class="tuss-field">
+                <label>Descrição alternativo</label>
+                <input type="text" value="Psicoterapia individual por psicólogo"/>
+              </div>
+              <div class="tuss-field">
+                <label>Usar por padrão</label>
+                <select>
+                  <option value="50000462" selected>50000462 — Consulta</option>
+                  <option value="50000470">50000470 — Psicoterapia</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- NUTRIÇÃO -->
+          <div class="tuss-card">
+            <div class="tuss-hd">
+              <div class="tuss-icon nutri">🥗</div>
+              <div>
+                <div class="tuss-spec">Nutrição</div>
+                <div class="tuss-code">Consulta Ambulatorial por Nutricionista</div>
+              </div>
+              <span class="tuss-badge ok">✅ Configurado</span>
+            </div>
+            <div class="tuss-body">
+              <div class="tuss-field">
+                <label>Código TUSS</label>
+                <input type="text" value="50000560" id="tuss-nutri"/>
+              </div>
+              <div class="tuss-field">
+                <label>Descrição</label>
+                <input type="text" value="Consulta ambulatorial por nutricionista"/>
+              </div>
+              <div class="tuss-field">
+                <label>Tabela ANS</label>
+                <input type="text" value="22 — TUSS" readonly style="color:var(--text-soft)"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- FONOAUDIOLOGIA -->
+          <div class="tuss-card">
+            <div class="tuss-hd">
+              <div class="tuss-icon fono">🗣️</div>
+              <div>
+                <div class="tuss-spec">Fonoaudiologia</div>
+                <div class="tuss-code">Consulta / Sessão Individual Ambulatorial</div>
+              </div>
+              <span class="tuss-badge ok">✅ Configurado</span>
+            </div>
+            <div class="tuss-body">
+              <div class="tuss-field">
+                <label>Código TUSS principal</label>
+                <input type="text" value="50000586" id="tuss-fono-1"/>
+              </div>
+              <div class="tuss-field">
+                <label>Descrição</label>
+                <input type="text" value="Consulta individual ambulatorial de fonoaudiologia"/>
+              </div>
+              <div class="tuss-field">
+                <label>Tabela ANS</label>
+                <input type="text" value="22 — TUSS" readonly style="color:var(--text-soft)"/>
+              </div>
+              <div class="tuss-field">
+                <label>Código alternativo (sessão)</label>
+                <input type="text" value="50000616" id="tuss-fono-2"/>
+              </div>
+              <div class="tuss-field">
+                <label>Descrição alternativo</label>
+                <input type="text" value="Sessão individual ambulatorial de fonoaudiologia"/>
+              </div>
+              <div class="tuss-field">
+                <label>Usar por padrão</label>
+                <select>
+                  <option value="50000586" selected>50000586 — Consulta</option>
+                  <option value="50000616">50000616 — Sessão</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:12px 16px;background:var(--sky-mist);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--text-soft);line-height:1.7">
+            💡 <strong style="color:var(--navy)">Sobre os códigos TUSS:</strong> Os códigos acima são da Tabela 22 da ANS (TUSS — Terminologia Unificada da Saúde Suplementar) e foram verificados para consultas ambulatoriais. O sistema os aplica automaticamente na geração do XML mensal, sem precisar preencher manualmente em cada guia.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ CONVÊNIOS & ANS ══ -->
+      <div class="tab-panel" id="tab-convenios">
+
+        <div class="section">
+          <div class="sec-hd">
+            <div>
+              <div class="sec-title">Registro ANS dos Convênios</div>
+              <div class="sec-sub">Código de registro de cada operadora na ANS. Obrigatório no XML TISS. Consulte cada convênio para obter o número correto.</div>
+            </div>
+            <div class="sec-badge">⚠️ Obrigatório para XML</div>
+          </div>
+
+          <table class="conv-table">
+            <thead>
+              <tr>
+                <th>Convênio</th>
+                <th>Registro ANS</th>
+                <th>Código no sistema</th>
+                <th>Status XML</th>
+              </tr>
+            </thead>
+            <tbody id="convTable"></tbody>
+          </table>
+
+          <div style="margin-top:14px;padding:12px 16px;background:var(--gold-pale);border:1px solid var(--gold);border-radius:10px;font-size:11px;color:#8B6A1E;line-height:1.7">
+            ⚠️ <strong>Como obter o número ANS:</strong> Acesse o portal da ANS em <strong>ans.gov.br → Operadoras → Consulta de operadoras</strong> e busque pelo nome do convênio. O número de registro ANS tem 6 dígitos. Cada convênio deve informar esse número ao prestador credenciado.
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="sec-hd">
+            <div>
+              <div class="sec-title">Credencial por Convênio</div>
+              <div class="sec-sub">Login e senha do portal de cada operadora para envio do XML</div>
+            </div>
+          </div>
+
+          <table class="conv-table">
+            <thead>
+              <tr>
+                <th>Convênio</th>
+                <th>Portal</th>
+                <th>Login (usuário)</th>
+                <th>Senha</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="conv-name"><div class="conv-dot"></div>HAPVIDA NOTREDAME</div></td>
+                <td><a href="#" style="font-size:11px;color:var(--sky)">prestador.hapvida.com.br</a></td>
+                <td><input class="conv-input" style="width:160px" placeholder="Usuário"/></td>
+                <td><input class="conv-input" style="width:130px" type="password" placeholder="••••••••"/></td>
+              </tr>
+              <tr>
+                <td><div class="conv-name"><div class="conv-dot"></div>BRADESCO SAÚDE</div></td>
+                <td><a href="#" style="font-size:11px;color:var(--sky)">prestadores.bradescosaude.com.br</a></td>
+                <td><input class="conv-input" style="width:160px" placeholder="Usuário"/></td>
+                <td><input class="conv-input" style="width:130px" type="password" placeholder="••••••••"/></td>
+              </tr>
+              <tr>
+                <td><div class="conv-name"><div class="conv-dot"></div>UNIMED</div></td>
+                <td><a href="#" style="font-size:11px;color:var(--sky)">unimed.coop.br</a></td>
+                <td><input class="conv-input" style="width:160px" placeholder="Usuário"/></td>
+                <td><input class="conv-input" style="width:130px" type="password" placeholder="••••••••"/></td>
+              </tr>
+              <tr>
+                <td><div class="conv-name"><div class="conv-dot"></div>PREVENT SENIOR</div></td>
+                <td><a href="#" style="font-size:11px;color:var(--sky)">portalprestadores.preventsenior.com.br</a></td>
+                <td><input class="conv-input" style="width:160px" placeholder="Usuário"/></td>
+                <td><input class="conv-input" style="width:130px" type="password" placeholder="••••••••"/></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="margin-top:12px;font-size:11px;color:var(--text-soft)">💡 As senhas são criptografadas e nunca exibidas em texto. Usadas apenas no envio automático do XML.</div>
+        </div>
+
+      </div>
+
+      <!-- ══ PRONTIDÃO XML ══ -->
+      <div class="tab-panel" id="tab-xml">
+
+        <div class="readiness-card">
+          <div class="rc-title">✅ Prontidão para Geração do XML TISS</div>
+          <div class="rc-items" id="readinessItems"></div>
+        </div>
+
+        <div class="section">
+          <div class="sec-hd">
+            <div>
+              <div class="sec-title">O que o sistema gera automaticamente</div>
+              <div class="sec-sub">Sem precisar de módulo de guias manual</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--green-pale);border:1px solid var(--green-bdr);border-radius:10px">
+              <div style="font-size:18px;flex-shrink:0">✅</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px">Guia de Consulta por agendamento realizado</div>
+                <div style="font-size:11px;color:var(--text-soft)">Cada consulta marcada como "realizada" na agenda gera automaticamente uma guia no lote mensal</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--green-pale);border:1px solid var(--green-bdr);border-radius:10px">
+              <div style="font-size:18px;flex-shrink:0">✅</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px">Código TUSS aplicado por especialidade</div>
+                <div style="font-size:11px;color:var(--text-soft)">Psico → 50000462 · Nutri → 50000560 · Fono → 50000586 — configurados nesta tela</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--green-pale);border:1px solid var(--green-bdr);border-radius:10px">
+              <div style="font-size:18px;flex-shrink:0">✅</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px">Dados do paciente puxados do cadastro</div>
+                <div style="font-size:11px;color:var(--text-soft)">Nome, CPF, número de carteirinha e validade do plano — já cadastrados no sistema</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--green-pale);border:1px solid var(--green-bdr);border-radius:10px">
+              <div style="font-size:18px;flex-shrink:0">✅</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px">Dados do profissional puxados do cadastro</div>
+                <div style="font-size:11px;color:var(--text-soft)">CPF e número do conselho (CRP/CRN/CREFONO) — já cadastrados no sistema</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--green-pale);border:1px solid var(--green-bdr);border-radius:10px">
+              <div style="font-size:18px;flex-shrink:0">✅</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px">Hash de integridade calculado automaticamente</div>
+                <div style="font-size:11px;color:var(--text-soft)">Gerado no back-end no momento da exportação — garante que o arquivo não foi adulterado</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--green-pale);border:1px solid var(--green-bdr);border-radius:10px">
+              <div style="font-size:18px;flex-shrink:0">✅</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px">Lotes de até 100 guias — divisão automática</div>
+                <div style="font-size:11px;color:var(--text-soft)">Se o mês tiver mais de 100 consultas por convênio, o sistema gera múltiplos lotes numerados sequencialmente</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ DATA ══
+var CONVS = [
+  { id:'hapvida',    name:'HAPVIDA NOTREDAME',    ans:'',       cod:'001' },
+  { id:'bradesco',   name:'BRADESCO SAÚDE',        ans:'',       cod:'002' },
+  { id:'prevent',   name:'PREVENT SENIOR',         ans:'',       cod:'003' },
+  { id:'porto',     name:'PORTO SEGURO',            ans:'',       cod:'004' },
+  { id:'unimed',    name:'UNIMED',                  ans:'',       cod:'005' },
+  { id:'careplus',  name:'CARE PLUS',               ans:'',       cod:'006' },
+  { id:'mediservice', name:'MEDISERVICE',           ans:'',       cod:'007' },
+  { id:'vivest',    name:'VIVEST',                  ans:'',       cod:'008' },
+  { id:'bradesco2', name:'BRADESCO OPERADORA',      ans:'',       cod:'009' },
+  { id:'omint',     name:'OMINT SAÚDE',             ans:'',       cod:'010' },
+  { id:'itau',      name:'FUNDAÇÃO SAÚDE ITAÚ',    ans:'',       cod:'011' },
+];
+
+// ══ RENDER CONV TABLE ══
+function renderConvTable() {
+  var tbody = document.getElementById('convTable');
+  tbody.innerHTML = '';
+  CONVS.forEach(function(c) {
+    var tr = document.createElement('tr');
+    var hasAns = c.ans.length >= 4;
+    tr.innerHTML =
+      '<td><div class="conv-name"><div class="conv-dot"></div>'+c.name+'</div></td>'+
+      '<td><input class="conv-input" id="ans-'+c.id+'" placeholder="000000 (6 dígitos)" value="'+c.ans+'" maxlength="6" oninput="onAnsInput(\''+c.id+'\')" /></td>'+
+      '<td style="font-size:11px;color:var(--text-soft)">COD-'+c.cod+'</td>'+
+      '<td><span class="conv-status '+(hasAns?'ok':'pending')+'">'+(hasAns?'✅ Pronto':'⏳ Pendente')+'</span></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function onAnsInput(id) {
+  var c = CONVS.find(function(x){ return x.id===id; });
+  var val = document.getElementById('ans-'+id).value;
+  if(c) c.ans = val;
+  var hasAns = val.length >= 4;
+  var row = document.getElementById('ans-'+id).closest('tr');
+  var badge = row.querySelector('.conv-status');
+  badge.className = 'conv-status '+(hasAns?'ok':'pending');
+  badge.textContent = hasAns?'✅ Pronto':'⏳ Pendente';
+  updateReadiness();
+}
+
+// ══ READINESS ══
+function updateReadiness() {
+  var cnpj  = document.getElementById('cnpjInput').value.trim();
+  var cnes  = document.getElementById('cnesInput').value.trim();
+  var ansOk = CONVS.filter(function(c){ return c.ans.length>=4; }).length;
+
+  document.getElementById('cnpjHint').textContent = cnpj ? '✅ CNPJ informado' : '⚠️ Obrigatório para geração do XML TISS';
+  document.getElementById('cnpjHint').className   = 'mf-hint '+(cnpj?'ok':'warn');
+  document.getElementById('cnesHint').textContent = cnes ? '✅ CNES informado' : '⚠️ Obrigatório para geração do XML TISS';
+  document.getElementById('cnesHint').className   = 'mf-hint '+(cnes?'ok':'warn');
+
+  var items = [
+    { label:'CNPJ da clínica', sub:'Identifica o prestador no XML', ok:cnpj.length>0 },
+    { label:'CNES da clínica', sub:'Cadastro Nacional de Estabelecimentos de Saúde', ok:cnes.length>0 },
+    { label:'Códigos TUSS', sub:'Psico (50000462) · Nutri (50000560) · Fono (50000586)', ok:true },
+    { label:'Registro ANS dos convênios', sub:ansOk+' de '+CONVS.length+' convênios configurados', ok:ansOk===CONVS.length, warn:ansOk>0&&ansOk<CONVS.length },
+    { label:'Dados dos pacientes (CPF + carteirinha)', sub:'Verificado no cadastro de pacientes', ok:true },
+    { label:'Dados dos profissionais (CPF + conselho)', sub:'Verificado no cadastro de profissionais', ok:true },
+    { label:'Hash e numeração de lotes', sub:'Calculado automaticamente pelo back-end', ok:true },
+  ];
+
+  var container = document.getElementById('readinessItems');
+  container.innerHTML = '';
+  var allOk = items.every(function(i){ return i.ok; });
+  items.forEach(function(item) {
+    var cls = item.ok ? 'ok' : (item.warn ? 'warn' : 'pending');
+    var icon = item.ok ? '✅' : (item.warn ? '⚠️' : '❌');
+    var badge = item.ok ? 'Pronto' : (item.warn ? 'Parcial' : 'Pendente');
+    var div = document.createElement('div');
+    div.className = 'rc-item '+cls;
+    div.innerHTML =
+      '<div class="rc-icon">'+icon+'</div>'+
+      '<div style="flex:1"><div class="rc-label">'+item.label+'</div><div class="rc-sub">'+item.sub+'</div></div>'+
+      '<span class="rc-badge '+cls+'">'+badge+'</span>';
+    container.appendChild(div);
+  });
+
+  // overall status
+  var exists = container.querySelector('.rc-overall');
+  if(exists) exists.remove();
+  var overall = document.createElement('div');
+  overall.className = 'rc-overall';
+  overall.style.cssText = 'margin-top:14px;padding:14px 16px;border-radius:10px;display:flex;align-items:center;gap:12px;font-weight:700;font-size:13px;'+(allOk?'background:var(--green-pale);border:1.5px solid var(--green-bdr);color:#1A6A42':'background:var(--orange-pale);border:1.5px solid var(--orange);color:#8B4A1E');
+  overall.innerHTML = (allOk?'✅ Sistema pronto para gerar XML TISS!':'⚠️ Preencha os campos pendentes para liberar a geração do XML');
+  container.appendChild(overall);
+}
+
+// ══ TABS ══
+function showTab(tab, el) {
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('tab-'+tab).classList.add('active');
+  el.classList.add('active');
+}
+
+// ══ SAVE ══
+function saveAll() {
+  showToast('💾 Configurações salvas com sucesso!');
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(function(){ t.style.display='none'; }, 3000);
+}
+
+// ══ INIT ══
+renderConvTable();
+updateReadiness();
+</script>
+</body>
+</html>

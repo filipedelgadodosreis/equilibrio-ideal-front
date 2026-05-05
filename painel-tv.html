@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel de Senhas — Clínica Equilíbrio Ideal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-light:#E8D5AC; --gold-pale:#FBF5EA;
+      --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
+      --psico:#5A9EC9; --psico-bg:#EBF4FA;
+      --nutri:#5AAE82; --nutri-bg:#EDFAF3;
+      --fono:#C9A96E;  --fono-bg:#FBF5EA;
+    }
+    html, body {
+      height:100%; font-family:'Lato',sans-serif;
+      background:linear-gradient(160deg, #0D2038 0%, #1B3A5C 60%, #2E5480 100%);
+      color:var(--white); overflow:hidden;
+    }
+
+    /* ── LAYOUT ── */
+    .screen { height:100vh; display:flex; flex-direction:column; }
+
+    /* header */
+    .hd {
+      padding:20px 40px 16px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      flex-shrink:0;
+    }
+    .hd-brand { display:flex; align-items:center; gap:14px; }
+    .hd-icon  { width:44px; height:44px; background:rgba(255,255,255,.1); border:1px solid rgba(201,169,110,.4); border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .hd-icon span { font-family:'Playfair Display',serif; font-size:20px; color:var(--gold-light); }
+    .hd-name { font-family:'Playfair Display',serif; font-size:22px; color:var(--white); }
+    .hd-sub  { font-size:11px; color:rgba(255,255,255,.45); letter-spacing:.1em; margin-top:2px; }
+    .hd-clock { text-align:right; }
+    .clock-time { font-family:'Playfair Display',serif; font-size:32px; color:var(--gold-light); line-height:1; }
+    .clock-date { font-size:12px; color:rgba(255,255,255,.45); margin-top:3px; letter-spacing:.06em; }
+
+    /* decorative gold line */
+    .gold-line { height:2px; background:linear-gradient(90deg, transparent, var(--gold), transparent); opacity:.3; flex-shrink:0; }
+
+    /* body */
+    .body { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:0; overflow:hidden; }
+
+    /* ── CURRENT CALL ── */
+    .current-panel {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:30px 40px;
+      border-right:1px solid rgba(255,255,255,.08);
+      position:relative; overflow:hidden;
+    }
+    /* glow */
+    .current-panel::before {
+      content:''; position:absolute; width:400px; height:400px; border-radius:50%;
+      background:radial-gradient(circle, rgba(125,168,201,.2) 0%, transparent 70%);
+      top:50%; left:50%; transform:translate(-50%,-50%);
+      animation:pulse-glow 3s ease-in-out infinite;
+    }
+    @keyframes pulse-glow { 0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)} 50%{opacity:1;transform:translate(-50%,-50%) scale(1.1)} }
+
+    .current-label {
+      font-size:12px; font-weight:700; letter-spacing:.22em; text-transform:uppercase;
+      color:rgba(255,255,255,.5); margin-bottom:16px; position:relative; z-index:2;
+    }
+    .current-card {
+      position:relative; z-index:2; text-align:center;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+      border-radius:24px; padding:32px 48px;
+      backdrop-filter:blur(10px);
+      animation:cardIn .4s ease;
+    }
+    @keyframes cardIn { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
+
+    .current-spec-tag {
+      display:inline-flex; align-items:center; gap:7px;
+      padding:5px 16px; border-radius:20px; font-size:12px; font-weight:700;
+      margin-bottom:20px; letter-spacing:.06em;
+    }
+    .current-spec-tag.psico { background:rgba(90,158,201,.25); border:1px solid rgba(90,158,201,.5); color:#B8D4E8; }
+    .current-spec-tag.nutri { background:rgba(90,174,130,.25); border:1px solid rgba(90,174,130,.5); color:#B8E8CC; }
+    .current-spec-tag.fono  { background:rgba(201,169,110,.25); border:1px solid rgba(201,169,110,.5); color:var(--gold-light); }
+
+    .current-number {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(80px,12vw,140px);
+      font-weight:700; line-height:1;
+      color:var(--white);
+      text-shadow:0 0 60px rgba(125,168,201,.4);
+    }
+    .current-name {
+      font-size:22px; font-weight:700; color:var(--white);
+      margin:12px 0 6px; letter-spacing:.02em;
+    }
+    .current-prof {
+      font-size:15px; color:rgba(255,255,255,.6); font-weight:300;
+    }
+    .current-sala {
+      margin-top:14px; display:inline-flex; align-items:center; gap:8px;
+      background:rgba(201,169,110,.15); border:1px solid rgba(201,169,110,.3);
+      border-radius:10px; padding:7px 16px;
+      font-size:14px; font-weight:700; color:var(--gold-light);
+    }
+
+    /* call animation */
+    .call-flash { animation:flash .6s ease 3; }
+    @keyframes flash { 0%,100%{background:rgba(255,255,255,.06)} 50%{background:rgba(125,168,201,.2)} }
+
+    /* ── QUEUE ── */
+    .queue-panel { display:flex; flex-direction:column; overflow:hidden; }
+    .queue-header {
+      padding:20px 28px 14px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex; align-items:center; justify-content:space-between;
+      flex-shrink:0;
+    }
+    .queue-title { font-size:13px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.5); }
+    .queue-count { font-size:12px; color:rgba(255,255,255,.35); }
+
+    .queue-list { flex:1; overflow-y:auto; padding:12px 16px; }
+    .queue-list::-webkit-scrollbar { width:3px; }
+    .queue-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,.15); border-radius:2px; }
+
+    .queue-item {
+      display:flex; align-items:center; gap:14px;
+      padding:12px 16px; border-radius:12px;
+      margin-bottom:8px; transition:all .2s;
+      border:1px solid rgba(255,255,255,.07);
+      background:rgba(255,255,255,.04);
+    }
+    .queue-item:first-child { background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.15); }
+    .qi-pos {
+      width:32px; height:32px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:700; flex-shrink:0;
+      background:rgba(255,255,255,.1); color:rgba(255,255,255,.6);
+    }
+    .queue-item:first-child .qi-pos { background:var(--gold); color:var(--navy); }
+    .qi-number { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--white); min-width:80px; }
+    .qi-info { flex:1; }
+    .qi-name { font-size:13px; font-weight:700; color:var(--white); }
+    .qi-prof { font-size:11px; color:rgba(255,255,255,.45); margin-top:2px; }
+    .qi-spec { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .qi-spec.psico { background:var(--psico); }
+    .qi-spec.nutri { background:var(--nutri); }
+    .qi-spec.fono  { background:var(--fono); }
+    .qi-time { font-size:11px; color:rgba(255,255,255,.35); }
+
+    /* ── FOOTER ── */
+    .footer {
+      padding:12px 40px;
+      border-top:1px solid rgba(255,255,255,.08);
+      display:flex; align-items:center; justify-content:center; gap:32px;
+      flex-shrink:0; background:rgba(0,0,0,.15);
+    }
+    .footer-item { display:flex; align-items:center; gap:8px; font-size:12px; color:rgba(255,255,255,.4); }
+    .footer-dot  { width:8px; height:8px; border-radius:50%; }
+    .footer-dot.psico { background:var(--psico); }
+    .footer-dot.nutri { background:var(--nutri); }
+    .footer-dot.fono  { background:var(--fono); }
+    .footer-div  { width:1px; height:16px; background:rgba(255,255,255,.1); }
+
+    /* decorative leaves */
+    .leaf-dec { position:fixed; pointer-events:none; opacity:.06; }
+    .leaf-tr   { top:-30px; right:-30px; width:280px; }
+    .leaf-bl   { bottom:-30px; left:-30px; width:220px; transform:rotate(180deg) scaleX(-1); }
+
+    /* watercolor leaves SVG */
+    /* sparkles */
+    .spark { position:fixed; color:var(--gold); font-size:12px; opacity:0; animation:twinkle 5s ease-in-out infinite; pointer-events:none; }
+    .spark:nth-child(1){ top:15%; right:28%; animation-delay:0s; }
+    .spark:nth-child(2){ top:65%; right:8%;  animation-delay:2s; }
+    .spark:nth-child(3){ bottom:20%; left:38%; animation-delay:1s; }
+    @keyframes twinkle { 0%,100%{opacity:0;transform:scale(.6)} 50%{opacity:.6;transform:scale(1.2)} }
+  </style>
+</head>
+<body>
+
+<div class="spark">✦</div>
+<div class="spark">✦</div>
+<div class="spark">✦</div>
+
+<!-- watercolor leaf top right -->
+<svg class="leaf-dec leaf-tr" viewBox="0 0 280 260" fill="none">
+  <ellipse cx="70" cy="55" rx="36" ry="66" fill="#7DA8C9" transform="rotate(-38 70 55)"/>
+  <ellipse cx="130" cy="35" rx="26" ry="54" fill="#9BBDD6" transform="rotate(-22 130 35)"/>
+  <ellipse cx="185" cy="72" rx="22" ry="46" fill="#6E9EBE" transform="rotate(-10 185 72)"/>
+  <path d="M55 25 Q75 78 95 125" stroke="#7DA8C9" stroke-width="1.4" fill="none"/>
+  <path d="M120 18 Q142 58 150 108" stroke="#9BBDD6" stroke-width="1.1" fill="none"/>
+</svg>
+<svg class="leaf-dec leaf-bl" viewBox="0 0 260 240" fill="none">
+  <ellipse cx="70" cy="55" rx="36" ry="66" fill="#7DA8C9" transform="rotate(-38 70 55)"/>
+  <ellipse cx="128" cy="34" rx="26" ry="54" fill="#9BBDD6" transform="rotate(-22 128 34)"/>
+  <path d="M55 25 Q75 78 95 125" stroke="#7DA8C9" stroke-width="1.4" fill="none"/>
+</svg>
+
+<div class="screen">
+
+  <!-- HEADER -->
+  <div class="hd">
+    <div class="hd-brand">
+      <div class="hd-icon"><span>Ψ</span></div>
+      <div>
+        <div class="hd-name">Clínica Equilíbrio Ideal</div>
+        <div class="hd-sub">PAINEL DE ATENDIMENTO</div>
+      </div>
+    </div>
+    <div class="hd-clock">
+      <div class="clock-time" id="clockTime">00:00</div>
+      <div class="clock-date" id="clockDate"></div>
+    </div>
+  </div>
+
+  <div class="gold-line"></div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- CURRENT -->
+    <div class="current-panel" id="currentPanel">
+      <div class="current-label">Chamando agora</div>
+      <div class="current-card" id="currentCard">
+        <div class="current-spec-tag psico" id="curSpecTag">🧠 Psicologia</div>
+        <div class="current-number" id="curNumber">PSI-007</div>
+        <div class="current-name"   id="curName">João Pereira</div>
+        <div class="current-prof"   id="curProf">Dra. Ana Costa</div>
+        <div class="current-sala"   id="curSala">🏥 Sala 01</div>
+      </div>
+    </div>
+
+    <!-- QUEUE -->
+    <div class="queue-panel">
+      <div class="queue-header">
+        <div class="queue-title">Próximos na fila</div>
+        <div class="queue-count" id="queueCount">0 aguardando</div>
+      </div>
+      <div class="queue-list" id="queueList"></div>
+    </div>
+
+  </div>
+
+  <div class="gold-line"></div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-item"><div class="footer-dot psico"></div>Psicologia</div>
+    <div class="footer-div"></div>
+    <div class="footer-item"><div class="footer-dot nutri"></div>Nutrição</div>
+    <div class="footer-div"></div>
+    <div class="footer-item"><div class="footer-dot fono"></div>Fonoaudiologia</div>
+    <div class="footer-div"></div>
+    <div class="footer-item">Santo André, SP · (11) 3110-0069</div>
+    <div class="footer-div"></div>
+    <div class="footer-item">clinicaequilibrioideal.com.br</div>
+  </div>
+
+</div>
+
+<script>
+// ══ CLOCK ══
+function updateClock() {
+  var now = new Date();
+  var h = String(now.getHours()).padStart(2,'0');
+  var m = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('clockTime').textContent = h+':'+m;
+  var days = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  var months = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  document.getElementById('clockDate').textContent =
+    days[now.getDay()]+', '+now.getDate()+' de '+months[now.getMonth()]+' de '+now.getFullYear();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ══ DATA — synced via localStorage with control panel ══
+var SPEC_ICONS = {psico:'🧠', nutri:'🥗', fono:'🗣️'};
+var SPEC_NAMES = {psico:'Psicologia', nutri:'Nutrição', fono:'Fonoaudiologia'};
+
+var DEFAULT_CURRENT = { number:'PSI-007', name:'João Pereira', prof:'Dra. Ana Costa', sala:'Sala 01', spec:'psico' };
+var DEFAULT_QUEUE = [
+  { number:'PSI-008', name:'Fernanda Souza',  prof:'Dr. Bruno Silva',    spec:'psico', time:'09:30' },
+  { number:'NUT-003', name:'Luciana Martins', prof:'Dra. Karen Alves',   spec:'nutri', time:'09:30' },
+  { number:'FON-002', name:'Rafael Santos',   prof:'Dr. Paulo Ribeiro',  spec:'fono',  time:'10:00' },
+  { number:'PSI-009', name:'Carlos Nunes',    prof:'Dra. Carla Mendes',  spec:'psico', time:'10:00' },
+  { number:'NUT-004', name:'Amanda Ferreira', prof:'Dr. Lucas Pinto',    spec:'nutri', time:'10:30' },
+  { number:'FON-003', name:'Patrícia Gomes',  prof:'Dra. Quésia Moreira',spec:'fono',  time:'10:30' },
+];
+
+function loadState() {
+  try {
+    var stored = localStorage.getItem('eq_painel_state');
+    if (stored) return JSON.parse(stored);
+  } catch(e){}
+  return { current: DEFAULT_CURRENT, queue: DEFAULT_QUEUE };
+}
+
+function renderDisplay() {
+  var state = loadState();
+  var cur = state.current;
+
+  // current
+  var specTag = document.getElementById('curSpecTag');
+  specTag.textContent = SPEC_ICONS[cur.spec] + ' ' + SPEC_NAMES[cur.spec];
+  specTag.className = 'current-spec-tag ' + cur.spec;
+  document.getElementById('curNumber').textContent = cur.number;
+  document.getElementById('curName').textContent   = cur.name;
+  document.getElementById('curProf').textContent   = cur.prof;
+  document.getElementById('curSala').textContent   = '🏥 ' + cur.sala;
+
+  // queue
+  var list  = document.getElementById('queueList');
+  var count = document.getElementById('queueCount');
+  list.innerHTML = '';
+  count.textContent = state.queue.length + ' aguardando';
+
+  state.queue.forEach(function(q, i) {
+    var item = document.createElement('div');
+    item.className = 'queue-item';
+    item.innerHTML =
+      '<div class="qi-pos">'+(i+1)+'</div>'+
+      '<div class="qi-number">'+q.number+'</div>'+
+      '<div class="qi-info">'+
+        '<div class="qi-name">'+q.name+'</div>'+
+        '<div class="qi-prof">'+q.prof+'</div>'+
+      '</div>'+
+      '<div class="qi-spec '+q.spec+'"></div>'+
+      '<div class="qi-time">'+q.time+'</div>';
+    list.appendChild(item);
+  });
+}
+
+// poll for updates every 2 seconds
+renderDisplay();
+setInterval(renderDisplay, 2000);
+
+// listen for storage events (cross-tab)
+window.addEventListener('storage', function(e) {
+  if (e.key === 'eq_painel_state') renderDisplay();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <title>Equilíbrio Ideal — Paciente</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    :root {
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA; --sky-mist:#F4F9FC;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-light:#E8D5AC; --gold-pale:#FBF5EA;
+      --cream:#FDFAF5; --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
+      --red:#E05252; --red-pale:#FEF0F0;
+      --psico:#5A9EC9; --psico-bg:#EBF4FA;
+      --nutri:#5AAE82; --nutri-bg:#EDFAF3;
+      --fono:#C9A96E;  --fono-bg:#FBF5EA;
+    }
+    html { height:100%; }
+    body {
+      height:100%; font-family:'Lato',sans-serif;
+      background:var(--cream); color:var(--text);
+      display:flex; flex-direction:column;
+      max-width:430px; margin:0 auto;
+      box-shadow:0 0 40px rgba(27,58,92,.12);
+      overflow:hidden; position:relative;
+    }
+
+    /* ── SCREENS ── */
+    .screen { display:none; flex:1; flex-direction:column; overflow:hidden; }
+    .screen.active { display:flex; }
+
+    /* ════════════════════════════
+       LOGIN SCREEN
+    ════════════════════════════ */
+    #loginScreen {
+      background:linear-gradient(160deg, var(--sky-pale) 0%, var(--sky-mist) 55%, var(--cream) 100%);
+      position:relative; overflow:hidden;
+    }
+
+    /* leaves */
+    .leaf-dec { position:absolute; pointer-events:none; }
+    .leaf-tr { top:-10px; right:-15px; width:180px; opacity:.65; }
+    .leaf-bl { bottom:-15px; left:-10px; width:150px; opacity:.5; transform:rotate(180deg) scaleX(-1); }
+
+    /* gold arc */
+    .login-arc { position:absolute; width:340px; height:340px; border-radius:50%; border:1px solid rgba(201,169,110,.18); top:-140px; left:-140px; pointer-events:none; }
+
+    .login-content { flex:1; display:flex; flex-direction:column; justify-content:center; padding:32px 28px 20px; position:relative; z-index:2; }
+
+    /* logo */
+    .login-logo { display:flex; flex-direction:column; align-items:center; margin-bottom:32px; }
+    .ll-circle { width:64px; height:64px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; margin-bottom:12px; }
+    .ll-circle::after { content:''; position:absolute; inset:-5px; border-radius:50%; border:1px solid rgba(201,169,110,.35); }
+    .ll-psi { font-family:'Playfair Display',serif; font-size:26px; color:#fff; }
+    .ll-clinic { font-size:9px; font-weight:700; letter-spacing:.26em; text-transform:uppercase; color:var(--sky); margin-bottom:2px; }
+    .ll-name1 { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--navy); line-height:1; }
+    .ll-name2 { font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); }
+    .ll-star  { color:var(--gold); font-size:11px; }
+
+    /* gold divider */
+    .gold-div { display:flex; align-items:center; gap:8px; margin:0 auto 24px; width:200px; }
+    .gold-div::before,.gold-div::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold-light),transparent); }
+    .gold-div span { color:var(--gold); font-size:10px; }
+
+    /* form */
+    .login-title { font-family:'Playfair Display',serif; font-size:22px; color:var(--navy); margin-bottom:4px; }
+    .login-sub   { font-size:12px; color:var(--text-soft); margin-bottom:22px; font-weight:300; }
+
+    .lf { margin-bottom:14px; }
+    .lf label { display:block; font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:5px; }
+    .lf-wrap { position:relative; }
+    .lf-wrap svg { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--sky-light); pointer-events:none; }
+    .lf input { width:100%; height:48px; padding:0 14px 0 40px; border:1.5px solid var(--border); border-radius:11px; font-family:'Lato',sans-serif; font-size:14px; color:var(--text); background:var(--white); outline:none; transition:all .15s; }
+    .lf input:focus { border-color:var(--sky); box-shadow:0 0 0 3px rgba(125,168,201,.12); }
+    .lf input::placeholder { color:var(--sky-light); }
+
+    .forgot { text-align:right; margin-bottom:22px; }
+    .forgot a { font-size:12px; color:var(--sky); font-weight:700; text-decoration:none; }
+
+    .btn-login { width:100%; height:50px; border:none; border-radius:12px; background:var(--navy); color:#fff; font-family:'Lato',sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:background .15s; letter-spacing:.04em; }
+    .btn-login:hover { background:var(--navy-mid); }
+    .btn-login:active { transform:scale(.98); }
+
+    .login-footer { text-align:center; margin-top:16px; font-size:11px; color:var(--text-soft); }
+
+    /* ════════════════════════════
+       APP SHELL (after login)
+    ════════════════════════════ */
+    #appScreen { background:var(--cream); }
+
+    /* top header */
+    .app-hd { background:var(--white); border-bottom:1px solid var(--border); padding:14px 20px 12px; flex-shrink:0; }
+    .app-hd-top { display:flex; align-items:center; justify-content:space-between; }
+    .app-greeting { font-size:11px; color:var(--text-soft); }
+    .app-name { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .app-hd-right { display:flex; align-items:center; gap:10px; }
+    .app-av { width:36px; height:36px; border-radius:50%; background:var(--sky-pale); border:2px solid var(--sky); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--navy); }
+    .notif-btn { width:34px; height:34px; border-radius:50%; background:var(--sky-mist); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; position:relative; }
+    .notif-dot { width:8px; height:8px; border-radius:50%; background:var(--red); position:absolute; top:2px; right:2px; border:1.5px solid #fff; }
+
+    /* pages */
+    .page { display:none; flex:1; overflow-y:auto; padding:16px; }
+    .page.active { display:block; }
+    .page::-webkit-scrollbar { display:none; }
+
+    /* bottom nav */
+    .bottom-nav { background:var(--white); border-top:1px solid var(--border); display:flex; flex-shrink:0; padding:6px 0 max(6px, env(safe-area-inset-bottom)); }
+    .bn-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; cursor:pointer; transition:all .15s; border:none; background:none; }
+    .bn-icon { font-size:20px; }
+    .bn-label { font-size:9px; font-weight:700; letter-spacing:.04em; color:var(--text-soft); text-transform:uppercase; }
+    .bn-item.active .bn-label { color:var(--navy); }
+    .bn-item.active .bn-icon  { transform:scale(1.1); }
+
+    /* ── PRÓXIMAS ── */
+    .section-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); margin-bottom:14px; }
+
+    /* next appointment hero */
+    .next-hero {
+      background:linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      border-radius:18px; padding:20px; margin-bottom:16px;
+      position:relative; overflow:hidden;
+    }
+    .next-hero::before { content:''; position:absolute; width:200px; height:200px; border-radius:50%; background:radial-gradient(circle,rgba(125,168,201,.2) 0%,transparent 70%); top:-60px; right:-60px; pointer-events:none; }
+    .nh-label { font-size:9.5px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:10px; }
+    .nh-date  { font-family:'Playfair Display',serif; font-size:22px; color:var(--white); margin-bottom:4px; }
+    .nh-time  { font-size:14px; color:rgba(255,255,255,.7); margin-bottom:14px; }
+    .nh-row   { display:flex; align-items:center; gap:10px; }
+    .nh-spec  { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; background:rgba(255,255,255,.12); color:var(--white); }
+    .nh-sala  { font-size:11px; color:rgba(255,255,255,.5); margin-left:auto; }
+    .nh-prof  { font-size:13px; color:rgba(255,255,255,.8); margin-top:10px; }
+    .nh-actions { display:flex; gap:8px; margin-top:14px; }
+    .btn-nh { flex:1; height:38px; border-radius:9px; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; border:none; }
+    .btn-nh.primary { background:rgba(255,255,255,.15); color:var(--white); border:1.5px solid rgba(255,255,255,.25); }
+    .btn-nh.primary:hover { background:rgba(255,255,255,.25); }
+    .btn-nh.danger  { background:rgba(224,82,82,.2); color:#FF9999; border:1.5px solid rgba(224,82,82,.3); }
+    .btn-nh.danger:hover { background:rgba(224,82,82,.3); }
+
+    /* upcoming list */
+    .upcoming-list { display:flex; flex-direction:column; gap:10px; }
+    .appt-card {
+      background:var(--white); border:1.5px solid var(--border);
+      border-radius:14px; padding:14px 16px;
+      display:flex; align-items:center; gap:14px;
+      transition:all .15s;
+    }
+    .appt-card:active { transform:scale(.98); }
+    .appt-date-block { text-align:center; min-width:44px; }
+    .adb-day  { font-family:'Playfair Display',serif; font-size:26px; color:var(--navy); line-height:1; }
+    .adb-mon  { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-soft); }
+    .appt-div { width:1px; height:40px; background:var(--border); flex-shrink:0; }
+    .appt-info { flex:1; }
+    .appt-spec { font-size:11px; font-weight:700; display:flex; align-items:center; gap:4px; margin-bottom:3px; }
+    .appt-spec.psico { color:var(--psico); }
+    .appt-spec.nutri { color:var(--nutri); }
+    .appt-spec.fono  { color:var(--fono); }
+    .appt-prof { font-size:13px; font-weight:700; color:var(--navy); }
+    .appt-time { font-size:11px; color:var(--text-soft); margin-top:2px; }
+    .appt-conv { font-size:10px; color:var(--text-soft); margin-top:2px; }
+    .appt-action { display:flex; flex-direction:column; gap:6px; align-items:flex-end; }
+    .btn-cancel-appt { padding:5px 12px; border:1.5px solid var(--border); border-radius:8px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:10px; font-weight:700; color:var(--red); transition:all .15s; }
+    .btn-cancel-appt:hover { border-color:var(--red); background:var(--red-pale); }
+    .appt-status { font-size:10px; font-weight:700; padding:3px 9px; border-radius:6px; }
+    .appt-status.confirmada { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .appt-status.pendente   { background:var(--gold-pale);  color:#8B6A1E; border:1px solid var(--gold); }
+
+    /* empty state */
+    .empty-state { text-align:center; padding:48px 20px; }
+    .empty-icon  { font-size:44px; margin-bottom:14px; }
+    .empty-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); margin-bottom:6px; }
+    .empty-sub   { font-size:12px; color:var(--text-soft); line-height:1.7; }
+
+    /* ── HISTÓRICO ── */
+    .hist-filter { display:flex; gap:6px; margin-bottom:14px; overflow-x:auto; padding-bottom:2px; }
+    .hist-filter::-webkit-scrollbar { display:none; }
+    .hftab { padding:5px 14px; border:1.5px solid var(--border); border-radius:18px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); white-space:nowrap; transition:all .15s; }
+    .hftab.active { background:var(--navy); border-color:var(--navy); color:#fff; }
+
+    .hist-item {
+      background:var(--white); border:1.5px solid var(--border);
+      border-radius:14px; padding:14px 16px; margin-bottom:10px;
+      display:flex; align-items:center; gap:14px;
+    }
+    .hi-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .hi-icon.psico { background:var(--psico-bg); }
+    .hi-icon.nutri { background:var(--nutri-bg); }
+    .hi-icon.fono  { background:var(--fono-bg); }
+    .hi-info { flex:1; }
+    .hi-spec { font-size:11px; font-weight:700; color:var(--text-soft); margin-bottom:2px; }
+    .hi-prof { font-size:13px; font-weight:700; color:var(--navy); }
+    .hi-date { font-size:11px; color:var(--text-soft); margin-top:2px; }
+    .hi-status { font-size:10px; font-weight:700; padding:3px 9px; border-radius:6px; align-self:flex-start; }
+    .hi-status.realizada  { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .hi-status.cancelada  { background:var(--red-pale); color:var(--red); border:1px solid #F5B8B8; }
+
+    /* ── PERFIL ── */
+    .profile-header { background:var(--white); border:1.5px solid var(--border); border-radius:18px; padding:20px; margin-bottom:14px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+    .ph-av { width:72px; height:72px; border-radius:50%; background:var(--sky-pale); border:3px solid var(--sky); display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-size:26px; color:var(--navy); }
+    .ph-name { font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); }
+    .ph-info { font-size:12px; color:var(--text-soft); text-align:center; line-height:1.7; }
+    .ph-conv { display:inline-flex; align-items:center; gap:6px; padding:4px 14px; border-radius:20px; font-size:11px; font-weight:700; background:var(--sky-pale); color:#1E6FA3; border:1px solid var(--sky-light); margin-top:4px; }
+
+    .profile-section { background:var(--white); border:1.5px solid var(--border); border-radius:14px; padding:16px; margin-bottom:10px; }
+    .ps-title { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-soft); margin-bottom:12px; }
+    .ps-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(212,232,242,.5); }
+    .ps-row:last-child { border-bottom:none; }
+    .ps-label { font-size:12px; color:var(--text-soft); }
+    .ps-value { font-size:12px; font-weight:700; color:var(--navy); }
+    .ps-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:4px; }
+    .ps-stat  { text-align:center; padding:12px 8px; background:var(--sky-mist); border-radius:10px; }
+    .ps-stat-n { font-family:'Playfair Display',serif; font-size:22px; color:var(--navy); line-height:1; }
+    .ps-stat-l { font-size:10px; color:var(--text-soft); margin-top:3px; }
+
+    .btn-logout { width:100%; height:46px; border:1.5px solid var(--border); border-radius:12px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:13px; font-weight:700; color:var(--red); transition:all .15s; margin-top:6px; }
+    .btn-logout:hover { border-color:var(--red); background:var(--red-pale); }
+
+    /* ── MODAL CANCEL ── */
+    .overlay { position:fixed; inset:0; background:rgba(15,35,56,.45); z-index:99999; display:none; align-items:flex-end; justify-content:center; backdrop-filter:blur(2px); }
+    .overlay.open { display:flex; }
+    .bottom-sheet { background:#fff; border-radius:20px 20px 0 0; width:100%; max-width:430px; padding:20px 24px 32px; animation:slideUp .25s ease; position:relative; z-index:100000; }
+    @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+    .bs-handle { width:36px; height:4px; border-radius:2px; background:var(--border); margin:0 auto 20px; }
+    .bs-title { font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); margin-bottom:6px; }
+    .bs-sub   { font-size:13px; color:var(--text-soft); line-height:1.6; margin-bottom:20px; }
+    .bs-appt  { background:var(--sky-mist); border:1.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:20px; }
+    .bs-appt-spec { font-size:11px; font-weight:700; color:var(--text-soft); margin-bottom:4px; }
+    .bs-appt-prof { font-size:14px; font-weight:700; color:var(--navy); }
+    .bs-appt-date { font-size:12px; color:var(--text-soft); margin-top:3px; }
+    .bs-reason { margin-bottom:20px; }
+    .bs-reason label { display:block; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:6px; }
+    .bs-reason select { width:100%; height:44px; padding:0 12px; border:1.5px solid var(--border); border-radius:9px; font-family:'Lato',sans-serif; font-size:13px; color:var(--text); background:var(--sky-mist); outline:none; }
+    .bs-btns { display:flex; gap:10px; }
+    .btn-bs-cancel { flex:1; height:46px; border:1.5px solid var(--border); border-radius:11px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:13px; font-weight:700; color:var(--text-soft); }
+    .btn-bs-confirm { flex:1; height:46px; border:none; border-radius:11px; background:var(--red); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:13px; font-weight:700; }
+
+    /* success toast */
+    .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--navy); color:#fff; padding:12px 20px; border-radius:12px; font-size:13px; font-weight:700; z-index:200000; display:none; white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,.2); animation:toastIn .3s ease; }
+    .toast.show { display:block; }
+    @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(-10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+    .page.active { animation:fadeUp .3s ease; }
+  </style>
+</head>
+<body>
+
+<!-- ════ LOGIN ════ -->
+<div class="screen active" id="loginScreen">
+
+  <div class="login-arc"></div>
+
+  <!-- leaves -->
+  <svg class="leaf-dec leaf-tr" viewBox="0 0 220 200" fill="none">
+    <ellipse cx="55" cy="42" rx="28" ry="52" fill="#7DA8C9" fill-opacity=".38" transform="rotate(-38 55 42)"/>
+    <ellipse cx="105" cy="28" rx="20" ry="42" fill="#9BBDD6" fill-opacity=".3"  transform="rotate(-22 105 28)"/>
+    <ellipse cx="150" cy="56" rx="17" ry="36" fill="#6E9EBE" fill-opacity=".3"  transform="rotate(-10 150 56)"/>
+    <path d="M44 20 Q58 62 74 98"  stroke="#7DA8C9" stroke-width="1.2" stroke-opacity=".4" fill="none"/>
+    <path d="M95 14 Q112 46 118 84" stroke="#9BBDD6" stroke-width="1"   stroke-opacity=".3" fill="none"/>
+  </svg>
+  <svg class="leaf-dec leaf-bl" viewBox="0 0 200 180" fill="none">
+    <ellipse cx="50" cy="42" rx="28" ry="52" fill="#7DA8C9" fill-opacity=".35" transform="rotate(-38 50 42)"/>
+    <ellipse cx="100" cy="26" rx="20" ry="42" fill="#9BBDD6" fill-opacity=".25" transform="rotate(-22 100 26)"/>
+    <path d="M40 18 Q56 58 70 95" stroke="#7DA8C9" stroke-width="1.2" stroke-opacity=".38" fill="none"/>
+  </svg>
+
+  <div class="login-content">
+    <div class="login-logo">
+      <div class="ll-circle"><span class="ll-psi">Ψ</span></div>
+      <div style="text-align:center">
+        <span class="ll-clinic" style="display:block;margin-bottom:3px">Clínica</span>
+        <span class="ll-name1" style="display:block">Equilíbrio</span>
+        <span class="ll-name2" style="display:block">Ideal <span class="ll-star">✦</span></span>
+      </div>
+    </div>
+
+    <div class="gold-div"><span>✦</span></div>
+
+    <div class="login-title">Olá, paciente!</div>
+    <div class="login-sub">Acesse suas consultas e histórico</div>
+
+    <div class="lf">
+      <label>CPF</label>
+      <div class="lf-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="text" placeholder="000.000.000-00" id="cpfInput"/>
+      </div>
+    </div>
+    <div class="lf">
+      <label>Senha</label>
+      <div class="lf-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" placeholder="••••••••" id="senhaInput"/>
+      </div>
+    </div>
+
+    <div class="forgot"><a href="#">Esqueci minha senha</a></div>
+
+    <button class="btn-login" onclick="doLogin()">Entrar</button>
+
+    <div class="login-footer">
+      Dúvidas? Ligue <strong>(11) 3110-0069</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ════ APP ════ -->
+<div class="screen" id="appScreen">
+
+  <!-- header -->
+  <div class="app-hd">
+    <div class="app-hd-top">
+      <div>
+        <div class="app-greeting">Bem-vinda de volta 👋</div>
+        <div class="app-name">Fernanda Souza</div>
+      </div>
+      <div class="app-hd-right">
+        <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+        <div class="app-av">FS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- pages -->
+
+  <!-- PRÓXIMAS -->
+  <div class="page active" id="pageProximas">
+
+    <!-- next appointment hero -->
+    <div class="next-hero">
+      <div class="nh-label">Próxima consulta</div>
+      <div class="nh-date">Quinta, 07 de Maio</div>
+      <div class="nh-time">⏰ 14:00 · 50 minutos</div>
+      <div class="nh-row">
+        <div class="nh-spec">🥗 Nutrição</div>
+        <div class="nh-sala">Sala 11</div>
+      </div>
+      <div class="nh-prof">Dra. Karen Alves</div>
+      <div class="nh-actions">
+        <button class="btn-nh primary">📍 Ver localização</button>
+        <button class="btn-nh danger" onclick="openCancel(1)">✕ Cancelar</button>
+      </div>
+    </div>
+
+    <!-- upcoming -->
+    <div class="section-title">Todas as consultas</div>
+    <div class="upcoming-list" id="upcomingList"></div>
+
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div class="page" id="pageHistorico">
+    <div class="section-title">Histórico</div>
+    <div class="hist-filter">
+      <div class="hftab active" onclick="setHistFilter('todos',this)">Todos</div>
+      <div class="hftab" onclick="setHistFilter('psico',this)">🧠 Psicologia</div>
+      <div class="hftab" onclick="setHistFilter('nutri',this)">🥗 Nutrição</div>
+      <div class="hftab" onclick="setHistFilter('fono',this)">🗣️ Fono</div>
+    </div>
+    <div id="histList"></div>
+  </div>
+
+  <!-- PERFIL -->
+  <div class="page" id="pagePerfil">
+    <div class="profile-header">
+      <div class="ph-av">FS</div>
+      <div class="ph-name">Fernanda Souza</div>
+      <div class="ph-info">CPF: 987.654.321-00<br>(11) 98765-4321 · fernanda@email.com</div>
+      <div class="ph-conv">🏥 Bradesco Saúde</div>
+    </div>
+
+    <div class="profile-section">
+      <div class="ps-title">Resumo de consultas</div>
+      <div class="ps-stats">
+        <div class="ps-stat"><div class="ps-stat-n">12</div><div class="ps-stat-l">Total</div></div>
+        <div class="ps-stat"><div class="ps-stat-n">10</div><div class="ps-stat-l">Realizadas</div></div>
+        <div class="ps-stat"><div class="ps-stat-n">2</div><div class="ps-stat-l">Próximas</div></div>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="ps-title">Dados pessoais</div>
+      <div class="ps-row"><span class="ps-label">Data de nascimento</span><span class="ps-value">24/07/1992</span></div>
+      <div class="ps-row"><span class="ps-label">Carteirinha</span><span class="ps-value">111222333444</span></div>
+      <div class="ps-row"><span class="ps-label">Validade do plano</span><span class="ps-value">Jun/2026</span></div>
+      <div class="ps-row"><span class="ps-label">Paciente desde</span><span class="ps-value">Jan/2025</span></div>
+    </div>
+
+    <div class="profile-section">
+      <div class="ps-title">Especialidades</div>
+      <div class="ps-row"><span class="ps-label">🥗 Nutrição</span><span class="ps-value">Dra. Karen Alves</span></div>
+      <div class="ps-row"><span class="ps-label">🧠 Psicologia</span><span class="ps-value">Dr. Bruno Silva</span></div>
+    </div>
+
+    <button class="btn-logout" onclick="doLogout()">Sair da conta</button>
+  </div>
+
+  <!-- bottom nav -->
+  <div class="bottom-nav">
+    <button class="bn-item active" id="bnProximas" onclick="showPage('proximas')">
+      <span class="bn-icon">📅</span>
+      <span class="bn-label">Consultas</span>
+    </button>
+    <button class="bn-item" id="bnHistorico" onclick="showPage('historico')">
+      <span class="bn-icon">📋</span>
+      <span class="bn-label">Histórico</span>
+    </button>
+    <button class="bn-item" id="bnPerfil" onclick="showPage('perfil')">
+      <span class="bn-icon">👤</span>
+      <span class="bn-label">Perfil</span>
+    </button>
+  </div>
+
+</div>
+
+<!-- CANCEL MODAL -->
+<div class="overlay" id="cancelOverlay" onclick="if(event.target===this)closeCancel()">
+  <div class="bottom-sheet">
+    <div class="bs-handle"></div>
+    <div class="bs-title">Cancelar consulta</div>
+    <div class="bs-sub">Tem certeza que deseja cancelar? Esta ação não pode ser desfeita.</div>
+    <div class="bs-appt" id="bsApptInfo"></div>
+    <div class="bs-reason">
+      <label>Motivo do cancelamento</label>
+      <select>
+        <option>Selecionar motivo…</option>
+        <option>Compromisso pessoal</option>
+        <option>Problema de saúde</option>
+        <option>Questão financeira</option>
+        <option>Reagendamento</option>
+        <option>Outro motivo</option>
+      </select>
+    </div>
+    <div class="bs-btns">
+      <button class="btn-bs-cancel" onclick="closeCancel()">Voltar</button>
+      <button class="btn-bs-confirm" onclick="confirmCancel()">Cancelar consulta</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ DATA ══
+var UPCOMING = [
+  { id:1, spec:'nutri', icon:'🥗', specName:'Nutrição',      prof:'Dra. Karen Alves',   day:7,  mon:'Mai', hora:'14:00', conv:'Bradesco Saúde', status:'confirmada' },
+  { id:2, spec:'psico', icon:'🧠', specName:'Psicologia',    prof:'Dr. Bruno Silva',    day:14, mon:'Mai', hora:'09:00', conv:'Bradesco Saúde', status:'confirmada' },
+  { id:3, spec:'nutri', icon:'🥗', specName:'Nutrição',      prof:'Dra. Karen Alves',   day:21, mon:'Mai', hora:'14:00', conv:'Bradesco Saúde', status:'pendente'   },
+];
+
+var HISTORY = [
+  { id:10, spec:'nutri', icon:'🥗', specName:'Nutrição',   prof:'Dra. Karen Alves', date:'01/05/2026', status:'realizada' },
+  { id:11, spec:'psico', icon:'🧠', specName:'Psicologia', prof:'Dr. Bruno Silva',  date:'17/04/2026', status:'realizada' },
+  { id:12, spec:'nutri', icon:'🥗', specName:'Nutrição',   prof:'Dra. Karen Alves', date:'03/04/2026', status:'realizada' },
+  { id:13, spec:'psico', icon:'🧠', specName:'Psicologia', prof:'Dr. Bruno Silva',  date:'20/03/2026', status:'realizada' },
+  { id:14, spec:'nutri', icon:'🥗', specName:'Nutrição',   prof:'Dra. Karen Alves', date:'06/03/2026', status:'cancelada' },
+  { id:15, spec:'psico', icon:'🧠', specName:'Psicologia', prof:'Dr. Bruno Silva',  date:'20/02/2026', status:'realizada' },
+  { id:16, spec:'nutri', icon:'🥗', specName:'Nutrição',   prof:'Dra. Karen Alves', date:'06/02/2026', status:'realizada' },
+  { id:17, spec:'psico', icon:'🧠', specName:'Psicologia', prof:'Dr. Bruno Silva',  date:'23/01/2026', status:'realizada' },
+  { id:18, spec:'nutri', icon:'🥗', specName:'Nutrição',   prof:'Dra. Karen Alves', date:'09/01/2026', status:'realizada' },
+  { id:19, spec:'psico', icon:'🧠', specName:'Psicologia', prof:'Dr. Bruno Silva',  date:'26/12/2025', status:'realizada' },
+];
+
+var cancelingId = null;
+var histFilter  = 'todos';
+
+// ══ LOGIN ══
+function doLogin() {
+  var cpf   = document.getElementById('cpfInput').value;
+  var senha = document.getElementById('senhaInput').value;
+  if (!cpf || !senha) { showToast('⚠️ Preencha CPF e senha'); return; }
+  document.getElementById('loginScreen').classList.remove('active');
+  document.getElementById('appScreen').classList.add('active');
+  renderUpcoming();
+  renderHistory();
+}
+
+function doLogout() {
+  document.getElementById('appScreen').classList.remove('active');
+  document.getElementById('loginScreen').classList.add('active');
+  document.getElementById('cpfInput').value='';
+  document.getElementById('senhaInput').value='';
+}
+
+// ══ NAVIGATION ══
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.bn-item').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('page'+cap(page)).classList.add('active');
+  document.getElementById('bn'+cap(page)).classList.add('active');
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+// ══ UPCOMING ══
+function renderUpcoming() {
+  var list = document.getElementById('upcomingList');
+  list.innerHTML='';
+  if (UPCOMING.length===0) {
+    list.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Sem consultas</div><div class="empty-sub">Você não tem consultas agendadas.<br>Entre em contato com a clínica.</div></div>';
+    return;
+  }
+  UPCOMING.forEach(function(a) {
+    var card=document.createElement('div'); card.className='appt-card';
+    card.innerHTML=
+      '<div class="appt-date-block"><div class="adb-day">'+a.day+'</div><div class="adb-mon">'+a.mon+'</div></div>'+
+      '<div class="appt-div"></div>'+
+      '<div class="appt-info">'+
+        '<div class="appt-spec '+a.spec+'">'+a.icon+' '+a.specName+'</div>'+
+        '<div class="appt-prof">'+a.prof+'</div>'+
+        '<div class="appt-time">⏰ '+a.hora+'</div>'+
+        '<div class="appt-conv">🏥 '+a.conv+'</div>'+
+      '</div>'+
+      '<div class="appt-action">'+
+        '<span class="appt-status '+a.status+'">'+(a.status==='confirmada'?'✅ Confirmada':'⏳ Pendente')+'</span>'+
+        '<button class="btn-cancel-appt" onclick="event.stopPropagation();openCancel('+a.id+')">Cancelar</button>'+
+      '</div>';
+    list.appendChild(card);
+  });
+}
+
+// ══ HISTORY ══
+function renderHistory() {
+  var list=document.getElementById('histList'); list.innerHTML='';
+  var filtered=HISTORY.filter(function(h){ return histFilter==='todos'||h.spec===histFilter; });
+  if(filtered.length===0){
+    list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Sem registros</div><div class="empty-sub">Nenhuma consulta encontrada para este filtro.</div></div>';
+    return;
+  }
+  filtered.forEach(function(h){
+    var item=document.createElement('div'); item.className='hist-item';
+    item.innerHTML=
+      '<div class="hi-icon '+h.spec+'">'+h.icon+'</div>'+
+      '<div class="hi-info">'+
+        '<div class="hi-spec">'+h.specName+'</div>'+
+        '<div class="hi-prof">'+h.prof+'</div>'+
+        '<div class="hi-date">'+h.date+'</div>'+
+      '</div>'+
+      '<span class="hi-status '+h.status+'">'+(h.status==='realizada'?'✅ Realizada':'✕ Cancelada')+'</span>';
+    list.appendChild(item);
+  });
+}
+
+function setHistFilter(f,el){
+  histFilter=f;
+  document.querySelectorAll('.hftab').forEach(function(b){b.classList.remove('active');});
+  el.classList.add('active');
+  renderHistory();
+}
+
+// ══ CANCEL ══
+function openCancel(id){
+  cancelingId=id;
+  var a=UPCOMING.find(function(x){return x.id===id;});
+  if(!a) return;
+  document.getElementById('bsApptInfo').innerHTML=
+    '<div class="bs-appt-spec">'+a.icon+' '+a.specName+'</div>'+
+    '<div class="bs-appt-prof">'+a.prof+'</div>'+
+    '<div class="bs-appt-date">'+a.day+' de '+a.mon+' · '+a.hora+'</div>';
+  document.getElementById('cancelOverlay').classList.add('open');
+}
+
+function closeCancel(){ document.getElementById('cancelOverlay').classList.remove('open'); cancelingId=null; }
+
+function confirmCancel(){
+  if(!cancelingId) return;
+  var idx=UPCOMING.findIndex(function(x){return x.id===cancelingId;});
+  if(idx>-1) UPCOMING.splice(idx,1);
+  closeCancel();
+  renderUpcoming();
+  showToast('✅ Consulta cancelada com sucesso');
+}
+
+// ══ TOAST ══
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); },3000);
+}
+
+// ══ INIT ══
+// allow login by pressing Enter
+document.addEventListener('keydown',function(e){ if(e.key==='Enter'&&document.getElementById('loginScreen').classList.contains('active')) doLogin(); });
+</script>
+</body>
+</html>

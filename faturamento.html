@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Faturamento — Clínica Equilíbrio Ideal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA; --sky-mist:#F4F9FC;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-pale:#FBF5EA;
+      --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
+      --red:#E05252; --red-pale:#FEF0F0;
+      --orange:#E8954A; --orange-pale:#FEF4EC;
+      --psico:#5A9EC9; --psico-bg:#EBF4FA;
+      --nutri:#5AAE82; --nutri-bg:#EDFAF3;
+      --fono:#C9A96E;  --fono-bg:#FBF5EA;
+      --sidebar-w:208px;
+    }
+    html, body { height:100%; overflow:hidden; font-family:'Lato',sans-serif; background:var(--sky-mist); color:var(--text); font-size:13px; }
+    .app { display:flex; height:100vh; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { width:var(--sidebar-w); background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+    .sb-brand { padding:13px 14px 11px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .sb-icon  { width:31px; height:31px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sb-icon span { color:#fff; font-size:13px; font-family:'Playfair Display',serif; }
+    .sb-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .sb-sub  { font-size:10px; color:var(--text-soft); }
+    .sb-nav  { padding:9px 7px; flex:1; overflow-y:auto; }
+    .sb-nav::-webkit-scrollbar { display:none; }
+    .nav-lbl  { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-soft); padding:6px 6px 3px; }
+    .nav-item { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:7px; cursor:pointer; color:var(--text-soft); font-size:12px; transition:all .15s; margin-bottom:1px; text-decoration:none; }
+    .nav-item:hover  { background:var(--sky-pale); color:var(--navy); }
+    .nav-item.active { background:var(--sky-pale); color:var(--navy); font-weight:700; }
+    .nav-icon { font-size:14px; width:18px; text-align:center; }
+    .sb-foot { padding:10px 13px; border-top:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .u-av   { width:28px; height:28px; border-radius:50%; background:var(--gold-pale); border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .u-name { font-size:11px; font-weight:700; color:var(--navy); }
+    .u-role { font-size:9px; color:var(--gold); font-weight:700; }
+    .u-out  { margin-left:auto; color:var(--text-soft); cursor:pointer; }
+
+    /* ═══ MAIN ═══ */
+    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+    /* header */
+    .top-hd { height:56px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:12px; flex-shrink:0; }
+    .hd-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .hd-spc { flex:1; }
+    .period-sel { display:flex; align-items:center; gap:6px; }
+    .period-sel select { height:32px; padding:0 10px; border:1.5px solid var(--border); border-radius:8px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; cursor:pointer; }
+    .period-sel select:focus { border-color:var(--sky); }
+
+    /* tabs */
+    .tabs { background:var(--white); border-bottom:1px solid var(--border); display:flex; padding:0 24px; flex-shrink:0; }
+    .tab { padding:12px 18px; font-size:12px; font-weight:700; color:var(--text-soft); cursor:pointer; border-bottom:2.5px solid transparent; transition:all .15s; white-space:nowrap; }
+    .tab:hover  { color:var(--navy); }
+    .tab.active { color:var(--navy); border-bottom-color:var(--navy); }
+
+    /* content */
+    .content { flex:1; overflow-y:auto; padding:20px 24px; }
+    .content::-webkit-scrollbar { width:5px; }
+    .content::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:3px; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* ── DASHBOARD ── */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+    .stat-card { background:var(--white); border:1.5px solid var(--border); border-radius:12px; padding:16px; }
+    .sc-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; margin-bottom:10px; }
+    .sc-icon.blue   { background:var(--sky-pale); }
+    .sc-icon.green  { background:var(--green-pale); }
+    .sc-icon.gold   { background:var(--gold-pale); }
+    .sc-icon.orange { background:var(--orange-pale); }
+    .sc-val  { font-family:'Playfair Display',serif; font-size:24px; color:var(--navy); line-height:1; margin-bottom:4px; }
+    .sc-lbl  { font-size:11px; color:var(--text-soft); }
+    .sc-sub  { font-size:10px; color:var(--green); margin-top:3px; font-weight:700; }
+
+    /* convenio summary cards */
+    .conv-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+    .conv-card { background:var(--white); border:1.5px solid var(--border); border-radius:12px; padding:14px; }
+    .cc-name { font-size:12px; font-weight:700; color:var(--navy); margin-bottom:8px; }
+    .cc-row  { display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid rgba(212,232,242,.4); }
+    .cc-row:last-child { border-bottom:none; }
+    .cc-label { font-size:10px; color:var(--text-soft); }
+    .cc-val   { font-size:12px; font-weight:700; color:var(--navy); }
+    .cc-status { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:6px; font-size:10px; font-weight:700; margin-top:8px; }
+    .cc-status.pago    { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .cc-status.pendente{ background:var(--gold-pale);  color:#8B6A1E; border:1px solid var(--gold); }
+    .cc-status.parcial { background:var(--orange-pale); color:#8B4A1E; border:1px solid var(--orange); }
+
+    /* ── REPASSE ── */
+    .repasse-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .repasse-hd-title { font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); }
+    .btn-export { display:flex; align-items:center; gap:6px; padding:7px 14px; border:1.5px solid var(--border); border-radius:8px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); transition:all .15s; }
+    .btn-export:hover { border-color:var(--sky); color:var(--navy); }
+
+    /* repasse table */
+    .repasse-table-wrap { background:var(--white); border:1.5px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:20px; }
+    table { width:100%; border-collapse:collapse; }
+    thead th { padding:10px 16px; text-align:left; font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); border-bottom:1.5px solid var(--border); background:var(--sky-mist); white-space:nowrap; }
+    thead th:first-child { padding-left:20px; }
+    thead th:last-child  { padding-right:20px; }
+    tbody tr { border-bottom:1px solid rgba(212,232,242,.5); transition:background .12s; cursor:pointer; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:var(--sky-pale); }
+    tbody td { padding:12px 16px; font-size:12px; }
+    tbody td:first-child { padding-left:20px; }
+    tbody td:last-child  { padding-right:20px; }
+
+    .td-prof { display:flex; align-items:center; gap:10px; }
+    .td-av { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; }
+    .td-av.psico { background:var(--psico-bg); color:#1E6FA3; border:1.5px solid var(--sky-light); }
+    .td-av.nutri { background:var(--nutri-bg); color:#1A6A42; border:1.5px solid var(--green-bdr); }
+    .td-av.fono  { background:var(--fono-bg);  color:#8B6A1E; border:1.5px solid var(--gold); }
+    .td-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .td-spec { font-size:10px; color:var(--text-soft); margin-top:1px; }
+    .val-green { color:var(--green); font-weight:700; }
+    .val-navy  { color:var(--navy);  font-weight:700; }
+    .status-tag { display:inline-block; padding:2px 9px; border-radius:6px; font-size:10px; font-weight:700; }
+    .status-tag.pago    { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .status-tag.pendente{ background:var(--gold-pale);  color:#8B6A1E; border:1px solid var(--gold); }
+    .btn-detail { padding:5px 12px; border:1.5px solid var(--border); border-radius:7px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:10px; font-weight:700; color:var(--text-soft); transition:all .15s; }
+    .btn-detail:hover { border-color:var(--sky); color:var(--navy); }
+    .btn-pagar { padding:5px 12px; border:none; border-radius:7px; background:var(--green); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:10px; font-weight:700; transition:all .15s; }
+    .btn-pagar:hover { background:#3A9468; }
+
+    /* totals row */
+    .totals-row { background:var(--sky-mist); }
+    .totals-row td { font-weight:700; font-size:13px; border-top:2px solid var(--border); }
+
+    /* ── TABELA DE VALORES ── */
+    .valores-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .valor-card { background:var(--white); border:1.5px solid var(--border); border-radius:12px; overflow:hidden; }
+    .vc-hd { padding:12px 16px; border-bottom:1px solid var(--border); background:var(--sky-mist); display:flex; align-items:center; justify-content:space-between; }
+    .vc-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .vc-edit { font-size:11px; color:var(--sky); cursor:pointer; font-weight:700; }
+    .vc-body { padding:12px 16px; }
+    .vc-row  { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(212,232,242,.4); }
+    .vc-row:last-child { border-bottom:none; }
+    .vc-spec { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--text); }
+    .vc-dot  { width:8px; height:8px; border-radius:50%; }
+    .vc-dot.psico { background:var(--psico); }
+    .vc-dot.nutri { background:var(--nutri); }
+    .vc-dot.fono  { background:var(--fono); }
+    .vc-val  { font-size:13px; font-weight:700; color:var(--navy); }
+    .vc-input{ width:90px; height:32px; padding:0 8px; border:1.5px solid var(--border); border-radius:7px; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; color:var(--navy); background:var(--sky-mist); outline:none; text-align:right; }
+    .vc-input:focus { border-color:var(--sky); background:#fff; }
+
+    /* ── XML ── */
+    .xml-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+    .xml-card { background:var(--white); border:1.5px solid var(--border); border-radius:12px; padding:18px; }
+    .xc-hd { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
+    .xc-name { font-size:14px; font-weight:700; color:var(--navy); margin-bottom:3px; }
+    .xc-period { font-size:11px; color:var(--text-soft); }
+    .xc-status { font-size:10px; font-weight:700; padding:3px 9px; border-radius:6px; white-space:nowrap; }
+    .xc-status.gerado   { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .xc-status.pendente { background:var(--gold-pale);  color:#8B6A1E; border:1px solid var(--gold); }
+    .xc-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+    .xc-stat { background:var(--sky-mist); border-radius:8px; padding:10px 12px; }
+    .xc-stat-n { font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); line-height:1; }
+    .xc-stat-l { font-size:10px; color:var(--text-soft); margin-top:2px; }
+    .xc-btns { display:flex; gap:8px; }
+    .btn-gerar { flex:1; height:36px; border:none; border-radius:8px; background:var(--navy); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; transition:background .15s; }
+    .btn-gerar:hover { background:var(--navy-mid); }
+    .btn-gerar.gerado { background:var(--green); }
+    .btn-baixar { height:36px; padding:0 12px; border:1.5px solid var(--border); border-radius:8px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); transition:all .15s; }
+    .btn-baixar:hover { border-color:var(--sky); color:var(--navy); }
+
+    /* XML preview */
+    .xml-preview-wrap { background:var(--white); border:1.5px solid var(--border); border-radius:12px; overflow:hidden; }
+    .xml-preview-hd { padding:12px 16px; background:var(--sky-mist); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .xml-preview-title { font-size:12px; font-weight:700; color:var(--navy); }
+    .btn-copy { padding:5px 12px; border:1.5px solid var(--border); border-radius:7px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); transition:all .15s; }
+    .btn-copy:hover { border-color:var(--sky); color:var(--navy); }
+    .xml-code { padding:16px; font-family:monospace; font-size:11px; color:var(--text); line-height:1.7; overflow-x:auto; max-height:280px; overflow-y:auto; background:#FAFCFF; }
+    .xml-code::-webkit-scrollbar { width:4px; height:4px; }
+    .xml-code::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:2px; }
+    .xml-tag  { color:#1E6FA3; }
+    .xml-val  { color:#1A6A42; }
+    .xml-attr { color:#8B6A1E; }
+    .xml-comment { color:var(--text-soft); font-style:italic; }
+
+    /* detail modal */
+    .overlay { position:fixed; inset:0; background:rgba(15,35,56,.4); z-index:99999; display:none; align-items:center; justify-content:center; backdrop-filter:blur(2px); }
+    .overlay.open { display:flex; }
+    .modal { background:#fff; border-radius:16px; width:560px; max-width:95vw; max-height:85vh; box-shadow:0 20px 60px rgba(0,0,0,.18); overflow:hidden; display:flex; flex-direction:column; animation:mIn .2s ease; position:relative; z-index:100000; }
+    @keyframes mIn { from{opacity:0;transform:translateY(10px) scale(.98)} to{opacity:1;transform:none} }
+    .m-hd { padding:18px 22px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .m-title { font-family:'Playfair Display',serif; font-size:19px; color:var(--navy); }
+    .m-close { width:28px; height:28px; border:none; background:var(--sky-mist); border-radius:7px; cursor:pointer; font-size:14px; color:var(--text-soft); display:flex; align-items:center; justify-content:center; z-index:100001; position:relative; }
+    .m-body { padding:18px 22px; overflow-y:auto; }
+    .m-body::-webkit-scrollbar { width:4px; }
+    .m-body::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:2px; }
+    .detail-summary { display:flex; align-items:center; gap:14px; padding:14px 16px; background:var(--sky-mist); border-radius:10px; margin-bottom:16px; }
+    .ds-av { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0; }
+    .ds-name { font-size:15px; font-weight:700; color:var(--navy); }
+    .ds-spec { font-size:11px; color:var(--text-soft); margin-top:2px; }
+    .ds-total { margin-left:auto; text-align:right; }
+    .ds-total-val { font-family:'Playfair Display',serif; font-size:22px; color:var(--green); line-height:1; }
+    .ds-total-lbl { font-size:10px; color:var(--text-soft); margin-top:2px; }
+    .detail-table-wrap { border:1.5px solid var(--border); border-radius:10px; overflow:hidden; }
+    .dt-row { display:grid; grid-template-columns:auto 1fr auto auto auto; gap:12px; padding:10px 14px; border-bottom:1px solid rgba(212,232,242,.5); align-items:center; font-size:12px; }
+    .dt-row:last-child { border-bottom:none; }
+    .dt-row.hd { background:var(--sky-mist); font-size:9.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-soft); }
+    .dt-date { color:var(--text-soft); white-space:nowrap; }
+    .dt-pac  { color:var(--navy); font-weight:700; }
+    .dt-conv { font-size:10px; padding:2px 7px; border-radius:5px; background:var(--sky-pale); color:#1E6FA3; border:1px solid var(--sky-light); font-weight:700; white-space:nowrap; }
+    .dt-val  { color:var(--green); font-weight:700; text-align:right; white-space:nowrap; }
+    .m-foot { padding:14px 22px; border-top:1px solid var(--border); display:flex; gap:9px; justify-content:flex-end; flex-shrink:0; }
+    .btn-marcar-pago { padding:8px 20px; border:none; border-radius:8px; background:var(--green); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; }
+
+    /* filter bar */
+    .repasse-filters { display:flex; align-items:center; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+    .rf-search { position:relative; }
+    .rf-search svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--sky-light); pointer-events:none; }
+    .rf-search input { width:220px; height:34px; padding:0 12px 0 28px; border:1.5px solid var(--border); border-radius:8px; font-family:"Lato",sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .rf-search input:focus { border-color:var(--sky); background:#fff; }
+    .rf-search input::placeholder { color:var(--sky-light); }
+    .rf-div { width:1px; height:20px; background:var(--border); }
+    .rftab { padding:5px 13px; border:1.5px solid var(--border); border-radius:18px; background:#fff; cursor:pointer; font-family:"Lato",sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); transition:all .15s; white-space:nowrap; }
+    .rftab:hover { border-color:var(--sky); color:var(--navy); }
+    .rftab.active { background:var(--navy); border-color:var(--navy); color:#fff; }
+    .rftab.psico.active { background:var(--psico); border-color:var(--psico); }
+    .rftab.nutri.active { background:var(--nutri); border-color:var(--nutri); }
+    .rftab.fono.active  { background:var(--fono);  border-color:var(--fono); }
+    .rftab.pago.active    { background:var(--green); border-color:var(--green); }
+    .rftab.pendente.active{ background:var(--orange); border-color:var(--orange); }
+    .rf-summary { margin-left:auto; font-size:11px; color:var(--text-soft); white-space:nowrap; }
+    .rf-summary strong { color:var(--navy); }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .content { animation:fadeUp .4s ease; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-icon"><span>Ψ</span></div>
+      <div><div class="sb-name">Equilíbrio Ideal</div><div class="sb-sub">Clínica Multidisciplinar</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-lbl">Principal</div>
+      <a class="nav-item" href="agenda-equilibrio-v3.html"><span class="nav-icon">📅</span>Agenda</a>
+      <a class="nav-item" href="cadastro-pacientes.html"><span class="nav-icon">👥</span>Pacientes</a>
+      <div class="nav-lbl" style="margin-top:5px">Admin</div>
+      <div class="nav-item active"><span class="nav-icon">💰</span>Faturamento</div>
+      <a class="nav-item" href="auditoria.html"><span class="nav-icon">🔍</span>Log de Auditoria</a>
+      <div class="nav-lbl" style="margin-top:5px">Clínica</div>
+      <a class="nav-item" href="cadastro-profissionais.html"><span class="nav-icon">🧠</span>Profissionais</a>
+      <a class="nav-item" href="cadastro-salas.html"><span class="nav-icon">🏥</span>Salas</a>
+    </nav>
+    <div class="sb-foot">
+      <div class="u-av">RA</div>
+      <div><div class="u-name">Roberto Admin</div><div class="u-role">👑 Admin</div></div>
+      <div class="u-out">↩</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="top-hd">
+      <div class="hd-title">Faturamento</div>
+      <div class="hd-spc"></div>
+      <div class="period-sel">
+        <span style="font-size:11px;color:var(--text-soft)">Período:</span>
+        <select id="periodSel" onchange="render()">
+          <option value="2026-05">Maio 2026</option>
+          <option value="2026-04">Abril 2026</option>
+          <option value="2026-03">Março 2026</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('dashboard',this)">📊 Visão Geral</div>
+      <div class="tab" onclick="showTab('repasse',this)">👥 Repasse Profissionais</div>
+      <div class="tab" onclick="showTab('valores',this)">📋 Tabela de Valores</div>
+      <div class="tab" onclick="showTab('xml',this)">📄 XML Convênios</div>
+    </div>
+
+    <div class="content">
+
+      <!-- ══ DASHBOARD ══ -->
+      <div class="tab-panel active" id="tab-dashboard">
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="sc-icon blue">📅</div>
+            <div class="sc-val">347</div>
+            <div class="sc-lbl">Consultas realizadas</div>
+            <div class="sc-sub">↑ 12% vs abril</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-icon green">💰</div>
+            <div class="sc-val">R$ 124.850</div>
+            <div class="sc-lbl">Faturamento bruto</div>
+            <div class="sc-sub">↑ 8% vs abril</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-icon gold">👥</div>
+            <div class="sc-val">R$ 74.910</div>
+            <div class="sc-lbl">Total de repasses</div>
+            <div class="sc-sub">60% do bruto</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-icon orange">⏳</div>
+            <div class="sc-val">R$ 49.940</div>
+            <div class="sc-lbl">Receita da clínica</div>
+            <div class="sc-sub">40% do bruto</div>
+          </div>
+        </div>
+
+        <!-- por convênio -->
+        <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--navy);margin-bottom:14px">Por convênio</div>
+        <div class="conv-grid" id="convGrid"></div>
+
+        <!-- por especialidade -->
+        <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--navy);margin-bottom:14px">Por especialidade</div>
+        <div style="background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+          <div style="text-align:center;padding:14px;background:var(--psico-bg);border-radius:10px;border:1px solid var(--sky-light)">
+            <div style="font-size:24px;margin-bottom:6px">🧠</div>
+            <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--navy)">178</div>
+            <div style="font-size:11px;color:var(--text-soft);margin-top:2px">consultas</div>
+            <div style="font-size:13px;font-weight:700;color:var(--psico);margin-top:6px">R$ 64.080</div>
+            <div style="font-size:10px;color:var(--text-soft)">Psicologia</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:var(--nutri-bg);border-radius:10px;border:1px solid var(--green-bdr)">
+            <div style="font-size:24px;margin-bottom:6px">🥗</div>
+            <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--navy)">98</div>
+            <div style="font-size:11px;color:var(--text-soft);margin-top:2px">consultas</div>
+            <div style="font-size:13px;font-weight:700;color:var(--nutri);margin-top:6px">R$ 35.280</div>
+            <div style="font-size:10px;color:var(--text-soft)">Nutrição</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:var(--fono-bg);border-radius:10px;border:1px solid var(--gold)">
+            <div style="font-size:24px;margin-bottom:6px">🗣️</div>
+            <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--navy)">71</div>
+            <div style="font-size:11px;color:var(--text-soft);margin-top:2px">consultas</div>
+            <div style="font-size:13px;font-weight:700;color:var(--fono);margin-top:6px">R$ 25.560</div>
+            <div style="font-size:10px;color:var(--text-soft)">Fonoaudiologia</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ REPASSE ══ -->
+      <div class="tab-panel" id="tab-repasse">
+        <div class="repasse-hd">
+          <div class="repasse-hd-title">Repasse de Profissionais — <span id="repasse-period"></span></div>
+          <button class="btn-export" onclick="alert('Exportando relatório PDF...')">📥 Exportar PDF</button>
+        </div>
+        <!-- Filter bar -->
+        <div class="repasse-filters">
+          <div class="rf-search">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="rfSearch" placeholder="Buscar profissional…" oninput="renderRepasse()"/>
+          </div>
+          <div class="rf-div"></div>
+          <div class="rftab active"   id="rft-todos"    onclick="setRfFilter('todos',this)">Todos</div>
+          <div class="rftab psico"    id="rft-psico"    onclick="setRfFilter('psico',this)">🧠 Psicologia</div>
+          <div class="rftab nutri"    id="rft-nutri"    onclick="setRfFilter('nutri',this)">🥗 Nutrição</div>
+          <div class="rftab fono"     id="rft-fono"     onclick="setRfFilter('fono',this)">🗣️ Fono</div>
+          <div class="rf-div"></div>
+          <div class="rftab pago"     id="rft-pago"     onclick="setRfFilter('pago',this)">✅ Pagos</div>
+          <div class="rftab pendente" id="rft-pendente" onclick="setRfFilter('pendente',this)">⏳ Pendentes</div>
+          <div class="rf-summary" id="rfSummary"></div>
+        </div>
+        <div class="repasse-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Profissional</th>
+                <th>Especialidade</th>
+                <th>Consultas</th>
+                <th>Valor bruto</th>
+                <th>Repasse (60%)</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="repasseTable"></tbody>
+            <tfoot>
+              <tr class="totals-row">
+                <td colspan="2" style="padding:12px 20px;font-size:13px;font-weight:700;color:var(--navy)">Total</td>
+                <td style="padding:12px 16px;font-weight:700;color:var(--navy)" id="totalConsultas"></td>
+                <td style="padding:12px 16px;font-weight:700;color:var(--navy)" id="totalBruto"></td>
+                <td style="padding:12px 16px;font-weight:700;color:var(--green)" id="totalRepasse"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ VALORES ══ -->
+      <div class="tab-panel" id="tab-valores">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy)">Tabela de Valores por Convênio</div>
+          <button class="btn-export" onclick="saveValores()">💾 Salvar alterações</button>
+        </div>
+        <div class="valores-grid" id="valoresGrid"></div>
+      </div>
+
+      <!-- ══ XML ══ -->
+      <div class="tab-panel" id="tab-xml">
+        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);margin-bottom:16px">Geração de XML — Convênios</div>
+        <div class="xml-grid" id="xmlGrid"></div>
+        <div class="xml-preview-wrap">
+          <div class="xml-preview-hd">
+            <div class="xml-preview-title">Preview do XML — Unimed · Maio 2026</div>
+            <button class="btn-copy" onclick="copyXml()">📋 Copiar XML</button>
+          </div>
+          <div class="xml-code" id="xmlCode"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="modal">
+    <div class="m-hd">
+      <div class="m-title" id="detailTitle">Detalhamento</div>
+      <button class="m-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="m-body" id="detailBody"></div>
+    <div class="m-foot">
+      <button class="btn-export" onclick="closeDetail()">Fechar</button>
+      <button class="btn-marcar-pago" onclick="closeDetail();showToast('✅ Repasse marcado como pago!')">✅ Marcar como pago</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:200000;display:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.2)"></div>
+
+<script>
+// ══ DATA ══
+var CONVS = [
+  { id:'hapvida',    name:'HAPVIDA NOTREDAME', consultas:68, bruto:24480, status:'pendente',
+    valores:{psico:360, nutri:280, fono:320} },
+  { id:'bradesco',   name:'BRADESCO SAÚDE',    consultas:52, bruto:18720, status:'pago',
+    valores:{psico:360, nutri:280, fono:320} },
+  { id:'prevent',    name:'PREVENT SENIOR',    consultas:44, bruto:15840, status:'parcial',
+    valores:{psico:360, nutri:280, fono:320} },
+  { id:'porto',      name:'PORTO SEGURO',       consultas:38, bruto:13680, status:'pago',
+    valores:{psico:360, nutri:280, fono:320} },
+  { id:'unimed',     name:'UNIMED',             consultas:72, bruto:25920, status:'pendente',
+    valores:{psico:360, nutri:280, fono:320} },
+  { id:'careplus',   name:'CARE PLUS',          consultas:28, bruto:10080, status:'pago',
+    valores:{psico:360, nutri:280, fono:320} },
+  { id:'particular', name:'PARTICULAR',         consultas:45, bruto:16200, status:'pago',
+    valores:{psico:360, nutri:280, fono:320} },
+];
+
+var PROFS = [
+  {id:1,  nome:'Dra. Ana Costa',       ini:'AC', spec:'psico', consultas:22, bruto:7920,  repasse:4752,  status:'pendente'},
+  {id:2,  nome:'Dr. Bruno Silva',      ini:'BS', spec:'psico', consultas:18, bruto:6480,  repasse:3888,  status:'pago'},
+  {id:3,  nome:'Dra. Carla Mendes',    ini:'CM', spec:'psico', consultas:20, bruto:7200,  repasse:4320,  status:'pendente'},
+  {id:4,  nome:'Dr. Diego Ramos',      ini:'DR', spec:'psico', consultas:15, bruto:5400,  repasse:3240,  status:'pago'},
+  {id:5,  nome:'Dra. Elisa Torres',    ini:'ET', spec:'psico', consultas:17, bruto:6120,  repasse:3672,  status:'pendente'},
+  {id:6,  nome:'Dr. Fábio Nunes',      ini:'FN', spec:'psico', consultas:19, bruto:6840,  repasse:4104,  status:'pago'},
+  {id:7,  nome:'Dra. Gisele Lima',     ini:'GL', spec:'psico', consultas:16, bruto:5760,  repasse:3456,  status:'pendente'},
+  {id:8,  nome:'Dr. Henrique Melo',    ini:'HM', spec:'psico', consultas:21, bruto:7560,  repasse:4536,  status:'pago'},
+  {id:9,  nome:'Dra. Isabela Costa',   ini:'IC', spec:'psico', consultas:14, bruto:5040,  repasse:3024,  status:'pendente'},
+  {id:10, nome:'Dr. Jonas Ferreira',   ini:'JF', spec:'psico', consultas:16, bruto:5760,  repasse:3456,  status:'pago'},
+  {id:11, nome:'Dra. Karen Alves',     ini:'KA', spec:'nutri', consultas:24, bruto:6720,  repasse:4032,  status:'pendente'},
+  {id:12, nome:'Dr. Lucas Pinto',      ini:'LP', spec:'nutri', consultas:20, bruto:5600,  repasse:3360,  status:'pago'},
+  {id:13, nome:'Dra. Marina Rocha',    ini:'MR', spec:'nutri', consultas:18, bruto:5040,  repasse:3024,  status:'pendente'},
+  {id:14, nome:'Dr. Nelson Braga',     ini:'NB', spec:'nutri', consultas:16, bruto:4480,  repasse:2688,  status:'pago'},
+  {id:15, nome:'Dra. Olívia Santos',   ini:'OS', spec:'nutri', consultas:20, bruto:5600,  repasse:3360,  status:'pendente'},
+  {id:16, nome:'Dr. Paulo Ribeiro',    ini:'PR', spec:'fono',  consultas:18, bruto:5760,  repasse:3456,  status:'pago'},
+  {id:17, nome:'Dra. Quésia Moreira',  ini:'QM', spec:'fono',  consultas:14, bruto:4480,  repasse:2688,  status:'pendente'},
+  {id:18, nome:'Dr. Rafael Duarte',    ini:'RD', spec:'fono',  consultas:16, bruto:5120,  repasse:3072,  status:'pago'},
+  {id:19, nome:'Dra. Sabrina Lima',    ini:'SL', spec:'fono',  consultas:12, bruto:3840,  repasse:2304,  status:'pendente'},
+  {id:20, nome:'Dr. Tiago Carvalho',   ini:'TC', spec:'fono',  consultas:11, bruto:3520,  repasse:2112,  status:'pago'},
+];
+
+var SAMPLE_CONSULTAS = [
+  {data:'02/05/2026', pac:'João Pereira',    conv:'Unimed',       val:360},
+  {data:'03/05/2026', pac:'Fernanda Souza',  conv:'Bradesco',     val:360},
+  {data:'05/05/2026', pac:'Ricardo Alves',   conv:'Particular',   val:360},
+  {data:'07/05/2026', pac:'Luciana Martins', conv:'Hapvida',      val:360},
+  {data:'08/05/2026', pac:'Carlos Nunes',    conv:'Prevent',      val:360},
+  {data:'10/05/2026', pac:'Patrícia Gomes',  conv:'Unimed',       val:360},
+  {data:'12/05/2026', pac:'Amanda Ferreira', conv:'Particular',   val:360},
+];
+
+var repasseFilter = 'todos';
+var repasseSearch = '';
+
+function setRfFilter(f, el) {
+  repasseFilter = f;
+  document.querySelectorAll('.rftab').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  renderRepasse();
+}
+
+var SPEC_LBL = {psico:'Psicologia', nutri:'Nutrição', fono:'Fonoaudiologia'};
+var SPEC_ICO = {psico:'🧠', nutri:'🥗', fono:'🗣️'};
+
+function fmt(v){ return 'R$ '+v.toLocaleString('pt-BR'); }
+
+// ══ RENDER ══
+function render(){
+  renderDashboard();
+  renderRepasse();
+  renderValores();
+  renderXml();
+}
+
+function renderDashboard(){
+  var grid=document.getElementById('convGrid'); grid.innerHTML='';
+  CONVS.forEach(function(c){
+    var card=document.createElement('div'); card.className='conv-card';
+    card.innerHTML=
+      '<div class="cc-name">'+c.name+'</div>'+
+      '<div class="cc-row"><span class="cc-label">Consultas</span><span class="cc-val">'+c.consultas+'</span></div>'+
+      '<div class="cc-row"><span class="cc-label">Valor total</span><span class="cc-val">'+fmt(c.bruto)+'</span></div>'+
+      '<div class="cc-row"><span class="cc-label">Repasse (60%)</span><span class="cc-val" style="color:var(--green)">'+fmt(Math.round(c.bruto*.6))+'</span></div>'+
+      '<div><span class="cc-status '+c.status+'">'+(c.status==='pago'?'✅ Pago':c.status==='parcial'?'⚠️ Parcial':'⏳ Pendente')+'</span></div>';
+    grid.appendChild(card);
+  });
+}
+
+function renderRepasse(){
+  var period = document.getElementById('periodSel');
+  var opt = period.options[period.selectedIndex].text;
+  document.getElementById('repasse-period').textContent = opt;
+
+  var rfQ = document.getElementById('rfSearch') ? document.getElementById('rfSearch').value.toLowerCase() : '';
+  var tbody=document.getElementById('repasseTable'); tbody.innerHTML='';
+  var totC=0, totB=0, totR=0;
+  var filtered = PROFS.filter(function(p){
+    if (repasseFilter==='psico'    && p.spec!=='psico')    return false;
+    if (repasseFilter==='nutri'    && p.spec!=='nutri')    return false;
+    if (repasseFilter==='fono'     && p.spec!=='fono')     return false;
+    if (repasseFilter==='pago'     && p.status!=='pago')    return false;
+    if (repasseFilter==='pendente' && p.status!=='pendente') return false;
+    if (rfQ && p.nome.toLowerCase().indexOf(rfQ) < 0) return false;
+    return true;
+  });
+  // update summary
+  var sumEl = document.getElementById('rfSummary');
+  if(sumEl) { var totRep=filtered.reduce(function(s,p){return s+p.repasse;},0); sumEl.innerHTML='<strong>'+filtered.length+'</strong> profissional(is) · Repasse: <strong>'+fmt(totRep)+'</strong>'; }
+  filtered.forEach(function(p){
+    totC+=p.consultas; totB+=p.bruto; totR+=p.repasse;
+    var tr=document.createElement('tr');
+    tr.innerHTML=
+      '<td><div class="td-prof"><div class="td-av '+p.spec+'">'+p.ini+'</div><div><div class="td-name">'+p.nome+'</div></div></div></td>'+
+      '<td><span style="font-size:11px">'+SPEC_ICO[p.spec]+' '+SPEC_LBL[p.spec]+'</span></td>'+
+      '<td style="text-align:center">'+p.consultas+'</td>'+
+      '<td class="val-navy">'+fmt(p.bruto)+'</td>'+
+      '<td class="val-green">'+fmt(p.repasse)+'</td>'+
+      '<td><span class="status-tag '+p.status+'">'+(p.status==='pago'?'✅ Pago':'⏳ Pendente')+'</span></td>'+
+      '<td style="display:flex;gap:5px;padding:12px 16px">'+
+        '<button class="btn-detail" onclick="openDetail('+p.id+')">Ver detalhes</button>'+
+        (p.status==='pendente'?'<button class="btn-pagar" onclick="marcarPago('+p.id+')">Pagar</button>':'')+
+      '</td>';
+    tbody.appendChild(tr);
+  });
+  if(filtered.length===0){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td colspan="7" style="text-align:center;padding:32px;color:var(--text-soft);font-style:italic">Nenhum profissional encontrado para os filtros selecionados</td>';
+    tbody.appendChild(tr);
+  }
+  document.getElementById('totalConsultas').textContent=totC;
+  document.getElementById('totalBruto').textContent=fmt(totB);
+  document.getElementById('totalRepasse').textContent=fmt(totR);
+}
+
+function renderValores(){
+  var grid=document.getElementById('valoresGrid'); grid.innerHTML='';
+  CONVS.forEach(function(c){
+    var card=document.createElement('div'); card.className='valor-card';
+    var editMode=false;
+    card.innerHTML=
+      '<div class="vc-hd"><div class="vc-name">'+c.name+'</div><div class="vc-edit" onclick="toggleVcEdit(\'vc-'+c.id+'\')">Editar</div></div>'+
+      '<div class="vc-body" id="vc-'+c.id+'">'+
+        ['psico','nutri','fono'].map(function(s){
+          return '<div class="vc-row">'+
+            '<div class="vc-spec"><div class="vc-dot '+s+'"></div>'+SPEC_LBL[s]+'</div>'+
+            '<div class="vc-val" id="vv-'+c.id+'-'+s+'">'+fmt(c.valores[s])+'</div>'+
+            '<input class="vc-input" id="vi-'+c.id+'-'+s+'" value="'+c.valores[s]+'" style="display:none"/>'+
+          '</div>';
+        }).join('')+
+      '</div>';
+    grid.appendChild(card);
+  });
+}
+
+function toggleVcEdit(bodyId){
+  var body=document.getElementById(bodyId);
+  var vals=body.querySelectorAll('.vc-val');
+  var inputs=body.querySelectorAll('.vc-input');
+  var isEdit=inputs[0].style.display!=='none';
+  vals.forEach(function(v){ v.style.display=isEdit?'block':'none'; });
+  inputs.forEach(function(i){ i.style.display=isEdit?'none':'block'; });
+}
+
+function saveValores(){ showToast('✅ Valores atualizados com sucesso!'); }
+
+function renderXml(){
+  var grid=document.getElementById('xmlGrid'); grid.innerHTML='';
+  CONVS.slice(0,4).forEach(function(c){
+    var card=document.createElement('div'); card.className='xml-card';
+    var isGerado=c.status==='pago';
+    card.innerHTML=
+      '<div class="xc-hd">'+
+        '<div><div class="xc-name">'+c.name+'</div><div class="xc-period">Maio 2026</div></div>'+
+        '<span class="xc-status '+(isGerado?'gerado':'pendente')+'">'+(isGerado?'✅ Gerado':'⏳ Pendente')+'</span>'+
+      '</div>'+
+      '<div class="xc-stats">'+
+        '<div class="xc-stat"><div class="xc-stat-n">'+c.consultas+'</div><div class="xc-stat-l">Consultas</div></div>'+
+        '<div class="xc-stat"><div class="xc-stat-n">'+fmt(c.bruto)+'</div><div class="xc-stat-l">Valor total</div></div>'+
+      '</div>'+
+      '<div class="xc-btns">'+
+        '<button class="btn-gerar'+(isGerado?' gerado':'')+'" onclick="gerarXml(\''+c.name+'\')">'+( isGerado?'🔄 Regerar':'📄 Gerar XML')+'</button>'+
+        (isGerado?'<button class="btn-baixar" onclick="showToast(\'📥 Download iniciado!\')">📥 Baixar</button>':'')+
+      '</div>';
+    grid.appendChild(card);
+  });
+
+  // XML preview
+  document.getElementById('xmlCode').innerHTML = buildXmlPreview('Unimed');
+}
+
+function buildXmlPreview(conv){
+  return '<span class="xml-comment">&lt;!-- XML de Faturamento — Clínica Equilíbrio Ideal --&gt;</span>\n'+
+    '<span class="xml-comment">&lt;!-- Convênio: '+conv+' · Competência: 05/2026 --&gt;</span>\n\n'+
+    '<span class="xml-tag">&lt;?xml</span> <span class="xml-attr">version</span>=<span class="xml-val">"1.0"</span> <span class="xml-attr">encoding</span>=<span class="xml-val">"UTF-8"</span><span class="xml-tag">?&gt;</span>\n'+
+    '<span class="xml-tag">&lt;faturamento&gt;</span>\n'+
+    '  <span class="xml-tag">&lt;prestador&gt;</span>\n'+
+    '    <span class="xml-tag">&lt;cnpj&gt;</span><span class="xml-val">00.000.000/0001-00</span><span class="xml-tag">&lt;/cnpj&gt;</span>\n'+
+    '    <span class="xml-tag">&lt;razaoSocial&gt;</span><span class="xml-val">Clínica Equilíbrio Ideal Ltda</span><span class="xml-tag">&lt;/razaoSocial&gt;</span>\n'+
+    '    <span class="xml-tag">&lt;cnes&gt;</span><span class="xml-val">0000000</span><span class="xml-tag">&lt;/cnes&gt;</span>\n'+
+    '  <span class="xml-tag">&lt;/prestador&gt;</span>\n'+
+    '  <span class="xml-tag">&lt;competencia&gt;</span><span class="xml-val">05/2026</span><span class="xml-tag">&lt;/competencia&gt;</span>\n'+
+    '  <span class="xml-tag">&lt;convenio&gt;</span><span class="xml-val">'+conv+'</span><span class="xml-tag">&lt;/convenio&gt;</span>\n'+
+    '  <span class="xml-tag">&lt;guias&gt;</span>\n'+
+    SAMPLE_CONSULTAS.slice(0,3).map(function(c,i){
+      return '    <span class="xml-tag">&lt;guia&gt;</span>\n'+
+        '      <span class="xml-tag">&lt;numero&gt;</span><span class="xml-val">202605000'+(i+1)+'</span><span class="xml-tag">&lt;/numero&gt;</span>\n'+
+        '      <span class="xml-tag">&lt;dataAtendimento&gt;</span><span class="xml-val">'+c.data.split('/').reverse().join('-')+'</span><span class="xml-tag">&lt;/dataAtendimento&gt;</span>\n'+
+        '      <span class="xml-tag">&lt;beneficiario&gt;</span><span class="xml-val">'+c.pac+'</span><span class="xml-tag">&lt;/beneficiario&gt;</span>\n'+
+        '      <span class="xml-tag">&lt;procedimento&gt;</span><span class="xml-val">consulta</span><span class="xml-tag">&lt;/procedimento&gt;</span>\n'+
+        '      <span class="xml-tag">&lt;valor&gt;</span><span class="xml-val">'+c.val.toFixed(2)+'</span><span class="xml-tag">&lt;/valor&gt;</span>\n'+
+        '    <span class="xml-tag">&lt;/guia&gt;</span>';
+    }).join('\n')+'\n'+
+    '    <span class="xml-comment">&lt;!-- ... mais '+( 72-3)+' guias --&gt;</span>\n'+
+    '  <span class="xml-tag">&lt;/guias&gt;</span>\n'+
+    '  <span class="xml-tag">&lt;totalGuias&gt;</span><span class="xml-val">72</span><span class="xml-tag">&lt;/totalGuias&gt;</span>\n'+
+    '  <span class="xml-tag">&lt;valorTotal&gt;</span><span class="xml-val">25920.00</span><span class="xml-tag">&lt;/valorTotal&gt;</span>\n'+
+    '<span class="xml-tag">&lt;/faturamento&gt;</span>';
+}
+
+function gerarXml(conv){ showToast('📄 XML de '+conv+' gerado com sucesso!'); }
+function copyXml(){ showToast('📋 XML copiado para a área de transferência!'); }
+
+// ══ DETAIL ══
+function openDetail(id){
+  var p=PROFS.find(function(x){return x.id===id;});
+  if(!p) return;
+  document.getElementById('detailTitle').textContent='Detalhamento — '+p.nome;
+  var body=document.getElementById('detailBody');
+  var rows=SAMPLE_CONSULTAS.map(function(c,i){
+    return '<div class="dt-row">'+
+      '<span class="dt-date">'+c.data+'</span>'+
+      '<span class="dt-pac">'+c.pac+'</span>'+
+      '<span class="dt-conv">'+c.conv+'</span>'+
+      '<span class="dt-val">'+fmt(c.val)+'</span>'+
+    '</div>';
+  }).join('');
+  body.innerHTML=
+    '<div class="detail-summary">'+
+      '<div class="ds-av '+p.spec+'" style="background:var(--'+p.spec+'-bg);color:#1E6FA3;border:2px solid var(--'+p.spec+')">'+p.ini+'</div>'+
+      '<div><div class="ds-name">'+p.nome+'</div><div class="ds-spec">'+SPEC_ICO[p.spec]+' '+SPEC_LBL[p.spec]+' · '+p.consultas+' consultas</div></div>'+
+      '<div class="ds-total"><div class="ds-total-val">'+fmt(p.repasse)+'</div><div class="ds-total-lbl">a repassar</div></div>'+
+    '</div>'+
+    '<div class="detail-table-wrap">'+
+      '<div class="dt-row hd"><span>Data</span><span>Paciente</span><span>Convênio</span><span style="text-align:right">Valor</span></div>'+
+      rows+
+    '</div>';
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+function closeDetail(){ document.getElementById('detailOverlay').classList.remove('open'); }
+
+function marcarPago(id){
+  var p=PROFS.find(function(x){return x.id===id;});
+  if(p){ p.status='pago'; renderRepasse(); showToast('✅ Repasse de '+p.nome+' marcado como pago!'); }
+}
+
+// ══ TABS ══
+function showTab(tab, el){
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  el.classList.add('active');
+}
+
+// ══ TOAST ══
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(function(){ t.style.display='none'; },3000);
+}
+
+// ══ INIT ══
+render();
+</script>
+</body>
+</html>

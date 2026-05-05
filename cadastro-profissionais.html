@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profissionais — Clínica Equilíbrio Ideal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA; --sky-mist:#F4F9FC;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-pale:#FBF5EA;
+      --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
+      --red:#E05252; --red-pale:#FEF0F0;
+      --psico:#5A9EC9; --psico-bg:#EBF4FA;
+      --nutri:#5AAE82; --nutri-bg:#EDFAF3;
+      --fono:#C9A96E;  --fono-bg:#FBF5EA;
+      --sidebar-w:208px;
+    }
+    html, body { height:100%; overflow:hidden; font-family:'Lato',sans-serif; background:var(--sky-mist); color:var(--text); font-size:13px; }
+    .app { display:flex; height:100vh; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { width:var(--sidebar-w); background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+    .sb-brand { padding:13px 14px 11px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .sb-icon  { width:31px; height:31px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sb-icon span { color:#fff; font-size:13px; font-family:'Playfair Display',serif; }
+    .sb-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .sb-sub  { font-size:10px; color:var(--text-soft); }
+    .sb-nav  { padding:9px 7px; flex:1; overflow-y:auto; }
+    .sb-nav::-webkit-scrollbar { display:none; }
+    .nav-lbl  { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-soft); padding:6px 6px 3px; }
+    .nav-item { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:7px; cursor:pointer; color:var(--text-soft); font-size:12px; transition:all .15s; margin-bottom:1px; text-decoration:none; }
+    .nav-item:hover  { background:var(--sky-pale); color:var(--navy); }
+    .nav-item.active { background:var(--sky-pale); color:var(--navy); font-weight:700; }
+    .nav-icon  { font-size:14px; width:18px; text-align:center; }
+    .nav-badge { margin-left:auto; background:var(--sky); color:#fff; font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px; }
+    .sb-foot { padding:10px 13px; border-top:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .u-av   { width:28px; height:28px; border-radius:50%; background:var(--sky-light); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .u-name { font-size:11px; font-weight:700; color:var(--navy); }
+    .u-role { font-size:9px; color:var(--text-soft); }
+    .u-out  { margin-left:auto; color:var(--text-soft); cursor:pointer; font-size:12px; }
+
+    /* ═══ MAIN ═══ */
+    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+    /* ── LIST VIEW ── */
+    #listView { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+    .top-hd { height:56px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:12px; flex-shrink:0; }
+    .hd-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .hd-spc { flex:1; }
+    .btn-new { display:flex; align-items:center; gap:6px; padding:8px 16px; border:none; border-radius:8px; background:var(--navy); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:background .15s; }
+    .btn-new:hover { background:var(--navy-mid); }
+
+    /* stats */
+    .stats-bar { padding:14px 24px; background:var(--white); border-bottom:1px solid var(--border); display:flex; gap:12px; flex-shrink:0; }
+    .stat-card { flex:1; background:var(--sky-mist); border:1.5px solid var(--border); border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
+    .stat-icon { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+    .stat-icon.blue   { background:var(--psico-bg); }
+    .stat-icon.green  { background:var(--nutri-bg); }
+    .stat-icon.gold   { background:var(--fono-bg); }
+    .stat-icon.gray   { background:var(--sky-mist); }
+    .stat-n { font-family:'Playfair Display',serif; font-size:22px; color:var(--navy); line-height:1; }
+    .stat-l { font-size:10px; color:var(--text-soft); margin-top:2px; }
+
+    /* filters */
+    .filter-bar { padding:10px 24px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .ftab { padding:5px 13px; border:1.5px solid var(--border); border-radius:18px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); transition:all .15s; white-space:nowrap; }
+    .ftab:hover { border-color:var(--sky); color:var(--navy); }
+    .ftab.active { background:var(--navy); border-color:var(--navy); color:#fff; }
+    .ftab.psico.active { background:var(--psico); border-color:var(--psico); }
+    .ftab.nutri.active { background:var(--nutri); border-color:var(--nutri); }
+    .ftab.fono.active  { background:var(--fono);  border-color:var(--fono); }
+    .f-spc { flex:1; }
+    .f-search { position:relative; }
+    .f-search svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--sky-light); pointer-events:none; }
+    .f-search input { width:210px; height:32px; padding:0 12px 0 28px; border:1.5px solid var(--border); border-radius:8px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .f-search input:focus { border-color:var(--sky); background:#fff; }
+    .f-search input::placeholder { color:var(--sky-light); }
+
+    /* table */
+    .table-wrap { flex:1; overflow-y:auto; }
+    .table-wrap::-webkit-scrollbar { width:5px; }
+    .table-wrap::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:3px; }
+    table { width:100%; border-collapse:collapse; }
+    thead th { padding:9px 16px; text-align:left; font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); border-bottom:1.5px solid var(--border); background:var(--sky-mist); position:sticky; top:0; white-space:nowrap; z-index:5; }
+    thead th:first-child { padding-left:24px; }
+    thead th:last-child  { padding-right:24px; }
+    tbody tr { border-bottom:1px solid rgba(212,232,242,.5); cursor:pointer; transition:background .12s; }
+    tbody tr:hover { background:var(--sky-pale); }
+    tbody td { padding:11px 16px; font-size:12px; }
+    tbody td:first-child { padding-left:24px; }
+    tbody td:last-child  { padding-right:24px; }
+
+    .td-prof { display:flex; align-items:center; gap:10px; }
+    .td-av   { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
+    .td-av.psico { background:var(--psico-bg); color:#1E6FA3; border:1.5px solid var(--sky-light); }
+    .td-av.nutri { background:var(--nutri-bg); color:#1A6A42; border:1.5px solid var(--green-bdr); }
+    .td-av.fono  { background:var(--fono-bg);  color:#8B6A1E; border:1.5px solid var(--gold); }
+    .td-name { font-size:13px; font-weight:700; color:var(--navy); }
+    .td-sub  { font-size:10px; color:var(--text-soft); margin-top:1px; }
+    .spec-tag { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:8px; font-size:10px; font-weight:700; }
+    .spec-tag.psico { background:var(--psico-bg); color:#1E6FA3; border:1px solid var(--sky-light); }
+    .spec-tag.nutri { background:var(--nutri-bg); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .spec-tag.fono  { background:var(--fono-bg);  color:#8B6A1E; border:1px solid var(--gold); }
+    .status-tag { display:inline-block; padding:2px 9px; border-radius:8px; font-size:10px; font-weight:700; }
+    .status-tag.ativo   { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .status-tag.inativo { background:#F5F5F5; color:#999; border:1px solid #DDD; }
+    .td-actions { display:flex; gap:5px; }
+    .act-btn { width:28px; height:28px; border:1.5px solid var(--border); border-radius:7px; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--text-soft); transition:all .12s; }
+    .act-btn:hover { border-color:var(--sky); color:var(--navy); }
+
+    /* ── RECORD VIEW ── */
+    #recordView { flex:1; display:none; flex-direction:column; overflow:hidden; }
+
+    .rv-hd { background:var(--white); border-bottom:1px solid var(--border); flex-shrink:0; }
+    .rv-hd-top { display:flex; align-items:center; gap:12px; padding:14px 24px; }
+    .btn-back { display:flex; align-items:center; gap:6px; padding:6px 12px; border:1.5px solid var(--border); border-radius:7px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); transition:all .15s; }
+    .btn-back:hover { border-color:var(--sky); color:var(--navy); }
+    .rv-name { font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); }
+    .rv-hd-spc { flex:1; }
+    .btn-agenda-prof { display:flex; align-items:center; gap:6px; padding:8px 14px; border:1.5px solid var(--sky); border-radius:8px; background:var(--sky-pale); color:var(--navy); cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:all .15s; }
+    .btn-agenda-prof:hover { background:var(--sky); color:#fff; }
+    .btn-edit-prof { display:flex; align-items:center; gap:6px; padding:8px 14px; border:none; border-radius:8px; background:var(--navy); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:background .15s; }
+    .btn-edit-prof:hover { background:var(--navy-mid); }
+    .btn-status-prof { display:flex; align-items:center; gap:6px; padding:8px 14px; border:1.5px solid var(--red); border-radius:8px; background:#fff; color:var(--red); cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:all .15s; }
+    .btn-status-prof:hover { background:var(--red-pale); }
+    .btn-status-prof.reativar { border-color:var(--green-bdr); color:var(--green); }
+    .btn-status-prof.reativar:hover { background:var(--green-pale); }
+
+    /* prof summary */
+    .prof-summary { margin:0 24px 0; padding:16px 20px; background:var(--sky-mist); border-radius:12px; border:1.5px solid var(--border); display:flex; align-items:center; gap:16px; }
+    .ps-av { width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; flex-shrink:0; }
+    .ps-av.psico { background:var(--psico-bg); color:#1E6FA3; border:2px solid var(--psico); }
+    .ps-av.nutri { background:var(--nutri-bg); color:#1A6A42; border:2px solid var(--nutri); }
+    .ps-av.fono  { background:var(--fono-bg);  color:#8B6A1E; border:2px solid var(--fono); }
+    .ps-name { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .ps-info { font-size:11px; color:var(--text-soft); margin-top:4px; display:flex; gap:14px; flex-wrap:wrap; }
+    .ps-stats { margin-left:auto; display:flex; gap:20px; flex-shrink:0; }
+    .ps-stat  { text-align:center; }
+    .ps-stat-n { font-family:'Playfair Display',serif; font-size:22px; color:var(--navy); line-height:1; }
+    .ps-stat-l { font-size:10px; color:var(--text-soft); margin-top:2px; }
+
+    /* tabs */
+    .rv-tabs { display:flex; gap:0; padding:0 24px; border-bottom:1px solid var(--border); background:var(--white); margin-top:14px; }
+    .rv-tab { padding:10px 16px; font-size:12px; font-weight:700; color:var(--text-soft); cursor:pointer; border-bottom:2.5px solid transparent; transition:all .15s; white-space:nowrap; }
+    .rv-tab:hover  { color:var(--navy); }
+    .rv-tab.active { color:var(--navy); border-bottom-color:var(--navy); }
+
+    /* record body */
+    .rv-body { flex:1; overflow-y:auto; padding:20px 24px; }
+    .rv-body::-webkit-scrollbar { width:5px; }
+    .rv-body::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:3px; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* sections */
+    .section { background:var(--white); border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:16px; }
+    .sec-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .sec-title { font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); }
+    .sec-edit  { font-size:11px; color:var(--sky); cursor:pointer; font-weight:700; }
+    .sec-edit:hover { color:var(--navy); }
+
+    .fg2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 20px; }
+    .fg3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 20px; }
+    .fld-label { font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:4px; }
+    .fld-value { font-size:13px; color:var(--navy); }
+    .fld-value.bold { font-weight:700; }
+
+    .edit-input  { width:100%; height:36px; padding:0 10px; border:1.5px solid var(--border); border-radius:7px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .edit-input:focus  { border-color:var(--sky); background:#fff; }
+    .edit-select { width:100%; height:36px; padding:0 10px; border:1.5px solid var(--border); border-radius:7px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; }
+
+    /* specialty card */
+    .spec-card { display:flex; align-items:center; gap:14px; padding:16px; border-radius:10px; }
+    .spec-card.psico { background:var(--psico-bg); border:1.5px solid var(--sky-light); }
+    .spec-card.nutri { background:var(--nutri-bg); border:1.5px solid var(--green-bdr); }
+    .spec-card.fono  { background:var(--fono-bg);  border:1.5px solid var(--gold); }
+    .spec-card-icon { font-size:28px; }
+    .spec-card-name { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .spec-card-reg  { font-size:11px; color:var(--text-soft); margin-top:3px; }
+
+    /* agenda preview */
+    .agenda-day { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:6px; }
+    .agenda-slot { height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; }
+    .agenda-slot.livre  { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .agenda-slot.ocupado{ background:var(--sky-pale);   color:#1E6FA3; border:1px solid var(--sky-light); }
+    .agenda-slot.folga  { background:#F5F5F5; color:#999; border:1px solid #DDD; }
+    .agenda-day-label { font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-soft); text-align:center; margin-bottom:4px; }
+    .agenda-day-labels { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+
+    /* save bar */
+    .save-bar { display:none; position:sticky; bottom:0; background:var(--white); border-top:1px solid var(--border); padding:12px 24px; align-items:center; gap:10px; box-shadow:0 -4px 16px rgba(27,58,92,.06); }
+    .save-bar.show { display:flex; }
+    .save-msg { font-size:12px; color:var(--text-soft); }
+    .save-spc { flex:1; }
+    .btn-discard { padding:8px 16px; border:1.5px solid var(--border); border-radius:7px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; color:var(--text-soft); }
+    .btn-save-prof { padding:8px 20px; border:none; border-radius:7px; background:var(--green); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .app { animation:fadeUp .4s ease; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-icon"><span>Ψ</span></div>
+      <div><div class="sb-name">Equilíbrio Ideal</div><div class="sb-sub">Clínica Multidisciplinar</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-lbl">Principal</div>
+      <a class="nav-item" href="agenda-equilibrio-v3.html"><span class="nav-icon">📅</span>Agenda</a>
+      <a class="nav-item" href="cadastro-pacientes.html"><span class="nav-icon">👥</span>Pacientes</a>
+      <div class="nav-item"><span class="nav-icon">🔢</span>Painel de Senhas</div>
+      <div class="nav-lbl" style="margin-top:5px">Clínica</div>
+      <div class="nav-item active"><span class="nav-icon">🧠</span>Profissionais<span class="nav-badge">20</span></div>
+      <a class="nav-item" href="cadastro-salas.html"><span class="nav-icon">🏥</span>Salas</a>
+      <div class="nav-lbl" style="margin-top:5px">Sistema</div>
+      <div class="nav-item"><span class="nav-icon">⚙️</span>Configurações</div>
+    </nav>
+    <div class="sb-foot">
+      <div class="u-av">MR</div>
+      <div><div class="u-name">Maria Recepção</div><div class="u-role">Recepção</div></div>
+      <div class="u-out">↩</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══ LIST VIEW ══ -->
+    <div id="listView">
+      <div class="top-hd">
+        <div class="hd-title">Profissionais</div>
+        <div class="hd-spc"></div>
+        <div class="f-search" style="margin-right:8px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Buscar profissional…" oninput="filterProfs(this.value)"/>
+        </div>
+        <button class="btn-new" onclick="openNewProf()">+ Novo Profissional</button>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-icon blue">🧠</div>
+          <div><div class="stat-n" id="statPsico">10</div><div class="stat-l">Psicologia</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">🥗</div>
+          <div><div class="stat-n" id="statNutri">5</div><div class="stat-l">Nutrição</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon gold">🗣️</div>
+          <div><div class="stat-n" id="statFono">5</div><div class="stat-l">Fonoaudiologia</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon gray">⊘</div>
+          <div><div class="stat-n" id="statInat">2</div><div class="stat-l">Inativos</div></div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="ftab active" onclick="setFilter('todos',this)">Todos (20)</div>
+        <div class="ftab psico" onclick="setFilter('psico',this)">🧠 Psicologia</div>
+        <div class="ftab nutri" onclick="setFilter('nutri',this)">🥗 Nutrição</div>
+        <div class="ftab fono"  onclick="setFilter('fono',this)">🗣️ Fono</div>
+        <div class="ftab" onclick="setFilter('inativo',this)">Inativos</div>
+        <div class="f-spc"></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Profissional</th>
+              <th>Especialidade</th>
+              <th>Registro profissional</th>
+              <th>WhatsApp</th>
+              <th>E-mail</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="profTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ RECORD VIEW ══ -->
+    <div id="recordView">
+      <div class="rv-hd">
+        <div class="rv-hd-top">
+          <button class="btn-back" onclick="showList()">← Voltar</button>
+          <div class="rv-name" id="rvName"></div>
+          <div class="rv-hd-spc"></div>
+          <button class="btn-agenda-prof" onclick="window.location.href='agenda-equilibrio-v3.html'">📅 Ver na agenda</button>
+          <button class="btn-status-prof" id="btnStatusProf" onclick="toggleProfStatus()"></button>
+          <button class="btn-edit-prof" onclick="toggleEditProf()">✏️ Editar ficha</button>
+        </div>
+        <div class="prof-summary" id="profSummary"></div>
+        <div class="rv-tabs">
+          <div class="rv-tab active" onclick="showTab('dados',this)">Dados pessoais</div>
+          <div class="rv-tab" onclick="showTab('contato',this)">Contato</div>
+          <div class="rv-tab" onclick="showTab('especialidade',this)">Especialidade</div>
+          <div class="rv-tab" onclick="showTab('agenda',this)">Agenda da semana</div>
+        </div>
+      </div>
+
+      <div class="rv-body">
+
+        <!-- DADOS -->
+        <div class="tab-panel active" id="tab-dados">
+          <div class="section">
+            <div class="sec-hd"><div class="sec-title">Dados pessoais</div><div class="sec-edit" onclick="toggleEditProf()">Editar</div></div>
+            <div class="fg3" id="dados-view">
+              <div><div class="fld-label">Nome completo</div><div class="fld-value bold" id="fv-nome"></div></div>
+              <div><div class="fld-label">CPF</div><div class="fld-value" id="fv-cpf"></div></div>
+              <div><div class="fld-label">RG</div><div class="fld-value" id="fv-rg"></div></div>
+              <div><div class="fld-label">Data de nascimento</div><div class="fld-value" id="fv-nasc"></div></div>
+              <div><div class="fld-label">Sexo</div><div class="fld-value" id="fv-sexo"></div></div>
+              <div><div class="fld-label">Naturalidade</div><div class="fld-value" id="fv-nat"></div></div>
+            </div>
+            <div class="fg3" id="dados-edit" style="display:none">
+              <div><div class="fld-label">Nome completo</div><input class="edit-input" id="ei-nome"/></div>
+              <div><div class="fld-label">CPF</div><input class="edit-input" id="ei-cpf"/></div>
+              <div><div class="fld-label">RG</div><input class="edit-input" id="ei-rg"/></div>
+              <div><div class="fld-label">Data de nascimento</div><input class="edit-input" type="date" id="ei-nasc"/></div>
+              <div><div class="fld-label">Sexo</div><select class="edit-select" id="ei-sexo"><option>Feminino</option><option>Masculino</option><option>Outro</option></select></div>
+              <div><div class="fld-label">Naturalidade</div><input class="edit-input" id="ei-nat"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTATO -->
+        <div class="tab-panel" id="tab-contato">
+          <div class="section">
+            <div class="sec-hd"><div class="sec-title">Contato</div><div class="sec-edit" onclick="toggleEditProf()">Editar</div></div>
+            <div class="fg3" id="contato-view">
+              <div><div class="fld-label">WhatsApp</div><div class="fld-value" id="fv-wpp"></div></div>
+              <div><div class="fld-label">Telefone fixo</div><div class="fld-value" id="fv-tel"></div></div>
+              <div><div class="fld-label">E-mail</div><div class="fld-value" id="fv-email"></div></div>
+              <div><div class="fld-label">Endereço</div><div class="fld-value" id="fv-end"></div></div>
+            </div>
+            <div class="fg3" id="contato-edit" style="display:none">
+              <div><div class="fld-label">WhatsApp</div><input class="edit-input" id="ei-wpp"/></div>
+              <div><div class="fld-label">Telefone fixo</div><input class="edit-input" id="ei-tel"/></div>
+              <div><div class="fld-label">E-mail</div><input class="edit-input" id="ei-email"/></div>
+              <div><div class="fld-label">Endereço</div><input class="edit-input" id="ei-end"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESPECIALIDADE -->
+        <div class="tab-panel" id="tab-especialidade">
+          <div class="section">
+            <div class="sec-hd"><div class="sec-title">Especialidade & Registro</div><div class="sec-edit" onclick="toggleEditProf()">Editar</div></div>
+            <div id="spec-view">
+              <div class="spec-card" id="fv-spec-card">
+                <div class="spec-card-icon" id="fv-spec-icon"></div>
+                <div>
+                  <div class="spec-card-name" id="fv-spec-name"></div>
+                  <div class="spec-card-reg"  id="fv-spec-reg"></div>
+                </div>
+              </div>
+              <div class="fg2" style="margin-top:14px">
+                <div><div class="fld-label">Nº do registro (CRP/CRN/CREFONO)</div><div class="fld-value bold" id="fv-reg"></div></div>
+                <div><div class="fld-label">Formação</div><div class="fld-value" id="fv-form"></div></div>
+              </div>
+            </div>
+            <div id="spec-edit" style="display:none">
+              <div class="fg3">
+                <div><div class="fld-label">Especialidade</div>
+                  <select class="edit-select" id="ei-spec">
+                    <option value="psico">🧠 Psicologia</option>
+                    <option value="nutri">🥗 Nutrição</option>
+                    <option value="fono">🗣️ Fonoaudiologia</option>
+                  </select>
+                </div>
+                <div><div class="fld-label">Nº do registro</div><input class="edit-input" id="ei-reg"/></div>
+                <div><div class="fld-label">Formação</div><input class="edit-input" id="ei-form"/></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AGENDA DA SEMANA -->
+        <div class="tab-panel" id="tab-agenda">
+          <div class="section">
+            <div class="sec-hd"><div class="sec-title">Agenda desta semana</div></div>
+            <div class="agenda-day-labels">
+              <div class="agenda-day-label">Seg</div>
+              <div class="agenda-day-label">Ter</div>
+              <div class="agenda-day-label">Qua</div>
+              <div class="agenda-day-label">Qui</div>
+              <div class="agenda-day-label">Sex</div>
+              <div class="agenda-day-label">Sáb</div>
+              <div class="agenda-day-label">Dom</div>
+            </div>
+            <div class="agenda-day" id="agendaWeek"></div>
+            <div style="display:flex;gap:14px;margin-top:14px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-soft)"><div style="width:12px;height:12px;border-radius:3px;background:var(--green-pale);border:1px solid var(--green-bdr)"></div>Livre</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-soft)"><div style="width:12px;height:12px;border-radius:3px;background:var(--sky-pale);border:1px solid var(--sky-light)"></div>Com consultas</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-soft)"><div style="width:12px;height:12px;border-radius:3px;background:#F5F5F5;border:1px solid #DDD"></div>Folga</div>
+            </div>
+          </div>
+          <div style="text-align:center;padding:20px">
+            <a href="agenda-equilibrio-v3.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--navy);color:#fff;border-radius:8px;text-decoration:none;font-size:12px;font-weight:700">📅 Abrir agenda completa</a>
+          </div>
+        </div>
+
+        <!-- save bar -->
+        <div class="save-bar" id="saveBarProf">
+          <div class="save-msg">✏️ Modo edição ativo</div>
+          <div class="save-spc"></div>
+          <button class="btn-discard" onclick="discardEditProf()">Descartar</button>
+          <button class="btn-save-prof" onclick="saveEditProf()">Salvar alterações</button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ══ DATA ══
+var SPECS = {psico:'Psicologia', nutri:'Nutrição', fono:'Fonoaudiologia'};
+var SPEC_ICONS = {psico:'🧠', nutri:'🥗', fono:'🗣️'};
+var SPEC_REG   = {psico:'CRP', nutri:'CRN', fono:'CREFONO'};
+
+var PROFS = [
+  {id:1,  nome:'Dra. Ana Costa',       ini:'AC', spec:'psico', reg:'CRP 06/12345', form:'Psicologia Clínica — USP',          cpf:'111.222.333-44', rg:'11.222.333-4', nasc:'1985-06-12', sexo:'Feminino',  nat:'São Paulo, SP', wpp:'(11) 99001-0001', tel:'', email:'ana.costa@equilibrio.com.br',       end:'Rua das Flores, 100 — Santo André', status:'ativo',  consultas:48},
+  {id:2,  nome:'Dr. Bruno Silva',      ini:'BS', spec:'psico', reg:'CRP 06/23456', form:'Psicologia Organizacional — PUC',   cpf:'222.333.444-55', rg:'22.333.444-5', nasc:'1980-03-22', sexo:'Masculino', nat:'Santo André, SP', wpp:'(11) 99002-0002', tel:'', email:'bruno.silva@equilibrio.com.br',      end:'Av. Industrial, 200 — Santo André', status:'ativo',  consultas:35},
+  {id:3,  nome:'Dra. Carla Mendes',    ini:'CM', spec:'psico', reg:'CRP 06/34567', form:'Neuropsicologia — UNIFESP',         cpf:'333.444.555-66', rg:'33.444.555-6', nasc:'1990-11-05', sexo:'Feminino',  nat:'Mauá, SP',       wpp:'(11) 99003-0003', tel:'', email:'carla.mendes@equilibrio.com.br',    end:'Rua 7 de Setembro, 300 — Santo André', status:'ativo',  consultas:22},
+  {id:4,  nome:'Dr. Diego Ramos',      ini:'DR', spec:'psico', reg:'CRP 06/45678', form:'Psicologia Clínica — UNIP',         cpf:'444.555.666-77', rg:'44.555.666-7', nasc:'1988-08-15', sexo:'Masculino', nat:'Diadema, SP',    wpp:'(11) 99004-0004', tel:'', email:'diego.ramos@equilibrio.com.br',     end:'Rua Amazonas, 400 — Santo André', status:'ativo',  consultas:30},
+  {id:5,  nome:'Dra. Elisa Torres',    ini:'ET', spec:'psico', reg:'CRP 06/56789', form:'Psicologia Infantil — Mackenzie',   cpf:'555.666.777-88', rg:'55.666.777-8', nasc:'1992-02-28', sexo:'Feminino',  nat:'São Paulo, SP',  wpp:'(11) 99005-0005', tel:'', email:'elisa.torres@equilibrio.com.br',    end:'Rua Boa Vista, 500 — Santo André', status:'ativo',  consultas:18},
+  {id:6,  nome:'Dr. Fábio Nunes',      ini:'FN', spec:'psico', reg:'CRP 06/67890', form:'Psicologia Clínica — UNICSUL',      cpf:'666.777.888-99', rg:'66.777.888-9', nasc:'1983-07-10', sexo:'Masculino', nat:'São Bernardo, SP',wpp:'(11) 99006-0006', tel:'', email:'fabio.nunes@equilibrio.com.br',     end:'Av. Pereira Barreto, 600 — Santo André', status:'ativo',  consultas:41},
+  {id:7,  nome:'Dra. Gisele Lima',     ini:'GL', spec:'psico', reg:'CRP 06/78901', form:'Psicologia Clínica — Anhembi',      cpf:'777.888.999-00', rg:'77.888.999-0', nasc:'1987-04-20', sexo:'Feminino',  nat:'Guarulhos, SP',  wpp:'(11) 99007-0007', tel:'', email:'gisele.lima@equilibrio.com.br',     end:'Rua Campos Sales, 700 — Santo André', status:'ativo',  consultas:27},
+  {id:8,  nome:'Dr. Henrique Melo',    ini:'HM', spec:'psico', reg:'CRP 06/89012', form:'Psicologia Cognitiva — FMU',        cpf:'888.999.000-11', rg:'88.999.000-1', nasc:'1979-12-01', sexo:'Masculino', nat:'Santo André, SP', wpp:'(11) 99008-0008', tel:'', email:'henrique.melo@equilibrio.com.br',   end:'Rua Cel. Oliveira Lima, 800 — Santo André', status:'ativo',  consultas:55},
+  {id:9,  nome:'Dra. Isabela Costa',   ini:'IC', spec:'psico', reg:'CRP 06/90123', form:'Psicologia Clínica — Estácio',      cpf:'999.000.111-22', rg:'99.000.111-2', nasc:'1994-09-17', sexo:'Feminino',  nat:'Ribeirão Pires, SP',wpp:'(11) 99009-0009', tel:'', email:'isabela.costa@equilibrio.com.br',  end:'Rua Vitória, 900 — Santo André', status:'ativo',  consultas:14},
+  {id:10, nome:'Dr. Jonas Ferreira',   ini:'JF', spec:'psico', reg:'CRP 06/01234', form:'Psicologia — USCS',                 cpf:'010.111.222-33', rg:'01.011.122-3', nasc:'1986-05-30', sexo:'Masculino', nat:'São Caetano, SP', wpp:'(11) 99010-0010', tel:'', email:'jonas.ferreira@equilibrio.com.br',  end:'Rua das Acácias, 1000 — Santo André', status:'inativo', consultas:8},
+  {id:11, nome:'Dra. Karen Alves',     ini:'KA', spec:'nutri', reg:'CRN 3/12345',  form:'Nutrição Clínica — UNIFESP',        cpf:'111.222.333-55', rg:'11.222.333-5', nasc:'1989-01-14', sexo:'Feminino',  nat:'Santo André, SP', wpp:'(11) 99011-0011', tel:'', email:'karen.alves@equilibrio.com.br',     end:'Rua Pinheiro, 100 — Santo André', status:'ativo',  consultas:60},
+  {id:12, nome:'Dr. Lucas Pinto',      ini:'LP', spec:'nutri', reg:'CRN 3/23456',  form:'Nutrição Esportiva — USP',          cpf:'222.333.444-66', rg:'22.333.444-6', nasc:'1991-10-08', sexo:'Masculino', nat:'São Paulo, SP',  wpp:'(11) 99012-0012', tel:'', email:'lucas.pinto@equilibrio.com.br',     end:'Rua Ipiranga, 200 — Santo André', status:'ativo',  consultas:44},
+  {id:13, nome:'Dra. Marina Rocha',    ini:'MR', spec:'nutri', reg:'CRN 3/34567',  form:'Nutrição Funcional — PUC',          cpf:'333.444.555-77', rg:'33.444.555-7', nasc:'1993-07-25', sexo:'Feminino',  nat:'Mauá, SP',       wpp:'(11) 99013-0013', tel:'', email:'marina.rocha@equilibrio.com.br',    end:'Rua das Palmeiras, 300 — Santo André', status:'ativo',  consultas:32},
+  {id:14, nome:'Dr. Nelson Braga',     ini:'NB', spec:'nutri', reg:'CRN 3/45678',  form:'Nutrição Clínica — Unip',           cpf:'444.555.666-88', rg:'44.555.666-8', nasc:'1975-03-11', sexo:'Masculino', nat:'São Paulo, SP',  wpp:'(11) 99014-0014', tel:'', email:'nelson.braga@equilibrio.com.br',    end:'Rua Goiás, 400 — Santo André', status:'ativo',  consultas:19},
+  {id:15, nome:'Dra. Olívia Santos',   ini:'OS', spec:'nutri', reg:'CRN 3/56789',  form:'Nutrição e Dietética — Mackenzie',  cpf:'555.666.777-99', rg:'55.666.777-9', nasc:'1988-12-03', sexo:'Feminino',  nat:'Diadema, SP',    wpp:'(11) 99015-0015', tel:'', email:'olivia.santos@equilibrio.com.br',   end:'Rua Bahia, 500 — Santo André', status:'inativo', consultas:5},
+  {id:16, nome:'Dr. Paulo Ribeiro',    ini:'PR', spec:'fono',  reg:'CREFONO 2/1234',form:'Fonoaudiologia Clínica — UNIFESP', cpf:'666.777.888-00', rg:'66.777.888-0', nasc:'1984-08-22', sexo:'Masculino', nat:'Santo André, SP', wpp:'(11) 99016-0016', tel:'', email:'paulo.ribeiro@equilibrio.com.br',   end:'Rua 11 de Junho, 600 — Santo André', status:'ativo',  consultas:38},
+  {id:17, nome:'Dra. Quésia Moreira',  ini:'QM', spec:'fono',  reg:'CREFONO 2/2345',form:'Fono — Linguagem e Voz — USP',     cpf:'777.888.999-11', rg:'77.888.999-1', nasc:'1990-06-16', sexo:'Feminino',  nat:'São Paulo, SP',  wpp:'(11) 99017-0017', tel:'', email:'quesia.moreira@equilibrio.com.br', end:'Rua Paraíba, 700 — Santo André', status:'ativo',  consultas:25},
+  {id:18, nome:'Dr. Rafael Duarte',    ini:'RD', spec:'fono',  reg:'CREFONO 2/3456',form:'Fonoaudiologia Infantil — PUC',    cpf:'888.999.000-22', rg:'88.999.000-2', nasc:'1987-02-09', sexo:'Masculino', nat:'São Caetano, SP', wpp:'(11) 99018-0018', tel:'', email:'rafael.duarte@equilibrio.com.br',  end:'Rua Minas Gerais, 800 — Santo André', status:'ativo',  consultas:17},
+  {id:19, nome:'Dra. Sabrina Lima',    ini:'SL', spec:'fono',  reg:'CREFONO 2/4567',form:'Fono — Motricidade Orofacial',     cpf:'999.000.111-33', rg:'99.000.111-3', nasc:'1992-11-30', sexo:'Feminino',  nat:'Guarulhos, SP',  wpp:'(11) 99019-0019', tel:'', email:'sabrina.lima@equilibrio.com.br',   end:'Rua Pará, 900 — Santo André', status:'ativo',  consultas:29},
+  {id:20, nome:'Dr. Tiago Carvalho',   ini:'TC', spec:'fono',  reg:'CREFONO 2/5678',form:'Fonoaudiologia — UNIP',            cpf:'000.111.222-44', rg:'00.011.122-4', nasc:'1983-09-07', sexo:'Masculino', nat:'Ribeirão Pires, SP',wpp:'(11) 99020-0020', tel:'', email:'tiago.carvalho@equilibrio.com.br', end:'Rua Ceará, 1000 — Santo André', status:'ativo',  consultas:33},
+];
+
+var activeFilter = 'todos';
+var searchQ = '';
+var currentProf = null;
+var editModeProf = false;
+
+// ══ UTILS ══
+function fmtDate(d) { if(!d) return '—'; var p=d.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+function calcAge(n) { if(!n) return '—'; var d=new Date(n+'T12:00'),t=new Date(); var a=t.getFullYear()-d.getFullYear(); if(t.getMonth()<d.getMonth()||(t.getMonth()===d.getMonth()&&t.getDate()<d.getDate())) a--; return a+' anos'; }
+
+// ══ LIST ══
+function getFiltered() {
+  return PROFS.filter(function(p) {
+    if (activeFilter==='psico'   && p.spec!=='psico')   return false;
+    if (activeFilter==='nutri'   && p.spec!=='nutri')   return false;
+    if (activeFilter==='fono'    && p.spec!=='fono')    return false;
+    if (activeFilter==='inativo' && p.status!=='inativo') return false;
+    if (searchQ && p.nome.toLowerCase().indexOf(searchQ)<0 && p.reg.toLowerCase().indexOf(searchQ)<0) return false;
+    return true;
+  });
+}
+
+function renderTable() {
+  var list = getFiltered();
+  var tbody = document.getElementById('profTable');
+  tbody.innerHTML = '';
+  document.getElementById('statPsico').textContent = PROFS.filter(function(p){return p.spec==='psico'&&p.status==='ativo';}).length;
+  document.getElementById('statNutri').textContent = PROFS.filter(function(p){return p.spec==='nutri'&&p.status==='ativo';}).length;
+  document.getElementById('statFono').textContent  = PROFS.filter(function(p){return p.spec==='fono' &&p.status==='ativo';}).length;
+  document.getElementById('statInat').textContent  = PROFS.filter(function(p){return p.status==='inativo';}).length;
+
+  if (list.length===0) {
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td colspan="7" style="text-align:center;padding:40px;color:var(--text-soft);font-style:italic">Nenhum profissional encontrado</td>';
+    tbody.appendChild(tr); return;
+  }
+
+  list.forEach(function(p) {
+    var tr=document.createElement('tr');
+    tr.innerHTML =
+      '<td><div class="td-prof"><div class="td-av '+p.spec+'">'+p.ini+'</div><div><div class="td-name">'+p.nome+'</div><div class="td-sub">'+p.form+'</div></div></div></td>'+
+      '<td><span class="spec-tag '+p.spec+'">'+SPEC_ICONS[p.spec]+' '+SPECS[p.spec]+'</span></td>'+
+      '<td style="font-size:11px;color:var(--text-soft)">'+p.reg+'</td>'+
+      '<td>'+p.wpp+'</td>'+
+      '<td style="font-size:11px">'+p.email+'</td>'+
+      '<td><span class="status-tag '+(p.status==='ativo'?'ativo':'inativo')+'">'+(p.status==='ativo'?'✅ Ativo':'⊘ Inativo')+'</span></td>'+
+      '<td><div class="td-actions"><button class="act-btn" title="Ver ficha" onclick="event.stopPropagation();openRecord('+p.id+')">👁</button><button class="act-btn" title="Ver na agenda" onclick="event.stopPropagation();window.location.href=\'agenda-equilibrio-v3.html\'">📅</button></div></td>';
+    tr.onclick=function(){ openRecord(p.id); };
+    tbody.appendChild(tr);
+  });
+}
+
+function setFilter(f, el) {
+  activeFilter=f;
+  document.querySelectorAll('.ftab').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  renderTable();
+}
+function filterProfs(q) { searchQ=q.toLowerCase(); renderTable(); }
+
+// ══ RECORD ══
+function openRecord(id) {
+  currentProf=PROFS.find(function(p){return p.id===id;});
+  if(!currentProf) return;
+  editModeProf=false;
+  document.getElementById('listView').style.display='none';
+  document.getElementById('recordView').style.display='flex';
+  fillRecord(currentProf);
+  showTab('dados',document.querySelector('.rv-tab'));
+}
+
+function showList() {
+  document.getElementById('recordView').style.display='none';
+  document.getElementById('listView').style.display='flex';
+  editModeProf=false;
+  renderTable();
+}
+
+function fillRecord(p) {
+  document.getElementById('rvName').textContent=p.nome;
+
+  // summary
+  document.getElementById('profSummary').innerHTML=
+    '<div class="ps-av '+p.spec+'">'+p.ini+'</div>'+
+    '<div><div class="ps-name">'+p.nome+'</div>'+
+    '<div class="ps-info">'+
+      '<span>'+SPEC_ICONS[p.spec]+' '+SPECS[p.spec]+'</span>'+
+      '<span>📋 '+p.reg+'</span>'+
+      '<span>📅 '+calcAge(p.nasc)+'</span>'+
+      '<span>💬 '+p.wpp+'</span>'+
+    '</div></div>'+
+    '<div class="ps-stats">'+
+      '<div class="ps-stat"><div class="ps-stat-n">'+p.consultas+'</div><div class="ps-stat-l">Consultas</div></div>'+
+    '</div>';
+
+  // dados
+  document.getElementById('fv-nome').textContent=p.nome;
+  document.getElementById('fv-cpf').textContent=p.cpf||'—';
+  document.getElementById('fv-rg').textContent=p.rg||'—';
+  document.getElementById('fv-nasc').textContent=fmtDate(p.nasc)+' ('+calcAge(p.nasc)+')';
+  document.getElementById('fv-sexo').textContent=p.sexo||'—';
+  document.getElementById('fv-nat').textContent=p.nat||'—';
+
+  // contato
+  document.getElementById('fv-wpp').textContent=p.wpp||'—';
+  document.getElementById('fv-tel').textContent=p.tel||'—';
+  document.getElementById('fv-email').textContent=p.email||'—';
+  document.getElementById('fv-end').textContent=p.end||'—';
+
+  // especialidade
+  var sc=document.getElementById('fv-spec-card');
+  sc.className='spec-card '+p.spec;
+  document.getElementById('fv-spec-icon').textContent=SPEC_ICONS[p.spec];
+  document.getElementById('fv-spec-name').textContent=SPECS[p.spec];
+  document.getElementById('fv-spec-reg').textContent='Registro '+SPEC_REG[p.spec];
+  document.getElementById('fv-reg').textContent=p.reg||'—';
+  document.getElementById('fv-form').textContent=p.form||'—';
+
+  // agenda week
+  buildAgendaWeek(p);
+
+  // edit fields
+  document.getElementById('ei-nome').value=p.nome||'';
+  document.getElementById('ei-cpf').value=p.cpf||'';
+  document.getElementById('ei-rg').value=p.rg||'';
+  document.getElementById('ei-nasc').value=p.nasc||'';
+  document.getElementById('ei-nat').value=p.nat||'';
+  document.getElementById('ei-wpp').value=p.wpp||'';
+  document.getElementById('ei-tel').value=p.tel||'';
+  document.getElementById('ei-email').value=p.email||'';
+  document.getElementById('ei-end').value=p.end||'';
+  document.getElementById('ei-reg').value=p.reg||'';
+  document.getElementById('ei-form').value=p.form||'';
+  document.getElementById('ei-spec').value=p.spec||'psico';
+
+  // status button
+  var btn=document.getElementById('btnStatusProf');
+  if(p.status==='ativo'){
+    btn.textContent='⊘ Inativar'; btn.className='btn-status-prof';
+  } else {
+    btn.textContent='✓ Reativar'; btn.className='btn-status-prof reativar';
+  }
+}
+
+function buildAgendaWeek(p) {
+  var grid=document.getElementById('agendaWeek');
+  grid.innerHTML='';
+  var slots=['livre','ocupado','ocupado','livre','ocupado','folga','folga'];
+  var labels=['3 livres','5 consultas','4 consultas','2 livres','6 consultas','—','—'];
+  slots.forEach(function(s,i){
+    var div=document.createElement('div');
+    div.className='agenda-slot '+s;
+    div.textContent=s==='folga'?'Folga':labels[i];
+    grid.appendChild(div);
+  });
+}
+
+function showTab(tab, el) {
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.rv-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+// ══ EDIT ══
+function toggleEditProf() {
+  editModeProf=!editModeProf;
+  var views=['dados-view','contato-view','spec-view'];
+  var edits=['dados-edit','contato-edit','spec-edit'];
+  views.forEach(function(v){ var e=document.getElementById(v); if(e) e.style.display=editModeProf?'none':'grid'; });
+  edits.forEach(function(e){ var el=document.getElementById(e); if(el) el.style.display=editModeProf?'grid':'none'; });
+  document.getElementById('spec-view').style.display=editModeProf?'none':'block';
+  document.getElementById('spec-edit').style.display=editModeProf?'block':'none';
+  document.getElementById('saveBarProf').classList.toggle('show',editModeProf);
+  var btn=document.querySelector('.btn-edit-prof');
+  if(btn) btn.textContent=editModeProf?'✕ Cancelar edição':'✏️ Editar ficha';
+}
+
+function discardEditProf() { editModeProf=true; toggleEditProf(); fillRecord(currentProf); }
+
+function saveEditProf() {
+  if(!currentProf) return;
+  currentProf.nome=document.getElementById('ei-nome').value;
+  currentProf.cpf=document.getElementById('ei-cpf').value;
+  currentProf.rg=document.getElementById('ei-rg').value;
+  currentProf.nasc=document.getElementById('ei-nasc').value;
+  currentProf.nat=document.getElementById('ei-nat').value;
+  currentProf.wpp=document.getElementById('ei-wpp').value;
+  currentProf.tel=document.getElementById('ei-tel').value;
+  currentProf.email=document.getElementById('ei-email').value;
+  currentProf.end=document.getElementById('ei-end').value;
+  currentProf.reg=document.getElementById('ei-reg').value;
+  currentProf.form=document.getElementById('ei-form').value;
+  currentProf.spec=document.getElementById('ei-spec').value;
+  editModeProf=true; toggleEditProf();
+  fillRecord(currentProf);
+}
+
+// ══ STATUS ══
+function toggleProfStatus() {
+  if(!currentProf) return;
+  var isAtivo=currentProf.status==='ativo';
+  var msg=(isAtivo?'Deseja inativar ':'Deseja reativar ')+currentProf.nome+'?';
+  if(!confirm(msg)) return;
+  currentProf.status=isAtivo?'inativo':'ativo';
+  fillRecord(currentProf);
+  renderTable();
+}
+
+function openNewProf() {
+  alert('Abre formulário de novo profissional.');
+}
+
+// ══ INIT ══
+document.getElementById('recordView').style.display='none';
+renderTable();
+</script>
+</body>
+</html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Log de Auditoria — Clínica Equilíbrio Ideal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA; --sky-mist:#F4F9FC;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-pale:#FBF5EA;
+      --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
+      --red:#E05252; --red-pale:#FEF0F0;
+      --orange:#E8954A; --orange-pale:#FEF4EC;
+      --purple:#7B68C8; --purple-pale:#F2EFFA;
+      --sidebar-w:208px;
+    }
+    html, body { height:100%; overflow:hidden; font-family:'Lato',sans-serif; background:var(--sky-mist); color:var(--text); font-size:13px; }
+    .app { display:flex; height:100vh; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { width:var(--sidebar-w); background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+    .sb-brand { padding:13px 14px 11px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .sb-icon  { width:31px; height:31px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sb-icon span { color:#fff; font-size:13px; font-family:'Playfair Display',serif; }
+    .sb-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .sb-sub  { font-size:10px; color:var(--text-soft); }
+    .sb-nav  { padding:9px 7px; flex:1; overflow-y:auto; }
+    .sb-nav::-webkit-scrollbar { display:none; }
+    .nav-lbl  { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-soft); padding:6px 6px 3px; }
+    .nav-item { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:7px; cursor:pointer; color:var(--text-soft); font-size:12px; transition:all .15s; margin-bottom:1px; text-decoration:none; }
+    .nav-item:hover  { background:var(--sky-pale); color:var(--navy); }
+    .nav-item.active { background:var(--sky-pale); color:var(--navy); font-weight:700; }
+    .nav-icon { font-size:14px; width:18px; text-align:center; }
+    .nav-badge { margin-left:auto; background:var(--sky); color:#fff; font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px; }
+    .sb-foot { padding:10px 13px; border-top:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .u-av   { width:28px; height:28px; border-radius:50%; background:var(--gold-pale); border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .u-name { font-size:11px; font-weight:700; color:var(--navy); }
+    .u-role { font-size:9px; color:var(--gold); font-weight:700; }
+    .u-out  { margin-left:auto; color:var(--text-soft); cursor:pointer; font-size:12px; }
+
+    /* ═══ MAIN ═══ */
+    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+    /* header */
+    .top-hd { height:56px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:12px; flex-shrink:0; }
+    .hd-icon { width:34px; height:34px; background:var(--navy); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+    .hd-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .hd-sub   { font-size:11px; color:var(--text-soft); margin-top:1px; }
+    .hd-spc   { flex:1; }
+    .hd-badge { background:var(--gold-pale); border:1px solid var(--gold); border-radius:20px; padding:4px 12px; font-size:10px; font-weight:700; color:var(--gold); letter-spacing:.06em; }
+
+    /* stats bar */
+    .stats-bar { padding:14px 24px; background:var(--white); border-bottom:1px solid var(--border); display:flex; gap:12px; flex-shrink:0; }
+    .stat-card { flex:1; background:var(--sky-mist); border:1.5px solid var(--border); border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
+    .stat-icon { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+    .stat-icon.blue   { background:var(--sky-pale); }
+    .stat-icon.green  { background:var(--green-pale); }
+    .stat-icon.orange { background:var(--orange-pale); }
+    .stat-icon.red    { background:var(--red-pale); }
+    .stat-n { font-family:'Playfair Display',serif; font-size:22px; color:var(--navy); line-height:1; }
+    .stat-l { font-size:10px; color:var(--text-soft); margin-top:2px; }
+
+    /* filter bar */
+    .filter-bar { padding:10px 24px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-shrink:0; flex-wrap:wrap; }
+    .ftab { padding:5px 13px; border:1.5px solid var(--border); border-radius:18px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); transition:all .15s; white-space:nowrap; }
+    .ftab:hover { border-color:var(--sky); color:var(--navy); }
+    .ftab.active { background:var(--navy); border-color:var(--navy); color:#fff; }
+    .f-spc { flex:1; }
+    .f-search { position:relative; }
+    .f-search svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--sky-light); pointer-events:none; }
+    .f-search input { width:220px; height:32px; padding:0 12px 0 28px; border:1.5px solid var(--border); border-radius:8px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .f-search input:focus { border-color:var(--sky); background:#fff; }
+    .f-search input::placeholder { color:var(--sky-light); }
+    .f-date { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text-soft); }
+    .f-date input { height:30px; padding:0 8px; border:1.5px solid var(--border); border-radius:7px; font-family:'Lato',sans-serif; font-size:11px; color:var(--text); background:var(--sky-mist); outline:none; }
+    .btn-export { display:flex; align-items:center; gap:6px; padding:6px 14px; border:1.5px solid var(--border); border-radius:8px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:11px; font-weight:700; color:var(--text-soft); transition:all .15s; white-space:nowrap; }
+    .btn-export:hover { border-color:var(--sky); color:var(--navy); }
+
+    /* log table */
+    .table-wrap { flex:1; overflow-y:auto; }
+    .table-wrap::-webkit-scrollbar { width:5px; }
+    .table-wrap::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:3px; }
+
+    table { width:100%; border-collapse:collapse; }
+    thead th { padding:9px 16px; text-align:left; font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); border-bottom:1.5px solid var(--border); background:var(--sky-mist); position:sticky; top:0; white-space:nowrap; z-index:5; }
+    thead th:first-child { padding-left:24px; }
+    thead th:last-child  { padding-right:24px; }
+    tbody tr { border-bottom:1px solid rgba(212,232,242,.5); transition:background .1s; cursor:pointer; }
+    tbody tr:hover { background:var(--sky-pale); }
+    tbody td { padding:11px 16px; font-size:12px; vertical-align:middle; }
+    tbody td:first-child { padding-left:24px; }
+    tbody td:last-child  { padding-right:24px; }
+
+    /* action badge */
+    .action-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:6px; font-size:10px; font-weight:700; white-space:nowrap; }
+    .action-badge.criou     { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .action-badge.editou    { background:var(--sky-pale);   color:#1E6FA3; border:1px solid var(--sky-light); }
+    .action-badge.inativou  { background:var(--red-pale);   color:var(--red); border:1px solid #F5B8B8; }
+    .action-badge.reativou  { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .action-badge.agendou   { background:var(--sky-pale);   color:#1E6FA3; border:1px solid var(--sky-light); }
+    .action-badge.cancelou  { background:var(--red-pale);   color:var(--red); border:1px solid #F5B8B8; }
+    .action-badge.confirmou { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .action-badge.acessou   { background:var(--purple-pale); color:var(--purple); border:1px solid #C5B8E8; }
+    .action-badge.exportou  { background:var(--gold-pale);  color:#8B6A1E; border:1px solid var(--gold); }
+
+    /* module badge */
+    .module-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:5px; font-size:10px; font-weight:700; background:var(--sky-mist); border:1px solid var(--border); color:var(--text-soft); }
+
+    /* user info */
+    .user-cell { display:flex; align-items:center; gap:8px; }
+    .user-av { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; }
+    .user-av.admin    { background:var(--gold-pale); border:1.5px solid var(--gold); color:var(--navy); }
+    .user-av.recep    { background:var(--sky-pale);  border:1.5px solid var(--sky); color:var(--navy); }
+    .user-av.prof     { background:var(--green-pale); border:1.5px solid var(--green-bdr); color:var(--navy); }
+    .user-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .user-role { font-size:9.5px; color:var(--text-soft); }
+
+    /* detail cell */
+    .detail-main { font-size:12px; color:var(--navy); font-weight:400; }
+    .detail-sub  { font-size:10px; color:var(--text-soft); margin-top:2px; }
+
+    /* timestamp */
+    .ts-date { font-size:12px; color:var(--navy); font-weight:400; }
+    .ts-time { font-size:10px; color:var(--text-soft); margin-top:1px; }
+
+    /* ip */
+    .ip-cell { font-size:10px; color:var(--text-soft); font-family:monospace; }
+
+    /* row detail panel */
+    .row-detail { display:none; background:var(--sky-mist); }
+    .row-detail.open { display:table-row; }
+    .row-detail td { padding:12px 24px 16px; border-bottom:1.5px solid var(--border); }
+    .rd-inner { background:var(--white); border:1.5px solid var(--border); border-radius:10px; padding:14px 16px; }
+    .rd-title { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-soft); margin-bottom:10px; }
+    .rd-grid  { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
+    .rd-item  {}
+    .rd-label { font-size:9.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-soft); margin-bottom:3px; }
+    .rd-value { font-size:12px; color:var(--navy); }
+    .rd-changes { margin-top:12px; }
+    .rd-change { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--border); font-size:11px; }
+    .rd-change:last-child { border-bottom:none; }
+    .rd-field { font-weight:700; color:var(--navy); min-width:120px; }
+    .rd-old   { color:var(--red); text-decoration:line-through; }
+    .rd-arrow { color:var(--text-soft); }
+    .rd-new   { color:var(--green); font-weight:700; }
+
+    /* pagination */
+    .pagination { padding:12px 24px; background:var(--white); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .pag-info { font-size:11px; color:var(--text-soft); }
+    .pag-btns { display:flex; gap:4px; }
+    .pag-btn  { width:30px; height:30px; border:1.5px solid var(--border); border-radius:7px; background:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; color:var(--text-soft); display:flex; align-items:center; justify-content:center; transition:all .15s; }
+    .pag-btn:hover  { border-color:var(--sky); color:var(--navy); }
+    .pag-btn.active { background:var(--navy); border-color:var(--navy); color:#fff; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .main { animation:fadeUp .4s ease; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-icon"><span>Ψ</span></div>
+      <div><div class="sb-name">Equilíbrio Ideal</div><div class="sb-sub">Clínica Multidisciplinar</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-lbl">Principal</div>
+      <a class="nav-item" href="agenda-equilibrio-v3.html"><span class="nav-icon">📅</span>Agenda</a>
+      <a class="nav-item" href="cadastro-pacientes.html"><span class="nav-icon">👥</span>Pacientes</a>
+      <div class="nav-item"><span class="nav-icon">🔢</span>Painel de Senhas</div>
+      <div class="nav-lbl" style="margin-top:5px">Clínica</div>
+      <div class="nav-item"><span class="nav-icon">🧠</span>Profissionais</div>
+      <div class="nav-item"><span class="nav-icon">🏥</span>Salas</div>
+      <div class="nav-lbl" style="margin-top:5px">Admin</div>
+      <div class="nav-item"><span class="nav-icon">💰</span>Faturamento</div>
+      <div class="nav-item active"><span class="nav-icon">🔍</span>Log de Auditoria<span class="nav-badge" id="logCount"></span></div>
+      <div class="nav-lbl" style="margin-top:5px">Sistema</div>
+      <div class="nav-item"><span class="nav-icon">⚙️</span>Configurações</div>
+    </nav>
+    <div class="sb-foot">
+      <div class="u-av admin">RA</div>
+      <div><div class="u-name">Roberto Admin</div><div class="u-role">👑 Admin</div></div>
+      <div class="u-out">↩</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- header -->
+    <div class="top-hd">
+      <div class="hd-icon">🔍</div>
+      <div>
+        <div class="hd-title">Log de Auditoria</div>
+        <div class="hd-sub">Todas as ações realizadas no sistema</div>
+      </div>
+      <div class="hd-spc"></div>
+      <div class="hd-badge">👑 Acesso exclusivo Admin</div>
+    </div>
+
+    <!-- stats -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-icon blue">📋</div>
+        <div><div class="stat-n" id="statTotal">0</div><div class="stat-l">Total de ações hoje</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">📅</div>
+        <div><div class="stat-n" id="statAgend">0</div><div class="stat-l">Agendamentos</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">✏️</div>
+        <div><div class="stat-n" id="statEdit">0</div><div class="stat-l">Edições de cadastro</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">⊘</div>
+        <div><div class="stat-n" id="statInativ">0</div><div class="stat-l">Inativações</div></div>
+      </div>
+    </div>
+
+    <!-- filters -->
+    <div class="filter-bar">
+      <div class="ftab active" onclick="setFilter('todos',this)">Todos</div>
+      <div class="ftab" onclick="setFilter('agendamento',this)">Agendamentos</div>
+      <div class="ftab" onclick="setFilter('cadastro',this)">Cadastros</div>
+      <div class="ftab" onclick="setFilter('acesso',this)">Acessos</div>
+      <div class="ftab" onclick="setFilter('inativacao',this)">Inativações</div>
+      <div class="f-spc"></div>
+      <div class="f-date">
+        De <input type="date" id="fDateFrom" value="2026-05-04"/>
+        até <input type="date" id="fDateTo"   value="2026-05-05"/>
+      </div>
+      <div class="f-search">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Buscar por usuário ou registro…" oninput="searchLog(this.value)"/>
+      </div>
+      <button class="btn-export" onclick="alert('Exportando CSV...')">📥 Exportar CSV</button>
+    </div>
+
+    <!-- table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Data / Hora</th>
+            <th>Usuário</th>
+            <th>Ação</th>
+            <th>Módulo</th>
+            <th>Registro afetado</th>
+            <th>IP</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="logTable"></tbody>
+      </table>
+    </div>
+
+    <!-- pagination -->
+    <div class="pagination">
+      <div class="pag-info" id="pagInfo"></div>
+      <div class="pag-btns">
+        <button class="pag-btn">‹</button>
+        <button class="pag-btn active">1</button>
+        <button class="pag-btn">2</button>
+        <button class="pag-btn">3</button>
+        <button class="pag-btn">›</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ══ DATA ══
+var LOGS = [
+  // May 5
+  { id:1,  dt:'2026-05-05', hr:'08:02', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'acessou',   modulo:'Sistema',    registro:'Login no sistema', ip:'192.168.1.10', cat:'acesso',
+    detail:{ sessao:'SES-2847', dispositivo:'Windows 11 · Chrome 124', duracao:'4h 12min' }, changes:[] },
+  { id:2,  dt:'2026-05-05', hr:'08:15', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'agendou',   modulo:'Agenda',     registro:'João Pereira — Psicologia 09:00', ip:'192.168.1.10', cat:'agendamento',
+    detail:{ paciente:'João Pereira', prof:'Dra. Ana Costa', data:'05/05/2026 09:00', sala:'Sala 01', cobertura:'Unimed' }, changes:[] },
+  { id:3,  dt:'2026-05-05', hr:'08:47', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'criou',     modulo:'Pacientes',  registro:'Novo paciente: Diego Souza', ip:'192.168.1.10', cat:'cadastro',
+    detail:{ paciente:'Diego Souza', cpf:'222.333.444-55', convenio:'Bradesco Saúde', telefone:'(11) 97777-8888' }, changes:[] },
+  { id:4,  dt:'2026-05-05', hr:'09:10', user:'Dra. Ana Costa', userIni:'AC', userRole:'prof',  acao:'acessou',   modulo:'Sistema',    registro:'Login no sistema', ip:'192.168.1.22', cat:'acesso',
+    detail:{ sessao:'SES-2848', dispositivo:'macOS · Safari 17', duracao:'3h 05min' }, changes:[] },
+  { id:5,  dt:'2026-05-05', hr:'09:33', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'editou',    modulo:'Pacientes',  registro:'Fernanda Souza — Contato', ip:'192.168.1.10', cat:'cadastro',
+    detail:{ paciente:'Fernanda Souza' },
+    changes:[ { campo:'WhatsApp', antes:'(11) 98765-0000', depois:'(11) 98765-4321' }, { campo:'E-mail', antes:'fernanda@gmail.com', depois:'fernanda@email.com' } ] },
+  { id:6,  dt:'2026-05-05', hr:'10:02', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'cancelou',  modulo:'Agenda',     registro:'Ricardo Alves — Psicologia 10:30', ip:'192.168.1.10', cat:'agendamento',
+    detail:{ paciente:'Ricardo Alves', prof:'Dr. Bruno Silva', data:'05/05/2026 10:30', motivo:'Solicitação do paciente' }, changes:[] },
+  { id:7,  dt:'2026-05-05', hr:'10:45', user:'Roberto Admin',  userIni:'RA', userRole:'admin', acao:'acessou',   modulo:'Sistema',    registro:'Login no sistema', ip:'192.168.1.5',  cat:'acesso',
+    detail:{ sessao:'SES-2849', dispositivo:'Windows 11 · Chrome 124', duracao:'Sessão ativa' }, changes:[] },
+  { id:8,  dt:'2026-05-05', hr:'11:00', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'agendou',   modulo:'Agenda',     registro:'Luciana Martins — Fono 14:00', ip:'192.168.1.10', cat:'agendamento',
+    detail:{ paciente:'Luciana Martins', prof:'Dr. Paulo Ribeiro', data:'05/05/2026 14:00', sala:'Sala 16', cobertura:'Hapvida' }, changes:[] },
+  { id:9,  dt:'2026-05-05', hr:'11:22', user:'Roberto Admin',  userIni:'RA', userRole:'admin', acao:'editou',    modulo:'Profissionais', registro:'Dr. Bruno Silva — Dados bancários', ip:'192.168.1.5', cat:'cadastro',
+    detail:{ profissional:'Dr. Bruno Silva' },
+    changes:[ { campo:'Banco', antes:'Itaú', depois:'Bradesco' }, { campo:'Agência', antes:'1234-5', depois:'5678-9' }, { campo:'Conta', antes:'12345-6', depois:'98765-4' } ] },
+  { id:10, dt:'2026-05-05', hr:'11:55', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'inativou',  modulo:'Pacientes',  registro:'Marcos Ribeiro — Inativado', ip:'192.168.1.10', cat:'inativacao',
+    detail:{ paciente:'Marcos Ribeiro', motivo:'Solicitação do paciente', historico:'3 consultas preservadas' }, changes:[] },
+  { id:11, dt:'2026-05-05', hr:'13:05', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'agendou',   modulo:'Agenda',     registro:'Carlos Nunes — Nutrição 15:00', ip:'192.168.1.10', cat:'agendamento',
+    detail:{ paciente:'Carlos Nunes', prof:'Dr. Lucas Pinto', data:'05/05/2026 15:00', sala:'Sala 12', cobertura:'Prevent Senior' }, changes:[] },
+  { id:12, dt:'2026-05-05', hr:'13:48', user:'Roberto Admin',  userIni:'RA', userRole:'admin', acao:'exportou',  modulo:'Faturamento', registro:'XML Unimed — Mai/2026', ip:'192.168.1.5', cat:'cadastro',
+    detail:{ convenio:'Unimed', periodo:'Maio 2026', registros:'47 consultas', valor:'R$ 18.450,00' }, changes:[] },
+  { id:13, dt:'2026-05-05', hr:'14:20', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'editou',    modulo:'Pacientes',  registro:'João Pereira — Convênio', ip:'192.168.1.10', cat:'cadastro',
+    detail:{ paciente:'João Pereira' },
+    changes:[ { campo:'Carteirinha', antes:'000123456788', depois:'000123456789' } ] },
+  { id:14, dt:'2026-05-05', hr:'15:10', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'confirmou', modulo:'Agenda',     registro:'Amanda Ferreira — Psicologia 15:00', ip:'192.168.1.10', cat:'agendamento',
+    detail:{ paciente:'Amanda Ferreira', prof:'Dra. Elisa Torres', status:'Paciente chegou — confirmada presença' }, changes:[] },
+  { id:15, dt:'2026-05-05', hr:'15:55', user:'Roberto Admin',  userIni:'RA', userRole:'admin', acao:'reativou',  modulo:'Pacientes',  registro:'Marcos Ribeiro — Reativado', ip:'192.168.1.5', cat:'inativacao',
+    detail:{ paciente:'Marcos Ribeiro', motivo:'Retorno ao tratamento' }, changes:[] },
+
+  // May 4
+  { id:16, dt:'2026-05-04', hr:'08:05', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'acessou',   modulo:'Sistema',    registro:'Login no sistema', ip:'192.168.1.10', cat:'acesso', detail:{}, changes:[] },
+  { id:17, dt:'2026-05-04', hr:'09:00', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'agendou',   modulo:'Agenda',     registro:'Patrícia Gomes — Psicologia 11:00', ip:'192.168.1.10', cat:'agendamento', detail:{ paciente:'Patrícia Gomes', prof:'Dra. Carla Mendes', data:'04/05/2026 11:00', sala:'Sala 03', cobertura:'Unimed' }, changes:[] },
+  { id:18, dt:'2026-05-04', hr:'10:30', user:'Roberto Admin',  userIni:'RA', userRole:'admin', acao:'editou',    modulo:'Configurações', registro:'Horário de funcionamento', ip:'192.168.1.5', cat:'cadastro',
+    detail:{}, changes:[ { campo:'Sábado — Fim', antes:'12:00', depois:'14:00' } ] },
+  { id:19, dt:'2026-05-04', hr:'14:00', user:'Maria Recepção', userIni:'MR', userRole:'recep', acao:'criou',     modulo:'Pacientes',  registro:'Novo paciente: Bianca Oliveira', ip:'192.168.1.10', cat:'cadastro', detail:{ paciente:'Bianca Oliveira', cpf:'999.888.777-66', convenio:'Porto Seguro', telefone:'(11) 96666-7777' }, changes:[] },
+  { id:20, dt:'2026-05-04', hr:'16:45', user:'Dra. Karen Alves', userIni:'KA', userRole:'prof', acao:'acessou',  modulo:'Sistema',    registro:'Login no sistema', ip:'192.168.1.30', cat:'acesso', detail:{ sessao:'SES-2840', dispositivo:'iPhone · Safari 17', duracao:'1h 20min' }, changes:[] },
+];
+
+var activeFilter = 'todos';
+var searchQ = '';
+
+// ══ RENDER ══
+function getFiltered() {
+  return LOGS.filter(function(l) {
+    if (activeFilter !== 'todos' && l.cat !== activeFilter) return false;
+    if (searchQ && l.user.toLowerCase().indexOf(searchQ) < 0 && l.registro.toLowerCase().indexOf(searchQ) < 0) return false;
+    return true;
+  });
+}
+
+function renderStats() {
+  var today = LOGS.filter(function(l){ return l.dt === '2026-05-05'; });
+  document.getElementById('statTotal').textContent  = today.length;
+  document.getElementById('statAgend').textContent  = today.filter(function(l){ return l.cat==='agendamento'; }).length;
+  document.getElementById('statEdit').textContent   = today.filter(function(l){ return l.cat==='cadastro'; }).length;
+  document.getElementById('statInativ').textContent = today.filter(function(l){ return l.cat==='inativacao'; }).length;
+  document.getElementById('logCount').textContent   = LOGS.length;
+}
+
+function renderTable() {
+  var list = getFiltered();
+  var tbody = document.getElementById('logTable');
+  tbody.innerHTML = '';
+  document.getElementById('pagInfo').textContent = list.length + ' registros encontrados';
+
+  if (list.length === 0) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td colspan="7" style="text-align:center;padding:40px;color:var(--text-soft);font-style:italic">Nenhum registro encontrado</td>';
+    tbody.appendChild(tr);
+    return;
+  }
+
+  var lastDate = '';
+  list.forEach(function(log) {
+    // date separator
+    if (log.dt !== lastDate) {
+      lastDate = log.dt;
+      var sep = document.createElement('tr');
+      sep.style.cssText = 'background:var(--sky-mist);pointer-events:none';
+      var d = log.dt.split('-'); var fmtDate = d[2]+'/'+d[1]+'/'+d[0];
+      var isToday = log.dt === '2026-05-05';
+      sep.innerHTML = '<td colspan="7" style="padding:7px 24px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft)">'+(isToday?'🟢 Hoje — ':'')+fmtDate+'</td>';
+      tbody.appendChild(sep);
+    }
+
+    var tr = document.createElement('tr');
+    tr.onclick = function(){ toggleDetail(log.id, tr); };
+
+    var roleClass = log.userRole==='admin'?'admin':log.userRole==='recep'?'recep':'prof';
+
+    tr.innerHTML =
+      '<td><div class="ts-date">'+log.hr+'</div><div class="ts-time">'+log.dt.split('-').reverse().join('/')+'</div></td>'+
+      '<td><div class="user-cell">'+
+        '<div class="user-av '+roleClass+'">'+log.userIni+'</div>'+
+        '<div><div class="user-name">'+log.user+'</div><div class="user-role">'+roleLabel(log.userRole)+'</div></div>'+
+      '</div></td>'+
+      '<td><span class="action-badge '+log.acao+'">'+actionIcon(log.acao)+' '+capitalize(log.acao)+'</span></td>'+
+      '<td><span class="module-badge">'+log.modulo+'</span></td>'+
+      '<td><div class="detail-main">'+log.registro+'</div>'+
+        (log.changes.length>0?'<div class="detail-sub">'+log.changes.length+' campo(s) alterado(s)</div>':'')+'</td>'+
+      '<td><div class="ip-cell">'+log.ip+'</div></td>'+
+      '<td style="text-align:center;color:var(--text-soft);font-size:12px" id="arr-'+log.id+'">›</td>';
+
+    tbody.appendChild(tr);
+
+    // detail row
+    var detailRow = document.createElement('tr');
+    detailRow.className = 'row-detail';
+    detailRow.id = 'detail-'+log.id;
+    detailRow.innerHTML = '<td colspan="7">'+buildDetailHTML(log)+'</td>';
+    tbody.appendChild(detailRow);
+  });
+}
+
+function buildDetailHTML(log) {
+  var html = '<div class="rd-inner"><div class="rd-title">Detalhes da ação</div><div class="rd-grid">';
+  var d = log.detail;
+  if (d.paciente)     html += rdItem('Paciente', d.paciente);
+  if (d.profissional) html += rdItem('Profissional', d.profissional);
+  if (d.prof)         html += rdItem('Profissional', d.prof);
+  if (d.data)         html += rdItem('Data & Hora', d.data);
+  if (d.sala)         html += rdItem('Sala', d.sala);
+  if (d.cobertura)    html += rdItem('Cobertura', d.cobertura);
+  if (d.convenio)     html += rdItem('Convênio', d.convenio);
+  if (d.periodo)      html += rdItem('Período', d.periodo);
+  if (d.registros)    html += rdItem('Registros', d.registros);
+  if (d.valor)        html += rdItem('Valor total', d.valor);
+  if (d.cpf)          html += rdItem('CPF', d.cpf);
+  if (d.telefone)     html += rdItem('Telefone', d.telefone);
+  if (d.sessao)       html += rdItem('Sessão', d.sessao);
+  if (d.dispositivo)  html += rdItem('Dispositivo', d.dispositivo);
+  if (d.duracao)      html += rdItem('Duração', d.duracao);
+  if (d.motivo)       html += rdItem('Motivo', d.motivo);
+  if (d.historico)    html += rdItem('Histórico', d.historico);
+  if (d.status)       html += rdItem('Status', d.status);
+  html += '</div>';
+
+  if (log.changes.length > 0) {
+    html += '<div class="rd-changes"><div class="rd-title" style="margin-top:12px">Campos alterados</div>';
+    log.changes.forEach(function(c){
+      html += '<div class="rd-change"><span class="rd-field">'+c.campo+'</span><span class="rd-old">'+c.antes+'</span><span class="rd-arrow">→</span><span class="rd-new">'+c.depois+'</span></div>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function rdItem(label, value) {
+  return '<div class="rd-item"><div class="rd-label">'+label+'</div><div class="rd-value">'+value+'</div></div>';
+}
+
+function toggleDetail(id, tr) {
+  var row = document.getElementById('detail-'+id);
+  var arr = document.getElementById('arr-'+id);
+  var isOpen = row.classList.contains('open');
+  // close all
+  document.querySelectorAll('.row-detail.open').forEach(function(r){ r.classList.remove('open'); });
+  document.querySelectorAll('[id^="arr-"]').forEach(function(a){ a.textContent='›'; a.style.transform=''; });
+  if (!isOpen) {
+    row.classList.add('open');
+    if(arr){ arr.textContent='›'; arr.style.transform='rotate(90deg)'; arr.style.transition='transform .2s'; }
+  }
+}
+
+// ══ FILTERS ══
+function setFilter(f, el) {
+  activeFilter = f;
+  document.querySelectorAll('.ftab').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  renderTable();
+}
+function searchLog(q) { searchQ = q.toLowerCase(); renderTable(); }
+
+// ══ UTILS ══
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function roleLabel(r)  { return r==='admin'?'👑 Admin':r==='recep'?'🏥 Recepção':'🧠 Profissional'; }
+function actionIcon(a) {
+  var icons = { criou:'➕', editou:'✏️', inativou:'⊘', reativou:'✓', agendou:'📅', cancelou:'✕', confirmou:'✅', acessou:'🔑', exportou:'📥' };
+  return icons[a] || '•';
+}
+
+// ══ INIT ══
+renderStats();
+renderTable();
+</script>
+</body>
+</html>

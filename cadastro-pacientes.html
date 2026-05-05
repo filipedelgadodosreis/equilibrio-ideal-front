@@ -115,6 +115,10 @@
     .btn-agendar:hover { background:var(--sky); color:#fff; }
     .btn-edit-pat { display:flex; align-items:center; gap:6px; padding:8px 14px; border:none; border-radius:8px; background:var(--navy); color:#fff; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:background .15s; }
     .btn-edit-pat:hover { background:var(--navy-mid); }
+    .btn-inativar { display:flex; align-items:center; gap:6px; padding:8px 14px; border:1.5px solid #E05252; border-radius:8px; background:#fff; color:#E05252; cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:all .15s; }
+    .btn-inativar:hover { background:#FEF0F0; }
+    .btn-reativar { display:flex; align-items:center; gap:6px; padding:8px 14px; border:1.5px solid var(--green-bdr); border-radius:8px; background:#fff; color:var(--green); cursor:pointer; font-family:'Lato',sans-serif; font-size:12px; font-weight:700; transition:all .15s; }
+    .btn-reativar:hover { background:var(--green-pale); }
 
     /* patient summary card */
     .pat-summary { margin:0 20px 0; padding:16px 18px; background:var(--sky-mist); border-radius:12px; border:1.5px solid var(--border); display:flex; align-items:center; gap:16px; }
@@ -276,7 +280,8 @@
           <button class="btn-back" onclick="showList()">← Voltar</button>
           <div class="rv-name" id="rvName"></div>
           <div class="rv-hd-spc"></div>
-          <button class="btn-agendar">📅 Agendar consulta</button>
+          <button class="btn-agendar" onclick="agendarPaciente()">📅 Agendar consulta</button>
+          <button class="btn-inativar" id="btnStatus" onclick="toggleStatus()">⊘ Inativar paciente</button>
           <button class="btn-edit-pat" onclick="toggleEdit()">✏️ Editar ficha</button>
         </div>
         <div class="pat-summary" id="patSummary"></div>
@@ -598,6 +603,7 @@ function openRecord(id) {
   document.getElementById('listView').style.display='none';
   document.getElementById('recordView').style.display='flex';
   fillRecord(currentPat);
+  updateStatusBtn();
   showTab('dados', document.querySelector('.rv-tab'));
 }
 
@@ -708,13 +714,42 @@ function showTab(tab, el) {
 // ── EDIT ──
 function toggleEdit() {
   editMode = !editMode;
-  var views  = ['dados-view','contato-view','conv-view','end-view','obs-view'];
-  var edits  = ['dados-edit','contato-edit','conv-edit','end-edit','obs-edit'];
-  views.forEach(function(v){ document.getElementById(v).style.display=editMode?'none':'grid'; });
-  edits.forEach(function(e){ document.getElementById(e).style.display=editMode?'grid':'none'; });
-  document.getElementById('obs-view').style.display = editMode?'none':'block';
-  document.getElementById('obs-edit').style.display = editMode?'block':'none';
-  document.getElementById('saveBar').classList.toggle('show',editMode);
+
+  // view elements — correct display types
+  var viewMap = {
+    'dados-view':   'grid',
+    'contato-view': 'grid',
+    'conv-view':    'grid',
+    'end-view':     'grid',
+    'obs-view':     'block'
+  };
+  var editMap = {
+    'dados-edit':   'grid',
+    'contato-edit': 'grid',
+    'conv-edit':    'grid',
+    'end-edit':     'grid',
+    'obs-edit':     'block'
+  };
+
+  Object.keys(viewMap).forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.style.display = editMode ? 'none' : viewMap[id];
+  });
+  Object.keys(editMap).forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.style.display = editMode ? editMap[id] : 'none';
+  });
+
+  // update button text
+  var btn = document.querySelector('.btn-edit-pat');
+  if(btn) btn.textContent = editMode ? '✕ Cancelar edição' : '✏️ Editar ficha';
+
+  // show/hide save bar
+  document.getElementById('saveBar').classList.toggle('show', editMode);
+
+  // scroll to top of body
+  var body = document.getElementById('recordView');
+  if(body) body.querySelector('.rv-body').scrollTop = 0;
 }
 
 function discardEdit() { editMode=false; toggleEdit(); fillRecord(currentPat); }
@@ -758,6 +793,51 @@ function openNewPatient() {
   showTab('dados',document.querySelector('.rv-tab'));
   // auto enter edit mode
   editMode=false; toggleEdit();
+}
+
+// ── STATUS ──
+function toggleStatus() {
+  if (!currentPat) return;
+  var isActive = currentPat.status === 'ativo';
+  var msg = isActive
+    ? 'Deseja inativar o paciente ' + currentPat.name + '? O histórico será preservado.'
+    : 'Deseja reativar o paciente ' + currentPat.name + '?';
+  if (!confirm(msg)) return;
+  currentPat.status = isActive ? 'inativo' : 'ativo';
+  updateStatusBtn();
+  renderTable();
+  // Update summary badge
+  fillRecord(currentPat);
+}
+
+function updateStatusBtn() {
+  var btn = document.getElementById('btnStatus');
+  if (!btn || !currentPat) return;
+  if (currentPat.status === 'ativo') {
+    btn.className = 'btn-inativar';
+    btn.textContent = '⊘ Inativar paciente';
+  } else {
+    btn.className = 'btn-reativar';
+    btn.textContent = '✓ Reativar paciente';
+  }
+}
+
+// ── AGENDAR ──
+function agendarPaciente() {
+  if (!currentPat) return;
+  sessionStorage.setItem('agendarPacNome', currentPat.name);
+  sessionStorage.setItem('agendarPacIni',  currentPat.ini);
+  sessionStorage.setItem('agendarPacCpf',  currentPat.cpf);
+  sessionStorage.setItem('agendarPacTel',  currentPat.wpp);
+  sessionStorage.setItem('agendarPacConv', currentPat.conv || 'Particular');
+  window.location.href = 'modal-agendamento.html';
+}
+
+function agendarById(id) {
+  var p = PATIENTS.find(function(x){ return x.id===id; });
+  if (!p) return;
+  currentPat = p;
+  agendarPaciente();
 }
 
 // ── INIT ──

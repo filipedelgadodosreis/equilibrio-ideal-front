@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Minha Fila — Clínica Equilíbrio Ideal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA; --sky-mist:#F4F9FC;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-pale:#FBF5EA;
+      --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
+      --red:#E05252; --red-pale:#FEF0F0;
+      --psico:#5A9EC9; --psico-bg:#EBF4FA;
+      --nutri:#5AAE82; --nutri-bg:#EDFAF3;
+      --fono:#C9A96E;  --fono-bg:#FBF5EA;
+      --sidebar-w:208px;
+    }
+    html, body { height:100%; overflow:hidden; font-family:'Lato',sans-serif; background:var(--sky-mist); color:var(--text); font-size:13px; }
+    .app { display:flex; height:100vh; }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar { width:var(--sidebar-w); background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+    .sb-brand { padding:13px 14px 11px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .sb-icon  { width:31px; height:31px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .sb-icon span { color:#fff; font-size:13px; font-family:'Playfair Display',serif; }
+    .sb-name { font-size:12px; font-weight:700; color:var(--navy); }
+    .sb-sub  { font-size:10px; color:var(--text-soft); }
+    .sb-nav  { padding:9px 7px; flex:1; overflow-y:auto; }
+    .sb-nav::-webkit-scrollbar { display:none; }
+    .nav-lbl  { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-soft); padding:6px 6px 3px; }
+    .nav-item { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:7px; cursor:pointer; color:var(--text-soft); font-size:12px; transition:all .15s; margin-bottom:1px; text-decoration:none; }
+    .nav-item:hover  { background:var(--sky-pale); color:var(--navy); }
+    .nav-item.active { background:var(--sky-pale); color:var(--navy); font-weight:700; }
+    .nav-icon  { font-size:14px; width:18px; text-align:center; }
+    .sb-foot { padding:10px 13px; border-top:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .u-av   { width:28px; height:28px; border-radius:50%; background:var(--psico-bg); border:1.5px solid var(--psico); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .u-name { font-size:11px; font-weight:700; color:var(--navy); }
+    .u-role { font-size:9px; color:var(--text-soft); }
+    .u-out  { margin-left:auto; color:var(--text-soft); cursor:pointer; }
+
+    /* ═══ MAIN ═══ */
+    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+    /* header */
+    .top-hd { height:56px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:12px; flex-shrink:0; }
+    .hd-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); }
+    .hd-sub   { font-size:11px; color:var(--text-soft); margin-left:4px; }
+    .hd-spc   { flex:1; }
+    .hd-clock { font-size:13px; font-weight:700; color:var(--text-soft); }
+
+    /* body */
+    .body { flex:1; display:grid; grid-template-columns:1fr 340px; overflow:hidden; }
+
+    /* ── LEFT: my queue ── */
+    .left { display:flex; flex-direction:column; overflow:hidden; border-right:1px solid var(--border); }
+
+    /* calling now */
+    .calling-now {
+      padding:20px 24px; flex-shrink:0;
+      background:linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      position:relative; overflow:hidden;
+    }
+    .calling-now::before { content:''; position:absolute; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(125,168,201,.2) 0%,transparent 70%); top:-100px; right:-100px; pointer-events:none; }
+    .cn-label { font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:12px; }
+    .cn-content { display:flex; align-items:center; gap:20px; position:relative; z-index:2; }
+    .cn-number { font-family:'Playfair Display',serif; font-size:56px; font-weight:700; color:var(--white); line-height:1; }
+    .cn-info { flex:1; }
+    .cn-name { font-size:18px; font-weight:700; color:var(--white); margin-bottom:4px; }
+    .cn-hora { font-size:13px; color:rgba(255,255,255,.55); margin-bottom:8px; }
+    .cn-sala { display:inline-flex; align-items:center; gap:6px; background:rgba(201,169,110,.2); border:1px solid rgba(201,169,110,.4); border-radius:8px; padding:5px 12px; font-size:12px; font-weight:700; color:var(--gold); }
+    .cn-actions { display:flex; flex-direction:column; gap:8px; flex-shrink:0; }
+    .btn-recall-prof {
+      padding:10px 18px; border:1.5px solid rgba(255,255,255,.25);
+      border-radius:8px; background:rgba(255,255,255,.1);
+      color:var(--white); cursor:pointer; font-family:'Lato',sans-serif;
+      font-size:12px; font-weight:700; transition:all .15s; white-space:nowrap;
+      text-align:center;
+    }
+    .btn-recall-prof:hover { background:rgba(255,255,255,.2); }
+    .btn-finish {
+      padding:10px 18px; border:none; border-radius:8px;
+      background:var(--green); color:#fff; cursor:pointer;
+      font-family:'Lato',sans-serif; font-size:12px; font-weight:700;
+      transition:background .15s; white-space:nowrap; text-align:center;
+    }
+    .btn-finish:hover { background:#3A9468; }
+
+    /* my queue list */
+    .mq-hd { padding:12px 24px; border-bottom:1px solid var(--border); background:var(--white); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .mq-title { font-size:12px; font-weight:700; color:var(--navy); }
+    .mq-count { font-size:11px; color:var(--text-soft); }
+
+    .mq-wrap { flex:1; overflow-y:auto; }
+    .mq-wrap::-webkit-scrollbar { width:4px; }
+    .mq-wrap::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:2px; }
+
+    .mq-item {
+      display:flex; align-items:center; gap:14px;
+      padding:14px 24px; border-bottom:1px solid rgba(212,232,242,.5);
+      transition:background .12s; cursor:default;
+    }
+    .mq-item.next { background:rgba(90,174,130,.05); }
+    .mq-pos { width:28px; height:28px; border-radius:50%; background:var(--sky-pale); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--text-soft); flex-shrink:0; }
+    .mq-pos.next { background:var(--green); border-color:var(--green); color:#fff; }
+    .mq-number { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--navy); min-width:90px; }
+    .mq-info { flex:1; }
+    .mq-name { font-size:13px; font-weight:700; color:var(--navy); }
+    .mq-hora { font-size:11px; color:var(--text-soft); margin-top:2px; }
+    .mq-conv { font-size:10px; color:var(--text-soft); margin-top:2px; display:flex; align-items:center; gap:4px; }
+    .btn-call-prof {
+      padding:8px 20px; border:none; border-radius:8px;
+      background:var(--navy); color:#fff; cursor:pointer;
+      font-family:'Lato',sans-serif; font-size:12px; font-weight:700;
+      transition:all .15s; white-space:nowrap;
+    }
+    .btn-call-prof:hover { background:var(--navy-mid); }
+    .btn-call-prof.next { background:var(--green); }
+    .btn-call-prof.next:hover { background:#3A9468; }
+
+    /* empty */
+    .mq-empty { padding:60px 24px; text-align:center; }
+    .mq-empty-icon  { font-size:40px; margin-bottom:12px; }
+    .mq-empty-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); margin-bottom:6px; }
+    .mq-empty-sub   { font-size:12px; color:var(--text-soft); }
+
+    /* ── RIGHT: today's summary ── */
+    .right { display:flex; flex-direction:column; overflow:hidden; background:var(--white); }
+
+    .rp-hd { padding:14px 20px 12px; border-bottom:1px solid var(--border); }
+    .rp-title { font-family:'Playfair Display',serif; font-size:16px; color:var(--navy); }
+    .rp-sub   { font-size:11px; color:var(--text-soft); margin-top:3px; }
+
+    /* stats */
+    .rp-stats { padding:14px 16px; display:flex; flex-direction:column; gap:10px; border-bottom:1px solid var(--border); }
+    .stat-row { display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--sky-mist); border-radius:9px; border:1px solid var(--border); }
+    .stat-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+    .stat-icon.blue  { background:var(--sky-pale); }
+    .stat-icon.green { background:var(--green-pale); }
+    .stat-icon.gold  { background:var(--gold-pale); }
+    .stat-n { font-family:'Playfair Display',serif; font-size:22px; color:var(--navy); line-height:1; margin-left:auto; }
+    .stat-l { font-size:11px; color:var(--text-soft); }
+
+    /* attended list */
+    .attended-hd { padding:12px 16px 8px; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-soft); }
+    .attended-wrap { flex:1; overflow-y:auto; padding:0 16px 16px; }
+    .attended-wrap::-webkit-scrollbar { width:4px; }
+    .attended-wrap::-webkit-scrollbar-thumb { background:var(--sky-light); border-radius:2px; }
+
+    .att-item { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid rgba(212,232,242,.5); }
+    .att-item:last-child { border-bottom:none; }
+    .att-av { width:30px; height:30px; border-radius:50%; background:var(--sky-pale); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--navy); flex-shrink:0; }
+    .att-name { font-size:12px; font-weight:700; color:var(--navy); flex:1; }
+    .att-hora { font-size:10px; color:var(--text-soft); }
+    .att-tag  { font-size:9px; font-weight:700; padding:2px 6px; border-radius:5px; }
+    .att-tag.realizada { background:var(--green-pale); color:#1A6A42; border:1px solid var(--green-bdr); }
+    .att-tag.em-andamento { background:var(--sky-pale); color:#1E6FA3; border:1px solid var(--sky-light); }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .body { animation:fadeUp .4s ease; }
+
+    /* call flash */
+    @keyframes callFlash {
+      0%,100%{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%)}
+      50%{background:linear-gradient(135deg,#1E5A8A 0%,#3A7AB8 100%)}
+    }
+    .calling-now.flash { animation:callFlash .5s ease 3; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-icon"><span>Ψ</span></div>
+      <div><div class="sb-name">Equilíbrio Ideal</div><div class="sb-sub">Clínica Multidisciplinar</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-lbl">Meu espaço</div>
+      <a class="nav-item" href="agenda-equilibrio-v3.html"><span class="nav-icon">📅</span>Minha Agenda</a>
+      <div class="nav-item active"><span class="nav-icon">🔢</span>Minha Fila</div>
+      <div class="nav-lbl" style="margin-top:5px">Clínica</div>
+      <div class="nav-item"><span class="nav-icon">👥</span>Meus Pacientes</div>
+      <div class="nav-lbl" style="margin-top:5px">Sistema</div>
+      <div class="nav-item"><span class="nav-icon">⚙️</span>Configurações</div>
+    </nav>
+    <div class="sb-foot">
+      <div class="u-av">AC</div>
+      <div><div class="u-name">Dra. Ana Costa</div><div class="u-role">🧠 Psicologia</div></div>
+      <div class="u-out">↩</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="top-hd">
+      <div>
+        <div class="hd-title">Minha Fila de Hoje</div>
+      </div>
+      <div class="hd-spc"></div>
+      <div class="hd-clock" id="hdClock"></div>
+    </div>
+
+    <div class="body">
+
+      <!-- LEFT -->
+      <div class="left">
+
+        <!-- calling now -->
+        <div class="calling-now" id="callingNow">
+          <div class="cn-label">Chamando agora — Sala 01</div>
+          <div class="cn-content">
+            <div class="cn-number" id="cnNumber">PSI-007</div>
+            <div class="cn-info">
+              <div class="cn-name" id="cnName">João Pereira</div>
+              <div class="cn-hora" id="cnHora">⏰ 09:00 · Unimed</div>
+              <div class="cn-sala">🏥 Sala 01</div>
+            </div>
+            <div class="cn-actions">
+              <button class="btn-recall-prof" onclick="recallProf()">🔁 Chamar novamente</button>
+              <button class="btn-finish"      onclick="finishCurrent()">✅ Finalizar atendimento</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- my queue -->
+        <div class="mq-hd">
+          <div class="mq-title">Próximos pacientes</div>
+          <div class="mq-count" id="mqCount">0 aguardando</div>
+        </div>
+        <div class="mq-wrap" id="mqWrap"></div>
+
+      </div>
+
+      <!-- RIGHT -->
+      <div class="right">
+        <div class="rp-hd">
+          <div class="rp-title">Resumo do dia</div>
+          <div class="rp-sub">Segunda-feira, 05 de Maio de 2026</div>
+        </div>
+
+        <div class="rp-stats">
+          <div class="stat-row">
+            <div class="stat-icon blue">📅</div>
+            <div><div class="stat-l">Agendados hoje</div></div>
+            <div class="stat-n" id="statTotal">8</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-icon green">✅</div>
+            <div><div class="stat-l">Realizados</div></div>
+            <div class="stat-n" id="statRealizados">2</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-icon gold">⏳</div>
+            <div><div class="stat-l">Aguardando</div></div>
+            <div class="stat-n" id="statAguardando">6</div>
+          </div>
+        </div>
+
+        <div class="attended-hd">Atendimentos do dia</div>
+        <div class="attended-wrap" id="attendedWrap"></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+// ══ CLOCK ══
+function updateClock() {
+  var now=new Date();
+  var h=String(now.getHours()).padStart(2,'0');
+  var m=String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('hdClock').textContent=h+':'+m;
+}
+setInterval(updateClock,1000); updateClock();
+
+// ══ DATA ══
+var MY_QUEUE = [
+  { number:'PSI-008', name:'Fernanda Souza',  hora:'09:30', conv:'Bradesco Saúde', ini:'FS' },
+  { number:'PSI-009', name:'Ricardo Alves',   hora:'10:00', conv:'Particular',     ini:'RA' },
+  { number:'PSI-010', name:'Carlos Nunes',    hora:'10:30', conv:'Unimed',         ini:'CN' },
+  { number:'PSI-011', name:'Patrícia Gomes',  hora:'11:00', conv:'Unimed',         ini:'PG' },
+  { number:'PSI-012', name:'Amanda Ferreira', hora:'13:00', conv:'Particular',     ini:'AF' },
+  { number:'PSI-013', name:'Marcos Ribeiro',  hora:'13:30', conv:'Bradesco Saúde', ini:'MR' },
+];
+
+var current = { number:'PSI-007', name:'João Pereira', hora:'09:00', conv:'Unimed', ini:'JP' };
+
+var attended = [
+  { number:'PSI-005', name:'Eduardo Lima',   hora:'08:00', ini:'EL', status:'realizada' },
+  { number:'PSI-006', name:'Bianca Oliveira',hora:'08:30', ini:'BO', status:'realizada' },
+  { number:'PSI-007', name:'João Pereira',   hora:'09:00', ini:'JP', status:'em-andamento' },
+];
+
+// ══ RENDER ══
+function render() {
+  // current
+  document.getElementById('cnNumber').textContent = current.number;
+  document.getElementById('cnName').textContent   = current.name;
+  document.getElementById('cnHora').textContent   = '⏰ '+current.hora+' · '+current.conv;
+
+  // queue
+  var wrap  = document.getElementById('mqWrap');
+  var count = document.getElementById('mqCount');
+  wrap.innerHTML='';
+  count.textContent = MY_QUEUE.length+' aguardando';
+
+  if (MY_QUEUE.length===0) {
+    wrap.innerHTML='<div class="mq-empty"><div class="mq-empty-icon">🎉</div><div class="mq-empty-title">Fila vazia!</div><div class="mq-empty-sub">Todos os pacientes foram atendidos hoje.</div></div>';
+  } else {
+    MY_QUEUE.forEach(function(q,i) {
+      var item=document.createElement('div');
+      item.className='mq-item'+(i===0?' next':'');
+      item.innerHTML=
+        '<div class="mq-pos'+(i===0?' next':'')+'">'+( i===0?'★':(i+1))+'</div>'+
+        '<div class="mq-number">'+q.number+'</div>'+
+        '<div class="mq-info">'+
+          '<div class="mq-name">'+q.name+'</div>'+
+          '<div class="mq-hora">⏰ '+q.hora+'</div>'+
+          '<div class="mq-conv">🏥 '+q.conv+'</div>'+
+        '</div>'+
+        '<button class="btn-call-prof'+(i===0?' next':'')+'" onclick="callPatient('+i+')">'+
+          (i===0?'📢 Chamar':'Chamar')+
+        '</button>';
+      wrap.appendChild(item);
+    });
+  }
+
+  // stats
+  var real=attended.filter(function(a){return a.status==='realizada';}).length;
+  document.getElementById('statTotal').textContent      = MY_QUEUE.length+attended.length;
+  document.getElementById('statRealizados').textContent = real;
+  document.getElementById('statAguardando').textContent = MY_QUEUE.length;
+
+  // attended list
+  var aw=document.getElementById('attendedWrap'); aw.innerHTML='';
+  attended.slice().reverse().forEach(function(a){
+    var d=document.createElement('div'); d.className='att-item';
+    d.innerHTML=
+      '<div class="att-av">'+a.ini+'</div>'+
+      '<div><div class="att-name">'+a.name+'</div><div class="att-hora">'+a.hora+'</div></div>'+
+      '<span class="att-tag '+a.status+'">'+(a.status==='realizada'?'✅ Realizada':'🔵 Em andamento')+'</span>';
+    aw.appendChild(d);
+  });
+
+  // sync with TV panel via localStorage
+  syncTV();
+}
+
+function syncTV() {
+  try {
+    var stored = localStorage.getItem('eq_painel_state');
+    var state  = stored ? JSON.parse(stored) : {};
+    // update only my slot in the shared queue
+    state.current = {
+      number: current.number,
+      name:   current.name,
+      prof:   'Dra. Ana Costa',
+      sala:   'Sala 01',
+      spec:   'psico'
+    };
+    localStorage.setItem('eq_painel_state', JSON.stringify(state));
+  } catch(e){}
+}
+
+// ══ ACTIONS ══
+function callPatient(idx) {
+  var patient = MY_QUEUE[idx];
+  // move current to attended as realizada
+  var cur=attended.find(function(a){return a.number===current.number;});
+  if(cur) cur.status='realizada';
+
+  // set new current
+  current=patient;
+  MY_QUEUE.splice(idx,1);
+
+  // add to attended
+  attended.push({ number:patient.number, name:patient.name, hora:patient.hora, ini:patient.ini, status:'em-andamento' });
+
+  render();
+  flash();
+}
+
+function recallProf() { flash(); }
+
+function finishCurrent() {
+  var cur=attended.find(function(a){return a.number===current.number;});
+  if(cur) cur.status='realizada';
+  if(MY_QUEUE.length>0){
+    var next=MY_QUEUE.shift();
+    current=next;
+    attended.push({ number:next.number, name:next.name, hora:next.hora, ini:next.ini, status:'em-andamento' });
+  } else {
+    current={ number:'—', name:'Fila vazia', hora:'—', conv:'—', ini:'—' };
+  }
+  render();
+}
+
+function flash() {
+  var el=document.getElementById('callingNow');
+  el.classList.add('flash');
+  setTimeout(function(){ el.classList.remove('flash'); },2000);
+}
+
+// ══ INIT ══
+render();
+</script>
+</body>
+</html>
