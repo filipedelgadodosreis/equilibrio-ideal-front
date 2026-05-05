@@ -231,6 +231,9 @@
     .rftab.pago.active    { background:var(--green); border-color:var(--green); }
     .rftab.pendente.active{ background:var(--orange); border-color:var(--orange); }
     .rf-summary { margin-left:auto; font-size:11px; color:var(--text-soft); white-space:nowrap; }
+    .period-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:8px; background:var(--gold-pale); border:1.5px solid var(--gold); font-size:11px; font-weight:700; color:#8B6A1E; white-space:nowrap; }
+    .period-input { height:34px; padding:0 10px; border:1.5px solid var(--border); border-radius:7px; font-family:'Lato',sans-serif; font-size:12px; color:var(--text); background:var(--sky-mist); outline:none; transition:all .15s; }
+    .period-input:focus { border-color:var(--sky); background:#fff; }
     .rf-summary strong { color:var(--navy); }
 
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
@@ -357,6 +360,21 @@
           <div class="repasse-hd-title">Repasse de Profissionais — <span id="repasse-period"></span></div>
           <button class="btn-export" onclick="alert('Exportando relatório PDF...')">📥 Exportar PDF</button>
         </div>
+        <!-- Period filter -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:12px 16px;background:var(--gold-pale);border:1.5px solid var(--gold);border-radius:10px;flex-wrap:wrap">
+          <div style="font-size:11px;font-weight:700;color:#8B6A1E;">📅 Período de fechamento:</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8B6A1E">
+            De <input type="date" class="period-input" id="rfDateFrom" value="2026-03-26" onchange="renderRepasse()"/>
+            até <input type="date" class="period-input" id="rfDateTo"   value="2026-04-25" onchange="renderRepasse()"/>
+          </div>
+          <div id="periodDays" style="font-size:11px;font-weight:700;color:#8B6A1E"></div>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <button onclick="setPeriod('prev')" style="padding:4px 10px;border:1.5px solid var(--gold);border-radius:6px;background:#fff;cursor:pointer;font-family:Lato,sans-serif;font-size:11px;font-weight:700;color:#8B6A1E">← Anterior</button>
+            <button onclick="setPeriod('curr')" style="padding:4px 10px;border:none;border-radius:6px;background:var(--gold);cursor:pointer;font-family:Lato,sans-serif;font-size:11px;font-weight:700;color:#fff">Atual</button>
+            <button onclick="setPeriod('next')" style="padding:4px 10px;border:1.5px solid var(--gold);border-radius:6px;background:#fff;cursor:pointer;font-family:Lato,sans-serif;font-size:11px;font-weight:700;color:#8B6A1E">Próximo →</button>
+          </div>
+        </div>
+
         <!-- Filter bar -->
         <div class="repasse-filters">
           <div class="rf-search">
@@ -508,6 +526,45 @@ function setRfFilter(f, el) {
 var SPEC_LBL = {psico:'Psicologia', nutri:'Nutrição', fono:'Fonoaudiologia'};
 var SPEC_ICO = {psico:'🧠', nutri:'🥗', fono:'🗣️'};
 
+function setPeriod(dir) {
+  var from = document.getElementById('rfDateFrom');
+  var to   = document.getElementById('rfDateTo');
+  var d = new Date(from.value + 'T12:00');
+  if (dir === 'curr') {
+    // current period: 26th of last month to 25th of this month
+    var now = new Date();
+    var f = new Date(now.getFullYear(), now.getMonth()-1, 26);
+    var t = new Date(now.getFullYear(), now.getMonth(), 25);
+    from.value = f.toISOString().split('T')[0];
+    to.value   = t.toISOString().split('T')[0];
+  } else if (dir === 'prev') {
+    // go back 1 month
+    var f2 = new Date(d.getFullYear(), d.getMonth()-1, 26);
+    var t2 = new Date(d.getFullYear(), d.getMonth(), 25);
+    from.value = f2.toISOString().split('T')[0];
+    to.value   = t2.toISOString().split('T')[0];
+  } else {
+    // go forward 1 month
+    var f3 = new Date(d.getFullYear(), d.getMonth()+1, 26);
+    var t3 = new Date(d.getFullYear(), d.getMonth()+2, 25);
+    from.value = f3.toISOString().split('T')[0];
+    to.value   = t3.toISOString().split('T')[0];
+  }
+  renderRepasse();
+}
+
+function updatePeriodLabel() {
+  var from = document.getElementById('rfDateFrom');
+  var to   = document.getElementById('rfDateTo');
+  var el   = document.getElementById('periodDays');
+  if (!from || !to || !el) return;
+  var d1 = new Date(from.value+'T12:00');
+  var d2 = new Date(to.value+'T12:00');
+  var days = Math.round((d2-d1)/(1000*60*60*24))+1;
+  var months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  el.textContent = '· ' + d1.getDate()+' '+months[d1.getMonth()]+' a '+d2.getDate()+' '+months[d2.getMonth()]+'/'+d2.getFullYear()+' ('+days+' dias)';
+}
+
 function fmt(v){ return 'R$ '+v.toLocaleString('pt-BR'); }
 
 // ══ RENDER ══
@@ -535,9 +592,17 @@ function renderDashboard(){
 function renderRepasse(){
   var period = document.getElementById('periodSel');
   var opt = period.options[period.selectedIndex].text;
+  var from = document.getElementById('rfDateFrom');
+  var to   = document.getElementById('rfDateTo');
+  var months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  if(from && to) {
+    var d1=new Date(from.value+'T12:00'), d2=new Date(to.value+'T12:00');
+    opt = d1.getDate()+'/'+months[d1.getMonth()]+' a '+d2.getDate()+'/'+months[d2.getMonth()]+'/'+d2.getFullYear();
+  }
   document.getElementById('repasse-period').textContent = opt;
 
   var rfQ = document.getElementById('rfSearch') ? document.getElementById('rfSearch').value.toLowerCase() : '';
+  updatePeriodLabel();
   var tbody=document.getElementById('repasseTable'); tbody.innerHTML='';
   var totC=0, totB=0, totR=0;
   var filtered = PROFS.filter(function(p){
