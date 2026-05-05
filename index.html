@@ -8,35 +8,17 @@
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     :root {
-      --sky:       #7DA8C9;
-      --sky-light: #B8D4E8;
-      --sky-pale:  #EBF4FA;
-      --sky-mist:  #F4F9FC;
-      --navy:      #1B3A5C;
-      --navy-mid:  #2E5480;
-      --gold:      #C9A96E;
-      --gold-light:#E8D5AC;
-      --gold-pale: #FBF5EA;
-      --cream:     #FDFAF5;
-      --white:     #FFFFFF;
-      --border:    #D4E8F2;
-      --text:      #1B3A5C;
-      --text-soft: #6B8BA4;
-      --green:     #5AAE82;
-      --green-pale:#EDFAF3;
-      --green-bdr: #8DD5AA;
+      --sky:#7DA8C9; --sky-light:#B8D4E8; --sky-pale:#EBF4FA; --sky-mist:#F4F9FC;
+      --navy:#1B3A5C; --navy-mid:#2E5480;
+      --gold:#C9A96E; --gold-light:#E8D5AC; --gold-pale:#FBF5EA;
+      --cream:#FDFAF5; --white:#FFFFFF; --border:#D4E8F2;
+      --text:#1B3A5C; --text-soft:#6B8BA4;
+      --green:#5AAE82; --green-pale:#EDFAF3; --green-bdr:#8DD5AA;
     }
     html, body { font-family:'Lato',sans-serif; background:var(--cream); color:var(--text); min-height:100vh; }
 
-    /* ── HEADER ── */
-    .header {
-      background:var(--white);
-      border-bottom:1px solid var(--border);
-      padding:0 40px;
-      height:62px;
-      display:flex; align-items:center; justify-content:space-between;
-      position:sticky; top:0; z-index:100;
-    }
+    /* HEADER */
+    .header { background:var(--white); border-bottom:1px solid var(--border); padding:0 40px; height:62px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
     .header-brand { display:flex; align-items:center; gap:12px; }
     .header-icon { width:34px; height:34px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; }
     .header-icon::after { content:''; position:absolute; inset:-4px; border-radius:50%; border:1px solid rgba(201,169,110,.4); }
@@ -45,64 +27,32 @@
     .header-sub  { font-size:9.5px; color:var(--text-soft); letter-spacing:.1em; text-transform:uppercase; margin-top:1px; }
     .header-badge { background:var(--gold-pale); border:1px solid var(--gold); border-radius:20px; padding:4px 12px; font-size:10px; color:var(--gold); font-weight:700; letter-spacing:.06em; }
 
-    /* ── HERO ── */
-    .hero {
-      background:linear-gradient(160deg, var(--sky-pale) 0%, var(--sky-mist) 60%, var(--cream) 100%);
-      padding:56px 40px 52px;
-      position:relative; overflow:hidden;
-    }
-    /* watercolor leaves */
-    .hero-leaf-tr {
-      position:absolute; top:-10px; right:-20px; width:280px; opacity:.6;
-      pointer-events:none; animation:floatLeaf 9s ease-in-out infinite;
-    }
-    .hero-leaf-bl {
-      position:absolute; bottom:-20px; left:-10px; width:220px; opacity:.45;
-      pointer-events:none; transform:rotate(180deg) scaleX(-1);
-      animation:floatLeaf 11s ease-in-out infinite reverse;
-    }
-    @keyframes floatLeaf {
-      0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)}
-    }
-    /* gold arc */
-    .hero-arc {
-      position:absolute; width:460px; height:460px; border-radius:50%;
-      border:1px solid rgba(201,169,110,.15);
-      top:-200px; left:-200px; pointer-events:none;
-    }
-    /* sparkles */
+    /* HERO */
+    .hero { background:linear-gradient(160deg, var(--sky-pale) 0%, var(--sky-mist) 60%, var(--cream) 100%); padding:56px 40px 52px; position:relative; overflow:hidden; }
+    .hero-arc { position:absolute; width:460px; height:460px; border-radius:50%; border:1px solid rgba(201,169,110,.15); top:-200px; left:-200px; pointer-events:none; }
     .spark { position:absolute; color:var(--gold); font-size:12px; opacity:0; animation:twinkle 4s ease-in-out infinite; pointer-events:none; }
     .spark:nth-child(1){ top:20%; right:32%; animation-delay:0s; }
     .spark:nth-child(2){ top:55%; right:18%; animation-delay:1.4s; }
     .spark:nth-child(3){ bottom:25%; left:42%; animation-delay:.7s; }
     @keyframes twinkle { 0%,100%{opacity:0;transform:scale(.6)} 50%{opacity:.8;transform:scale(1.2)} }
-
+    .leaf-dec { position:absolute; pointer-events:none; }
+    .leaf-tr { top:-10px; right:-20px; width:280px; opacity:.6; animation:floatLeaf 9s ease-in-out infinite; }
+    .leaf-bl { bottom:-20px; left:-10px; width:220px; opacity:.45; transform:rotate(180deg) scaleX(-1); animation:floatLeaf 11s ease-in-out infinite reverse; }
+    @keyframes floatLeaf { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
     .hero-inner { max-width:960px; margin:0 auto; position:relative; z-index:2; }
     .hero-label { font-size:10px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--sky); margin-bottom:14px; }
-
     .hero-content { display:grid; grid-template-columns:1fr auto; gap:40px; align-items:center; }
     .hero-title { font-family:'Playfair Display',serif; font-size:clamp(30px,4vw,46px); font-weight:400; color:var(--navy); line-height:1.12; margin-bottom:14px; }
     .hero-title em { font-style:italic; color:var(--sky); }
     .hero-title strong { font-weight:700; }
     .hero-sub { font-size:14px; color:var(--text-soft); line-height:1.75; max-width:480px; font-weight:300; margin-bottom:28px; }
-
-    /* gold divider */
     .gold-div { display:flex; align-items:center; gap:10px; margin-bottom:28px; width:280px; }
     .gold-div::before,.gold-div::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold-light),transparent); }
     .gold-div span { color:var(--gold); font-size:11px; }
-
-    /* taglines */
     .taglines { display:flex; flex-direction:column; gap:4px; }
     .tagline-a { font-family:'Playfair Display',serif; font-size:14px; color:var(--text-soft); }
     .tagline-b { font-family:'Playfair Display',serif; font-size:18px; font-style:italic; color:var(--sky); }
-
-    /* logo block */
-    .hero-logo {
-      display:flex; flex-direction:column; align-items:center; gap:10px;
-      background:var(--white); border:1px solid var(--border);
-      border-radius:18px; padding:24px 28px; flex-shrink:0;
-      box-shadow:0 4px 20px rgba(125,168,201,.12);
-    }
+    .hero-logo { display:flex; flex-direction:column; align-items:center; gap:10px; background:var(--white); border:1px solid var(--border); border-radius:18px; padding:24px 28px; flex-shrink:0; box-shadow:0 4px 20px rgba(125,168,201,.12); }
     .hl-circle { width:60px; height:60px; background:var(--navy); border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; }
     .hl-circle::after { content:''; position:absolute; inset:-5px; border-radius:50%; border:1px solid rgba(201,169,110,.4); }
     .hl-psi { font-family:'Playfair Display',serif; font-size:24px; color:#fff; }
@@ -110,62 +60,41 @@
     .hl-name1 { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--navy); line-height:1; }
     .hl-name2 { font-family:'Playfair Display',serif; font-size:18px; color:var(--navy); line-height:1; }
     .hl-star  { color:var(--gold); font-size:12px; }
-
-    /* stats row */
     .hero-stats { display:flex; gap:0; margin-top:32px; background:var(--white); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
     .hero-stat { flex:1; padding:14px 16px; text-align:center; border-right:1px solid var(--border); }
     .hero-stat:last-child { border-right:none; }
     .hs-n { font-family:'Playfair Display',serif; font-size:26px; color:var(--navy); line-height:1; }
     .hs-l { font-size:10px; color:var(--text-soft); margin-top:3px; letter-spacing:.06em; }
 
-    /* ── CONTENT ── */
+    /* CONTENT */
     .content { max-width:960px; margin:0 auto; padding:44px 40px 60px; }
-
-    /* section */
     .sec-hd { margin-bottom:22px; }
     .sec-title { font-family:'Playfair Display',serif; font-size:24px; color:var(--navy); margin-bottom:5px; }
     .sec-sub   { font-size:13px; color:var(--text-soft); font-weight:300; }
-
-    /* divider */
     .sec-div { display:flex; align-items:center; gap:12px; margin:40px 0 32px; }
     .sec-div::before,.sec-div::after { content:''; flex:1; height:1px; background:var(--border); }
     .sec-div span { font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--text-soft); white-space:nowrap; }
 
-    /* modules grid */
+    /* MODULE GRID */
     .modules { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; margin-bottom:0; }
-
-    /* module card */
-    .mod-card {
-      background:var(--white); border:1.5px solid var(--border);
-      border-radius:14px; overflow:hidden;
-      transition:all .2s ease; cursor:pointer;
-      text-decoration:none; color:inherit;
-      display:flex; flex-direction:column;
-    }
+    .mod-card { background:var(--white); border:1.5px solid var(--border); border-radius:14px; overflow:hidden; transition:all .2s ease; cursor:pointer; text-decoration:none; color:inherit; display:flex; flex-direction:column; }
     .mod-card:hover { border-color:var(--sky); box-shadow:0 8px 28px rgba(27,58,92,.09); transform:translateY(-2px); }
-    .mod-card.soon { cursor:default; opacity:.55; }
-    .mod-card.soon:hover { transform:none; box-shadow:none; border-color:var(--border); }
-
     .mod-top { padding:20px 20px 16px; flex:1; }
     .mod-icon { width:42px; height:42px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:19px; margin-bottom:13px; }
     .mod-icon.blue   { background:var(--sky-pale); }
     .mod-icon.green  { background:var(--green-pale); }
     .mod-icon.gold   { background:var(--gold-pale); }
     .mod-icon.purple { background:#F2EFFA; }
-    .mod-icon.gray   { background:#F5F5F5; }
+    .mod-icon.navy   { background:#EEF2F7; }
     .mod-name { font-size:14px; font-weight:700; color:var(--navy); margin-bottom:6px; }
     .mod-desc { font-size:12px; color:var(--text-soft); line-height:1.65; font-weight:300; }
-
     .mod-footer { padding:11px 20px; border-top:1px solid var(--border); background:var(--sky-mist); display:flex; align-items:center; justify-content:space-between; }
     .mod-status { font-size:10px; font-weight:700; display:flex; align-items:center; gap:5px; }
     .mod-status.ready { color:var(--green); }
-    .mod-status.pending { color:var(--text-soft); }
-    .mod-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-    .mod-dot.green { background:var(--green); }
-    .mod-dot.gray  { background:var(--border); }
+    .mod-dot { width:6px; height:6px; border-radius:50%; background:var(--green); }
     .mod-arrow { font-size:14px; color:var(--sky); }
 
-    /* stack section */
+    /* STACK */
     .stack-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .stack-item { background:var(--white); border:1.5px solid var(--border); border-radius:12px; padding:16px 18px; display:flex; align-items:flex-start; gap:12px; }
     .stack-icon { font-size:22px; flex-shrink:0; }
@@ -175,7 +104,7 @@
     .stack-tag.now  { background:var(--sky-pale); color:#1E6FA3; border:1px solid var(--sky-light); }
     .stack-tag.next { background:var(--gold-pale); color:#8B6A1E; border:1px solid var(--gold); }
 
-    /* ── FOOTER ── */
+    /* FOOTER */
     .footer { background:var(--navy); padding:32px 40px; text-align:center; }
     .footer-psi  { font-family:'Playfair Display',serif; font-size:18px; color:var(--white); margin-bottom:4px; }
     .footer-sub  { font-size:11px; color:rgba(255,255,255,.35); letter-spacing:.06em; }
@@ -190,7 +119,6 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="header">
     <div class="header-brand">
       <div class="header-icon"><span>Ψ</span></div>
@@ -199,39 +127,30 @@
         <div class="header-sub">Sistema de Gestão Clínica</div>
       </div>
     </div>
-    <div class="header-badge">✦ Protótipo v0.1</div>
+    <div class="header-badge">✦ Protótipo v1.0</div>
   </header>
 
-  <!-- HERO -->
   <div class="hero">
     <div class="hero-arc"></div>
-    <div class="spark">✦</div>
-    <div class="spark">✦</div>
-    <div class="spark">✦</div>
-
-    <!-- watercolor leaves -->
-    <svg class="hero-leaf-tr" viewBox="0 0 280 260" fill="none">
-      <ellipse cx="70"  cy="55"  rx="36" ry="66" fill="#7DA8C9" fill-opacity=".38" transform="rotate(-38 70 55)"/>
-      <ellipse cx="130" cy="35"  rx="26" ry="54" fill="#9BBDD6" fill-opacity=".3"  transform="rotate(-22 130 35)"/>
-      <ellipse cx="185" cy="72"  rx="22" ry="46" fill="#6E9EBE" fill-opacity=".32" transform="rotate(-10 185 72)"/>
-      <ellipse cx="235" cy="44"  rx="18" ry="38" fill="#8CB4CC" fill-opacity=".22" transform="rotate(6 235 44)"/>
-      <path d="M55 25 Q75 78 95 125"  stroke="#7DA8C9" stroke-width="1.4" stroke-opacity=".45" fill="none"/>
+    <div class="spark">✦</div><div class="spark">✦</div><div class="spark">✦</div>
+    <svg class="leaf-dec leaf-tr" viewBox="0 0 280 260" fill="none">
+      <ellipse cx="70" cy="55" rx="36" ry="66" fill="#7DA8C9" fill-opacity=".38" transform="rotate(-38 70 55)"/>
+      <ellipse cx="130" cy="35" rx="26" ry="54" fill="#9BBDD6" fill-opacity=".3" transform="rotate(-22 130 35)"/>
+      <ellipse cx="185" cy="72" rx="22" ry="46" fill="#6E9EBE" fill-opacity=".32" transform="rotate(-10 185 72)"/>
+      <path d="M55 25 Q75 78 95 125" stroke="#7DA8C9" stroke-width="1.4" stroke-opacity=".45" fill="none"/>
       <path d="M120 18 Q142 58 150 108" stroke="#9BBDD6" stroke-width="1.1" stroke-opacity=".35" fill="none"/>
-      <path d="M210 8 Q228 48 218 98"  stroke="#C9A96E" stroke-width=".9" stroke-opacity=".28" fill="none"/>
     </svg>
-    <svg class="hero-leaf-bl" viewBox="0 0 260 240" fill="none">
-      <ellipse cx="70"  cy="55"  rx="36" ry="66" fill="#7DA8C9" fill-opacity=".35" transform="rotate(-38 70 55)"/>
-      <ellipse cx="128" cy="34"  rx="26" ry="54" fill="#9BBDD6" fill-opacity=".26" transform="rotate(-22 128 34)"/>
-      <ellipse cx="180" cy="70"  rx="22" ry="44" fill="#6E9EBE" fill-opacity=".28" transform="rotate(-10 180 70)"/>
+    <svg class="leaf-dec leaf-bl" viewBox="0 0 260 240" fill="none">
+      <ellipse cx="70" cy="55" rx="36" ry="66" fill="#7DA8C9" fill-opacity=".35" transform="rotate(-38 70 55)"/>
+      <ellipse cx="128" cy="34" rx="26" ry="54" fill="#9BBDD6" fill-opacity=".26" transform="rotate(-22 128 34)"/>
       <path d="M55 25 Q75 78 95 125" stroke="#7DA8C9" stroke-width="1.4" stroke-opacity=".4" fill="none"/>
     </svg>
-
     <div class="hero-inner">
       <div class="hero-label">Clínica Multidisciplinar · Santo André, SP</div>
       <div class="hero-content">
         <div>
           <h1 class="hero-title">Sistema de Gestão<br><strong>Clínica</strong> <em>Equilíbrio Ideal</em></h1>
-          <p class="hero-sub">Plataforma desenvolvida sob medida — agenda inteligente com 20 salas, cadastros completos, faturamento por convênio e muito mais. Explore os módulos abaixo.</p>
+          <p class="hero-sub">Plataforma desenvolvida sob medida — agenda inteligente com 20 salas, cadastros completos, faturamento por convênio e muito mais.</p>
           <div class="gold-div"><span>✦</span></div>
           <div class="taglines">
             <div class="tagline-a">Cuidado que acolhe.</div>
@@ -247,7 +166,6 @@
           </div>
         </div>
       </div>
-
       <div class="hero-stats">
         <div class="hero-stat"><div class="hs-n">3</div><div class="hs-l">Especialidades</div></div>
         <div class="hero-stat"><div class="hs-n">20</div><div class="hs-l">Salas</div></div>
@@ -258,111 +176,81 @@
     </div>
   </div>
 
-  <!-- CONTENT -->
   <div class="content">
-
     <div class="sec-hd">
       <div class="sec-title">Módulos do sistema</div>
-      <div class="sec-sub">Clique em qualquer módulo pronto para visualizar o protótipo</div>
+      <div class="sec-sub">Clique em qualquer módulo para visualizar o protótipo</div>
     </div>
 
     <div class="modules">
 
       <a class="mod-card" href="login-equilibrio-v3.html">
-        <div class="mod-top">
-          <div class="mod-icon blue">🔐</div>
-          <div class="mod-name">Login & Acesso</div>
-          <div class="mod-desc">Tela de entrada com seleção de perfil — Recepção, Profissional, Admin e Paciente. Identidade visual da clínica com folhas aquareladas.</div>
-        </div>
-        <div class="mod-footer">
-          <div class="mod-status ready"><div class="mod-dot green"></div>Pronto</div>
-          <div class="mod-arrow">→</div>
-        </div>
+        <div class="mod-top"><div class="mod-icon blue">🔐</div><div class="mod-name">Login & Acesso</div><div class="mod-desc">Tela de entrada com 4 perfis — Recepção, Profissional, Admin e Paciente. Identidade visual com folhas aquareladas.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
       </a>
 
       <a class="mod-card" href="agenda-equilibrio-v3.html">
-        <div class="mod-top">
-          <div class="mod-icon blue">📅</div>
-          <div class="mod-name">Agenda</div>
-          <div class="mod-desc">Visão dia e semana com 20 colunas simultâneas. Filtros por profissional, sala e especialidade. Modo disponibilidade com jogo de cores verde.</div>
-        </div>
-        <div class="mod-footer">
-          <div class="mod-status ready"><div class="mod-dot green"></div>Pronto</div>
-          <div class="mod-arrow">→</div>
-        </div>
+        <div class="mod-top"><div class="mod-icon blue">📅</div><div class="mod-name">Agenda</div><div class="mod-desc">Visão dia e semana com 20 colunas. Filtros por profissional, sala e especialidade. Modo disponibilidade.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
       </a>
 
       <a class="mod-card" href="modal-agendamento.html">
-        <div class="mod-top">
-          <div class="mod-icon green">➕</div>
-          <div class="mod-name">Novo Agendamento</div>
-          <div class="mod-desc">Modal em 3 passos — busca de paciente com cadastro rápido, detalhes da consulta com horários disponíveis e confirmação com notificação.</div>
-        </div>
-        <div class="mod-footer">
-          <div class="mod-status ready"><div class="mod-dot green"></div>Pronto</div>
-          <div class="mod-arrow">→</div>
-        </div>
+        <div class="mod-top"><div class="mod-icon green">➕</div><div class="mod-name">Novo Agendamento</div><div class="mod-desc">Modal em 3 passos — busca de paciente com cadastro rápido, detalhes da consulta e confirmação.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
       </a>
 
       <a class="mod-card" href="cadastro-pacientes.html">
-        <div class="mod-top">
-          <div class="mod-icon green">👥</div>
-          <div class="mod-name">Cadastro de Pacientes</div>
-          <div class="mod-desc">Lista com busca e filtros. Ficha completa com dados pessoais, contato, convênio, endereço, observações clínicas e histórico de consultas.</div>
-        </div>
-        <div class="mod-footer">
-          <div class="mod-status ready"><div class="mod-dot green"></div>Pronto</div>
-          <div class="mod-arrow">→</div>
-        </div>
+        <div class="mod-top"><div class="mod-icon green">👥</div><div class="mod-name">Cadastro de Pacientes</div><div class="mod-desc">Lista com busca e filtros. Ficha completa com dados pessoais, convênio, histórico. Inativar/reativar.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
       </a>
 
-      <div class="mod-card soon">
-        <div class="mod-top">
-          <div class="mod-icon purple">🧠</div>
-          <div class="mod-name">Cadastro de Profissionais</div>
-          <div class="mod-desc">Ficha completa dos terapeutas com especialidade, agenda, salas e dados para repasse financeiro.</div>
-        </div>
-        <div class="mod-footer">
-          <div class="mod-status pending"><div class="mod-dot gray"></div>Em desenvolvimento</div>
-        </div>
-      </div>
+      <a class="mod-card" href="cadastro-profissionais.html">
+        <div class="mod-top"><div class="mod-icon purple">🧠</div><div class="mod-name">Cadastro de Profissionais</div><div class="mod-desc">Ficha dos 20 terapeutas com especialidade, registro (CRP/CRN/CREFONO), contato e agenda da semana.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
+      </a>
 
-      <div class="mod-card soon">
-        <div class="mod-top">
-          <div class="mod-icon gray">🔢</div>
-          <div class="mod-name">Painel de Senhas</div>
-          <div class="mod-desc">Display para TV da sala de espera. Paciente visualiza sua vez em tempo real.</div>
-        </div>
-        <div class="mod-footer">
-          <div class="mod-status pending"><div class="mod-dot gray"></div>Em desenvolvimento</div>
-        </div>
-      </div>
+      <a class="mod-card" href="cadastro-salas.html">
+        <div class="mod-top"><div class="mod-icon blue">🏥</div><div class="mod-name">Cadastro de Salas</div><div class="mod-desc">Grid visual das 20 salas flexíveis. Inativar/reativar com confirmação. Novo cadastro em modal simples.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
+      </a>
 
-      <div class="mod-card soon">
-        <div class="mod-top">
-          <div class="mod-icon gold">💰</div>
-          <div class="mod-name">Faturamento</div>
-          <div class="mod-desc">Repasses aos profissionais e geração de XML para envio aos convênios. Requisitos em levantamento.</div>
-        </div>
-        <div class="mod-footer">
-          <div class="mod-status pending"><div class="mod-dot gray"></div>Requisitos em levantamento</div>
-        </div>
-      </div>
+      <a class="mod-card" href="painel-controle.html">
+        <div class="mod-top"><div class="mod-icon blue">🔢</div><div class="mod-name">Painel de Senhas — Recepção</div><div class="mod-desc">Gerencia a fila completa. Adiciona pacientes, chama e remove com um clique. Sincroniza com TV.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
+      </a>
 
-      <div class="mod-card soon">
-        <div class="mod-top">
-          <div class="mod-icon blue">👤</div>
-          <div class="mod-name">App do Paciente</div>
-          <div class="mod-desc">Área do paciente para ver histórico, próximas consultas, agendar e cancelar via PWA instalável.</div>
-        </div>
-        <div class="mod-footer">
-          <div class="mod-status pending"><div class="mod-dot gray"></div>Em desenvolvimento</div>
-        </div>
-      </div>
+      <a class="mod-card" href="painel-tv.html">
+        <div class="mod-top"><div class="mod-icon navy">📺</div><div class="mod-name">Painel de Senhas — TV</div><div class="mod-desc">Display tela cheia para a televisão da sala de espera. Senha atual em destaque, relógio e fila lateral.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
+      </a>
+
+      <a class="mod-card" href="painel-terapeuta.html">
+        <div class="mod-top"><div class="mod-icon purple">🧠</div><div class="mod-name">Painel de Senhas — Terapeuta</div><div class="mod-desc">O terapeuta vê só seus pacientes e chama direto da sala. Finaliza atendimento e chama o próximo.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
+      </a>
+
+      <a class="mod-card" href="app-paciente.html">
+        <div class="mod-top"><div class="mod-icon green">👤</div><div class="mod-name">App do Paciente</div><div class="mod-desc">PWA mobile — login com CPF, consultas agendadas, histórico por especialidade e cancelamento com motivo.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
+      </a>
+
+      <a class="mod-card" href="faturamento.html">
+        <div class="mod-top"><div class="mod-icon gold">💰</div><div class="mod-name">Faturamento</div><div class="mod-desc">Visão geral, repasse mensal dos 20 profissionais PJ, tabela de valores por convênio e geração de XML TISS.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
+      </a>
+
+      <a class="mod-card" href="auditoria.html">
+        <div class="mod-top"><div class="mod-icon navy">🔍</div><div class="mod-name">Log de Auditoria</div><div class="mod-desc">Exclusivo Admin — registro de todas as ações do sistema com usuário, data, hora e campos alterados.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
+      </a>
+
+      <a class="mod-card" href="configuracoes.html">
+        <div class="mod-top"><div class="mod-icon gold">⚙️</div><div class="mod-name">Configurações</div><div class="mod-desc">Dados da clínica, CNPJ, CNES, versão TISS, códigos TUSS por especialidade e registro ANS dos convênios.</div></div>
+        <div class="mod-footer"><div class="mod-status ready"><div class="mod-dot"></div>Pronto</div><div class="mod-arrow">→</div></div>
+      </a>
 
     </div>
 
-    <!-- STACK -->
     <div class="sec-div"><span>Tecnologia & Roadmap</span></div>
 
     <div class="sec-hd">
@@ -373,49 +261,27 @@
     <div class="stack-grid">
       <div class="stack-item">
         <div class="stack-icon">🎨</div>
-        <div>
-          <div class="stack-name">Front-end — Protótipo</div>
-          <div class="stack-desc">HTML5 + CSS3 + JavaScript puro. Design system com variáveis CSS e identidade visual da clínica completamente definida.</div>
-          <span class="stack-tag now">Fase atual</span>
-        </div>
+        <div><div class="stack-name">Front-end — Protótipo</div><div class="stack-desc">HTML5 + CSS3 + JavaScript puro. Design system completo com variáveis CSS e identidade visual da clínica.</div><span class="stack-tag now">Fase atual</span></div>
       </div>
       <div class="stack-item">
         <div class="stack-icon">⚛️</div>
-        <div>
-          <div class="stack-name">Front-end — Produção</div>
-          <div class="stack-desc">Migração para React.js. Todo o design CSS é 100% portável para componentes. Fácil de manter e evoluir em equipe.</div>
-          <span class="stack-tag next">Próxima fase</span>
-        </div>
+        <div><div class="stack-name">Front-end — Produção</div><div class="stack-desc">Migração para React.js. Todo o CSS é 100% portável. Fácil de manter e evoluir em equipe.</div><span class="stack-tag next">Próxima fase</span></div>
       </div>
       <div class="stack-item">
         <div class="stack-icon">🔌</div>
-        <div>
-          <div class="stack-name">Back-end — APIs REST</div>
-          <div class="stack-desc">APIs já em desenvolvimento em repositório separado. O front consumirá os endpoints para dados reais.</div>
-          <span class="stack-tag now">Em desenvolvimento</span>
-        </div>
+        <div><div class="stack-name">Back-end — APIs REST</div><div class="stack-desc">APIs já em desenvolvimento em repositório separado. O front consumirá os endpoints para dados reais.</div><span class="stack-tag now">Em desenvolvimento</span></div>
       </div>
       <div class="stack-item">
         <div class="stack-icon">📱</div>
-        <div>
-          <div class="stack-name">PWA — Progressive Web App</div>
-          <div class="stack-desc">Instalável no celular como app nativo. Funciona em iOS e Android sem App Store. Ideal para recepção e pacientes.</div>
-          <span class="stack-tag next">Próxima fase</span>
-        </div>
+        <div><div class="stack-name">PWA — Progressive Web App</div><div class="stack-desc">Instalável no celular como app nativo. Funciona em iOS e Android sem App Store.</div><span class="stack-tag next">Próxima fase</span></div>
       </div>
     </div>
-
   </div>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-psi">Clínica Equilíbrio Ideal</div>
-    <div class="footer-sub">Sistema de Gestão · Protótipo v0.1 · Santo André, SP</div>
-    <div class="footer-line">
-      <div class="fl-hr"></div>
-      <div class="fl-star">✦</div>
-      <div class="fl-hr"></div>
-    </div>
+    <div class="footer-sub">Sistema de Gestão · Protótipo v1.0 · Santo André, SP</div>
+    <div class="footer-line"><div class="fl-hr"></div><div class="fl-star">✦</div><div class="fl-hr"></div></div>
     <div class="footer-tagline">Cuidado que acolhe. Presença que transforma.</div>
   </footer>
 
