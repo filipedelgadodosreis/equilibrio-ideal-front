@@ -378,28 +378,35 @@ var id = 1;
 var baseDate = new Date('2026-03-26T12:00:00');
 for (var d = 0; d < 31; d++) {
   var dt = new Date(baseDate); dt.setDate(dt.getDate()+d);
-  if (dt.getDay()===0) continue; // skip sunday
-  var dayConsultas = dt.getDay()===6 ? 5 : 14;
+  if (dt.getDay()===0) continue;
+  var dayConsultas = dt.getDay()===6 ? 4 : 12;
   for (var c = 0; c < dayConsultas; c++) {
-    var prof = PROFS_LIST[Math.floor((d*14+c)*7%PROFS_LIST.length)];
-    var conv = CONVS_LIST[Math.floor((d*3+c)*5%CONVS_LIST.length)];
-    var pac  = PACS_LIST[Math.floor((d*7+c)*3%PACS_LIST.length)];
-    var status = STATUS_ALL[Math.floor((d+c)*3%STATUS_ALL.length)];
-    var hora = String(8+Math.floor(c/2)).padStart(2,'0')+':'+(c%2===0?'00':'30');
-    var dd=String(dt.getDate()).padStart(2,'0'), mm=String(dt.getMonth()+1).padStart(2,'0');
+    var pidx = (d * 12 + c) % PROFS_LIST.length;
+    var cidx = (d * 7  + c) % CONVS_LIST.length;
+    var pacidx = (d * 5 + c) % PACS_LIST.length;
+    var sidx = (d + c) % STATUS_ALL.length;
+    var prof = PROFS_LIST[pidx];
+    var conv = CONVS_LIST[cidx];
+    var pac  = PACS_LIST[pacidx];
+    var status = STATUS_ALL[sidx];
+    if (!prof || !conv || !pac) continue;
+    var hora = String(8 + Math.floor(c/2)).padStart(2,'0') + ':' + (c%2===0?'00':'30');
+    var dd = String(dt.getDate()).padStart(2,'0');
+    var mm = String(dt.getMonth()+1).padStart(2,'0');
     ALL_DATA.push({
-      id:id++,
-      data:dt.toISOString().split('T')[0],
-      dataFmt:dd+'/'+mm+'/'+dt.getFullYear(),
-      hora:hora,
-      prof:prof.nome, ini:prof.ini, spec:prof.spec,
-      pac:pac, conv:conv,
-      status:status,
-      valor: status==='realizada'?SPEC_VALS[prof.spec]:0,
-      repasse: status==='realizada'?Math.round(SPEC_VALS[prof.spec]*.6):0,
+      id: id++,
+      data: dt.toISOString().split('T')[0],
+      dataFmt: dd+'/'+mm+'/'+dt.getFullYear(),
+      hora: hora,
+      prof: prof.nome, ini: prof.ini, spec: prof.spec,
+      pac: pac, conv: conv,
+      status: status,
+      valor:   status==='realizada' ? SPEC_VALS[prof.spec] : 0,
+      repasse: status==='realizada' ? Math.round(SPEC_VALS[prof.spec]*0.6) : 0,
     });
   }
 }
+console.log('Dados gerados:', ALL_DATA.length, 'registros');
 
 // ══ STATE ══
 var filters = { status:'todos', spec:'', prof:'', conv:'', search:'' };
@@ -631,8 +638,10 @@ function showToast(msg){
 }
 
 // ══ INIT ══
-initSelects();
-render();
+document.addEventListener('DOMContentLoaded', function(){
+  initSelects();
+  render();
+});
 </script>
 </body>
 </html>
