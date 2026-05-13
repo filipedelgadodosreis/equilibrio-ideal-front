@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap');
+
 /* ── Design System — Clínica Equilíbrio Ideal ──────────────────────────────── */
 
 :root {
@@ -72,4 +74,21 @@
   /* Layout */
   --header-height: 60px;
   --content-max-w: 1280px;
+
+  /* ── Paleta Login / Clínica (protótipo v3) ─────────────────────────────── */
+  --navy:        #1B3A5C;
+  --navy-mid:    #2E5480;
+  --sky:         #7DA8C9;
+  --sky-light:   #B8D4E8;
+  --sky-pale:    #EBF4FA;
+  --sky-mist:    #F4F9FC;
+  --gold:        #C9A96E;
+  --gold-light:  #E8D5AC;
+  --gold-pale:   #FBF5EA;
+  --cream:       #FDFAF5;
+  --text-navy:   #1B3A5C;
+  --text-soft:   #6B8BA4;
+  --border-sky:  #D4E8F2;
+  --font-serif:  'Playfair Display', Georgia, serif;
+  --font-lato:   'Lato', system-ui, sans-serif;
 }

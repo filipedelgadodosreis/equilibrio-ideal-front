@@ -1,0 +1,46 @@
+/* Animações e estilos que precisam de @keyframes — não cabem em inline style */
+
+@keyframes sparkle {
+  0%,100% { opacity: 0;   transform: scale(.6); }
+  50%      { opacity: .85; transform: scale(1.2); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.login-left-inner  { animation: fadeUp .9s ease both; }
+.login-form-box    { animation: fadeUp .8s .1s ease both; }
+
+.login-spark {
+  position: absolute;
+  color: var(--gold);
+  font-size: 13px;
+  opacity: 0;
+  animation: sparkle 4s ease-in-out infinite;
+  pointer-events: none;
+  user-select: none;
+}
+.login-spark:nth-child(1) { top: 22%; left: 14%; animation-delay: 0s; }
+.login-spark:nth-child(2) { top: 55%; right: 22%; animation-delay: 1.5s; }
+.login-spark:nth-child(3) { bottom: 28%; left: 42%; animation-delay: .8s; }
+
+.login-btn-enter:hover  { background: var(--navy-mid) !important; transform: translateY(-1px); }
+.login-btn-enter:active { transform: translateY(0); }
+
+.login-btn-wpp:hover { background: #e0faee !important; border-color: #88d4a8 !important; }
+
+.login-field input:focus {
+  border-color: var(--sky) !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(125,168,201,.12) !important;
+}
+
+@media (max-width: 780px) {
+  .login-page { grid-template-columns: 1fr !important; }
+  .login-left { padding: 44px 24px 32px !important; }
+  .login-right { border-left: none !important; border-top: 1px solid var(--border-sky) !important; padding: 36px 24px 52px !important; }
+  .leaf-tr { width: 160px !important; }
+  .leaf-bl { width: 140px !important; }
+}
