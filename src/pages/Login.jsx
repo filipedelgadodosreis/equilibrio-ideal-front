@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const { entrar } = useAuth();
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
@@ -13,7 +15,8 @@ export default function Login() {
     setErro('');
     setCarregando(true);
     try {
-      await entrar(cpf, senha);
+      const perfil = await login(cpf, senha);
+      navigate(perfil === 'Paciente' ? '/app' : '/agenda', { replace: true });
     } catch (err) {
       setErro(err.response?.data?.mensagem ?? 'Erro ao fazer login. Tente novamente.');
     } finally {

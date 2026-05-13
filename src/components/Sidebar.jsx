@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Sidebar() {
-  const { usuario, sair } = useAuth();
+  const { usuario, logout } = useAuth();
 
   return (
     <aside style={{
@@ -31,7 +31,7 @@ export default function Sidebar() {
           {usuario?.nome}
         </div>
         <button
-          onClick={sair}
+          onClick={logout}
           style={{
             width: '100%',
             background: 'transparent',

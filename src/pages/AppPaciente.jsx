@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 
 export default function AppPaciente() {
-  const { usuario, sair } = useAuth();
+  const { usuario, logout } = useAuth();
 
   return (
     <div style={{
@@ -20,7 +20,7 @@ export default function AppPaciente() {
         Área do Paciente — em desenvolvimento.
       </p>
       <button
-        onClick={sair}
+        onClick={logout}
         style={{
           background: 'var(--color-primary)',
           color: '#fff',
