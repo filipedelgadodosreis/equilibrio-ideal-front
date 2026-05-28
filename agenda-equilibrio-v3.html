@@ -187,6 +187,23 @@
     .btn-save{padding:8px 20px;border:none;border-radius:7px;background:var(--navy);color:#fff;cursor:pointer;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;}
     .btn-save:hover{background:var(--navy-mid);}
 
+
+    /* MINI CALENDAR */
+    .mini-cal { padding:12px 10px; border-top:1px solid var(--border); flex-shrink:0; }
+    .mc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .mc-title { font-size:11px; font-weight:700; color:var(--navy); }
+    .mc-nav { width:20px; height:20px; border:none; background:none; cursor:pointer; color:var(--text-soft); font-size:12px; display:flex; align-items:center; justify-content:center; border-radius:4px; }
+    .mc-nav:hover { background:var(--sky-pale); color:var(--navy); }
+    .mc-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; }
+    .mc-dow { font-size:9px; font-weight:700; text-align:center; color:var(--text-soft); padding:2px 0; }
+    .mc-day { font-size:10px; text-align:center; padding:3px 1px; border-radius:4px; cursor:pointer; color:var(--text); transition:all .12s; }
+    .mc-day:hover { background:var(--sky-pale); color:var(--navy); }
+    .mc-day.today { background:var(--navy); color:#fff; font-weight:700; border-radius:50%; }
+    .mc-day.selected { background:var(--sky-pale); color:var(--navy); font-weight:700; border:1.5px solid var(--sky); border-radius:50%; }
+    .mc-day.other-month { color:var(--border); }
+    .mc-day.has-appts::after { content:''; display:block; width:4px; height:4px; border-radius:50%; background:var(--sky); margin:0 auto; margin-top:-2px; }
+    .mc-day.today::after { background:#fff; }
+
     /* SUCCESS BANNER */
     .success-banner{display:none;position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:200000;background:var(--green-pale);border:1.5px solid var(--green-bdr);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;color:#1A6A42;box-shadow:0 4px 20px rgba(0,0,0,.12);white-space:nowrap;}
     .success-banner.show{display:block;animation:fadeUp .4s ease;}
@@ -217,6 +234,14 @@
       <div class="nav-lbl" style="margin-top:5px">Sistema</div>
       <a class="nav-item" href="configuracoes.html"><span class="nav-icon">⚙️</span>Configurações</a>
     </nav>
+    <div class="mini-cal">
+      <div class="mc-header">
+        <button class="mc-nav" onclick="mcMove(-1)">‹</button>
+        <div class="mc-title" id="mcTitle"></div>
+        <button class="mc-nav" onclick="mcMove(1)">›</button>
+      </div>
+      <div class="mc-grid" id="mcGrid"></div>
+    </div>
     <div class="sb-foot">
       <div class="u-av">MR</div>
       <div><div class="u-name">Maria Recepção</div><div class="u-role">Recepção</div></div>
@@ -367,6 +392,80 @@
 <div class="success-banner" id="successBanner"></div>
 
 <script>
+
+// ══ MINI CALENDAR ══
+var mcDate = new Date();
+var DAYS_SHORT = ['D','S','T','Q','Q','S','S'];
+var MONTHS_SHORT2 = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+function buildMiniCal(){
+  var y = mcDate.getFullYear();
+  var m = mcDate.getMonth();
+  document.getElementById('mcTitle').textContent = MONTHS_SHORT2[m] + ' ' + y;
+
+  var grid = document.getElementById('mcGrid');
+  grid.innerHTML = '';
+
+  // Day of week headers
+  DAYS_SHORT.forEach(function(d){
+    var el = document.createElement('div');
+    el.className = 'mc-dow';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  // First day of month
+  var first = new Date(y, m, 1);
+  var startDow = first.getDay(); // 0=Sun
+
+  // Blanks
+  for(var i=0; i<startDow; i++){
+    var blank = document.createElement('div');
+    blank.className = 'mc-day other-month';
+    // prev month days
+    var prevDate = new Date(y, m, 1-startDow+i);
+    blank.textContent = prevDate.getDate();
+    grid.appendChild(blank);
+  }
+
+  // Days of month
+  var daysInMonth = new Date(y, m+1, 0).getDate();
+  for(var d2=1; d2<=daysInMonth; d2++){
+    var el2 = document.createElement('div');
+    var thisDate = new Date(y, m, d2);
+    var thisISO  = fmtISO(thisDate);
+    var classes  = ['mc-day'];
+    if(fmtISO(thisDate)===fmtISO(today))    classes.push('today');
+    if(fmtISO(thisDate)===fmtISO(curDate))  classes.push('selected');
+    // has appointments?
+    var hasAppts = APPTS.some(function(a){ return a.date===thisISO; });
+    if(hasAppts) classes.push('has-appts');
+    el2.className = classes.join(' ');
+    el2.textContent = d2;
+    el2.onclick = (function(dt){ return function(){
+      curDate = dt;
+      buildMiniCal();
+      render();
+    }; })(new Date(y, m, d2));
+    grid.appendChild(el2);
+  }
+
+  // Fill remaining cells
+  var total = startDow + daysInMonth;
+  var remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for(var r=1; r<=remaining; r++){
+    var nextEl = document.createElement('div');
+    nextEl.className = 'mc-day other-month';
+    nextEl.textContent = r;
+    grid.appendChild(nextEl);
+  }
+}
+
+function mcMove(dir){
+  mcDate.setMonth(mcDate.getMonth()+dir);
+  buildMiniCal();
+}
+
 // ══ DATA ══
 var DAYS_PT = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 var MONTHS_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -458,8 +557,8 @@ function addDays(d,n){ var r=new Date(d); r.setDate(r.getDate()+n); return r; }
 function isToday(d){ return fmtISO(d)===fmtISO(today); }
 
 // ══ NAVIGATION ══
-function moveDay(n){ curDate=addDays(curDate,n); render(); }
-function goToday(){ curDate=new Date(today); render(); }
+function moveDay(n){ curDate=addDays(curDate,n); buildMiniCal(); render(); }
+function goToday(){ curDate=new Date(today); mcDate=new Date(today); buildMiniCal(); render(); }
 function setView(v){
   curView=v;
   document.getElementById('btnDia').classList.toggle('active',v==='day');
@@ -775,6 +874,7 @@ document.getElementById('overlay').addEventListener('click',function(e){
 });
 
 // ══ INIT ══
+buildMiniCal();
 render();
 
 // Check sessionStorage for last booked
