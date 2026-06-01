@@ -91,4 +91,32 @@
   --border-sky:  #D4E8F2;
   --font-serif:  'Playfair Display', Georgia, serif;
   --font-lato:   'Lato', system-ui, sans-serif;
+
+  /* ── Aliases semânticos (agenda / componentes) ──────────────────────────── */
+  --white:      #FFFFFF;
+  --text:       #1A202C;
+  --border:     #E2E8F0;
+  --green:      #38A169;
+  --green-pale: #F0FFF4;
+  --green-bdr:  #9AE6B4;
+  --red:        #E53E3E;
+  --red-pale:   #FFF5F5;
+  --orange:     #F6AD55;
+  --orange-pale:#FFFAF0;
+
+  /* Cores por especialidade — alinhadas ao protótipo */
+  --psico:    #5A9EC9;
+  --psico-bg: #EBF4FA;
+  --psico-txt:#1E6FA3;
+  --nutri:    #5AAE82;
+  --nutri-bg: #EDFAF3;
+  --nutri-txt:#1A6A42;
+  --fono:     #C9A96E;
+  --fono-bg:  #FBF5EA;
+  --fono-txt: #8B6A1E;
+
+  /* Disponibilidade */
+  --avail:     #E8F8EF;
+  --avail-bdr: #8DD5AA;
+  --avail-txt: #2A7A52;
 }
