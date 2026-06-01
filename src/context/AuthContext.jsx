@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login as apiLogin } from '../api/auth';
+import { authApi } from '../api/auth';
 
 const AuthContext = createContext(null);
 
@@ -47,7 +47,8 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate();
 
   const login = useCallback(async (cpf, senha) => {
-    const dados = await apiLogin(cpf, senha);
+    const res = await authApi.login(cpf, senha);
+    const dados = res.data;
     localStorage.setItem('eq_token', dados.token);
     const payload = decodeJwt(dados.token);
     const u = usuarioDoPayload(payload);

@@ -1,9 +1,13 @@
 import axios from 'axios';
 
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
+  baseURL: import.meta.env.VITE_API_URL
+    || 'https://equilibrio-ideal-api-production.up.railway.app',
   headers: { 'Content-Type': 'application/json' },
 });
+
+console.log('BASE URL:', import.meta.env.VITE_API_URL);
+console.log('URL completa:', client.defaults.baseURL);
 
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem('eq_token');

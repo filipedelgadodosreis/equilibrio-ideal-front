@@ -1,10 +1,7 @@
 import client from './client';
 
-export const login = (cpf, senha) =>
-  client.post('/auth/login', { cpf, senha }).then((r) => r.data);
-
-export const me = () =>
-  client.get('/auth/me').then((r) => r.data);
-
-export const alterarSenha = (data) =>
-  client.patch('/auth/senha', data);
+export const authApi = {
+  login:        (cpf, senha) => client.post('/api/auth/login', { cpf, senha }),
+  me:           ()           => client.get('/api/auth/me'),
+  alterarSenha: (data)       => client.patch('/api/auth/senha', data),
+};
