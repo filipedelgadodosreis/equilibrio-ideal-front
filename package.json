@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "npx serve -s dist -p ${PORT:-3000}"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.10",
