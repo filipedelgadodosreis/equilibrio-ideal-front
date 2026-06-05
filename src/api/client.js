@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://equilibrio-ideal-api-production.up.railway.app';
+const BASE_URL = 'https://equilibrio-ideal-api-production.up.railway.app/api';
 
 const client = axios.create({
   baseURL: BASE_URL,
