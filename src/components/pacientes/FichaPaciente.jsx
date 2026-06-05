@@ -238,6 +238,21 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
 
   const p = paciente || {};
 
+  const barraEdicao = (editMode || isNovo) && (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px' }}>
+      <span style={{ fontSize: 11, color: 'var(--text-soft)', display: 'flex', alignItems: 'center', gap: 5 }}>
+        ✏️ Modo edição ativo
+      </span>
+      <div style={{ flex: 1 }} />
+      <button onClick={descartar} style={{ padding: '7px 16px', border: '1.5px solid var(--border)', borderRadius: 7, background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: 'var(--text-soft)', fontFamily: 'Lato, sans-serif' }}>
+        Descartar
+      </button>
+      <button onClick={salvar} disabled={isPending} style={{ padding: '7px 20px', border: 'none', borderRadius: 7, background: 'var(--green)', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700, fontFamily: 'Lato, sans-serif', opacity: isPending ? .7 : 1 }}>
+        {isPending ? 'Salvando...' : 'Salvar alterações'}
+      </button>
+    </div>
+  );
+
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'var(--sky-mist)', fontFamily: 'var(--font-lato)' }}>
       <Sidebar selectedDate={selectedDate} onDateChange={onDateChange} />
@@ -360,6 +375,7 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
 
             {/* ── ABA DADOS ── */}
             {abaAtiva === 'dados' && (
+              <>
               <div style={secaoStyle}>
                 <div style={secaoTituloStyle}>
                   Dados pessoais
@@ -421,10 +437,13 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
                   <F label="Naturalidade" field="naturalidade" form={form} view={p.naturalidade} editMode={editMode} onChange={handleChange} placeholder="Opcional" />
                 </div>
               </div>
+              {barraEdicao}
+              </>
             )}
 
             {/* ── ABA CONTATO ── */}
             {abaAtiva === 'contato' && (
+              <>
               <div style={secaoStyle}>
                 <div style={secaoTituloStyle}>
                   Contato
@@ -455,10 +474,13 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
                   </label>
                 </div>
               </div>
+              {barraEdicao}
+              </>
             )}
 
             {/* ── ABA CONVÊNIO ── */}
             {abaAtiva === 'convenio' && (
+              <>
               <div style={secaoStyle}>
                 <div style={secaoTituloStyle}>
                   Convênio
@@ -492,10 +514,13 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
                   </div>
                 )}
               </div>
+              {barraEdicao}
+              </>
             )}
 
             {/* ── ABA ENDEREÇO ── */}
             {abaAtiva === 'endereco' && (
+              <>
               <div style={secaoStyle}>
                 <div style={secaoTituloStyle}>
                   Endereço
@@ -526,10 +551,13 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
                   </div>
                 </div>
               </div>
+              {barraEdicao}
+              </>
             )}
 
             {/* ── ABA OBSERVAÇÕES ── */}
             {abaAtiva === 'obs' && (
+              <>
               <div style={secaoStyle}>
                 <div style={secaoTituloStyle}>
                   Observações clínicas
@@ -551,6 +579,8 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
                     </div>
                 }
               </div>
+              {barraEdicao}
+              </>
             )}
 
             {/* ── ABA HISTÓRICO ── */}
@@ -601,40 +631,6 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
               </div>
             )}
 
-            {/* ── Barra de edição — inline, sem sticky ── */}
-            {(editMode || isNovo) && (
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '10px 4px',
-              }}>
-                <span style={{
-                  fontSize: 11, color: 'var(--text-soft)',
-                  display: 'flex', alignItems: 'center', gap: 5,
-                }}>
-                  ✏️ Modo edição ativo
-                </span>
-                <div style={{ flex: 1 }} />
-                <button onClick={descartar} style={{
-                  padding: '7px 16px',
-                  border: '1.5px solid var(--border)',
-                  borderRadius: 7, background: '#fff',
-                  cursor: 'pointer', fontSize: 12, fontWeight: 700,
-                  color: 'var(--text-soft)', fontFamily: 'Lato, sans-serif',
-                }}>
-                  Descartar
-                </button>
-                <button onClick={salvar} disabled={isPending} style={{
-                  padding: '7px 20px', border: 'none',
-                  borderRadius: 7, background: 'var(--green)',
-                  color: '#fff', cursor: 'pointer',
-                  fontSize: 12, fontWeight: 700,
-                  fontFamily: 'Lato, sans-serif',
-                  opacity: isPending ? .7 : 1,
-                }}>
-                  {isPending ? 'Salvando...' : 'Salvar alterações'}
-                </button>
-              </div>
-            )}
         </div>
       </main>
 
