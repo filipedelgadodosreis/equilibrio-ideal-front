@@ -56,7 +56,7 @@ const viewValueStyle = {
 
 const secaoStyle = {
   background: '#fff', border: '1px solid var(--border)',
-  borderRadius: 12, padding: '18px 20px', marginBottom: 16,
+  borderRadius: 10, padding: '16px 20px', marginBottom: 12,
 };
 
 const secaoTituloStyle = {
@@ -356,8 +356,7 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
         </div>
 
         {/* ── Corpo (scroll independente) ── */}
-        <div style={{ flex: 1, overflowY: 'auto', background: 'var(--sky-mist)' }}>
-          <div style={{ padding: '16px 24px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', background: 'var(--sky-mist)', padding: '16px 24px' }}>
 
             {/* ── ABA DADOS ── */}
             {abaAtiva === 'dados' && (
@@ -606,9 +605,7 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
             {(editMode || isNovo) && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 12,
-                padding: '10px 0',
-                borderTop: '1px solid var(--border)',
-                marginTop: 4,
+                padding: '10px 4px',
               }}>
                 <span style={{
                   fontSize: 11, color: 'var(--text-soft)',
@@ -638,7 +635,6 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
                 </button>
               </div>
             )}
-          </div>
         </div>
       </main>
 
