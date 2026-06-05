@@ -601,47 +601,45 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
                 {erro}
               </div>
             )}
+
+            {/* ── Barra de edição — inline, sem sticky ── */}
+            {(editMode || isNovo) && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '10px 0',
+                borderTop: '1px solid var(--border)',
+                marginTop: 4,
+              }}>
+                <span style={{
+                  fontSize: 11, color: 'var(--text-soft)',
+                  display: 'flex', alignItems: 'center', gap: 5,
+                }}>
+                  ✏️ Modo edição ativo
+                </span>
+                <div style={{ flex: 1 }} />
+                <button onClick={descartar} style={{
+                  padding: '7px 16px',
+                  border: '1.5px solid var(--border)',
+                  borderRadius: 7, background: '#fff',
+                  cursor: 'pointer', fontSize: 12, fontWeight: 700,
+                  color: 'var(--text-soft)', fontFamily: 'Lato, sans-serif',
+                }}>
+                  Descartar
+                </button>
+                <button onClick={salvar} disabled={isPending} style={{
+                  padding: '7px 20px', border: 'none',
+                  borderRadius: 7, background: 'var(--green)',
+                  color: '#fff', cursor: 'pointer',
+                  fontSize: 12, fontWeight: 700,
+                  fontFamily: 'Lato, sans-serif',
+                  opacity: isPending ? .7 : 1,
+                }}>
+                  {isPending ? 'Salvando...' : 'Salvar alterações'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* ── Barra de salvar sticky ── */}
-        {(editMode || isNovo) && (
-          <div style={{
-            position: 'sticky', bottom: 0, zIndex: 10,
-            background: 'var(--white)',
-            borderTop: '1px solid var(--border)',
-            padding: '10px 24px',
-            display: 'flex', alignItems: 'center', gap: 12,
-            boxShadow: '0 -2px 10px rgba(27,58,92,.06)',
-          }}>
-            <span style={{
-              fontSize: 11, color: 'var(--text-soft)',
-              display: 'flex', alignItems: 'center', gap: 5,
-            }}>
-              ✏️ Modo edição ativo
-            </span>
-            <div style={{ flex: 1 }} />
-            <button onClick={descartar} style={{
-              padding: '7px 16px',
-              border: '1.5px solid var(--border)',
-              borderRadius: 7, background: '#fff',
-              cursor: 'pointer', fontSize: 12, fontWeight: 700,
-              color: 'var(--text-soft)', fontFamily: 'Lato, sans-serif',
-            }}>
-              Descartar
-            </button>
-            <button onClick={salvar} disabled={isPending} style={{
-              padding: '7px 20px',
-              border: 'none', borderRadius: 7,
-              background: 'var(--green)', color: '#fff',
-              cursor: 'pointer', fontSize: 12, fontWeight: 700,
-              fontFamily: 'Lato, sans-serif',
-              opacity: isPending ? .7 : 1,
-            }}>
-              {isPending ? 'Salvando...' : 'Salvar alterações'}
-            </button>
-          </div>
-        )}
       </main>
 
       {/* Modal confirmação inativação */}
