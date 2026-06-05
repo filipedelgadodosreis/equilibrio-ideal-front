@@ -1,25 +1,20 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL
-  || 'https://equilibrio-ideal-api-production.up.railway.app';
+const BASE_URL = 'https://equilibrio-ideal-api-production.up.railway.app';
 
 const client = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: BASE_URL,
+  headers: { 'Content-Type': 'application/json' },
 });
 
-client.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('eq_token');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+client.interceptors.request.use((config) => {
+  const token = localStorage.getItem('eq_token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  console.log('[Axios] Request:', config.method?.toUpperCase(), config.url, 'Token:', !!token);
+  return config;
+});
 
 client.interceptors.response.use(
   (response) => response,
