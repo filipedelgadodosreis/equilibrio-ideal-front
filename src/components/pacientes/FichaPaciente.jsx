@@ -211,9 +211,11 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
   }
 
   function agendar() {
-    sessionStorage.setItem('agendarPaciente', JSON.stringify({
-      id: paciente.id, nome: paciente.nome, conv: paciente.convenioNome,
-    }));
+    if (paciente) {
+      sessionStorage.setItem('agendarPaciente', JSON.stringify({
+        id: paciente.id, nome: paciente.nome, conv: paciente.convenioNome,
+      }));
+    }
     navigate('/agenda');
   }
 
@@ -246,33 +248,69 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
         <div style={{ background: '#fff', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
 
           {/* Linha de ações */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px' }}>
-            <button onClick={onVoltar} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', border: '1.5px solid var(--border)', borderRadius: 7, background: '#fff', color: 'var(--text-soft)', fontFamily: 'var(--font-lato)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '12px 24px',
+            borderBottom: '1px solid var(--border)',
+            background: 'var(--white)',
+          }}>
+            <button onClick={onVoltar} style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '6px 12px', border: 'none', background: 'none',
+              cursor: 'pointer', fontSize: 13, color: 'var(--text-soft)',
+              fontFamily: 'Lato, sans-serif',
+            }}>
               ← Voltar
             </button>
-            <span style={{ fontFamily: 'var(--font-serif)', fontSize: 20, color: 'var(--navy)', fontWeight: 600, marginLeft: 4 }}>
-              {isNovo ? 'Novo Paciente' : (p.nome || '...')}
+
+            <span style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: 20, color: 'var(--navy)', fontWeight: 500,
+            }}>
+              {isNovo ? 'Novo Paciente' : p.nome}
             </span>
-            {!isNovo && p.ativo === false && (
-              <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: '#F5F5F5', color: '#999', border: '1px solid #DDD' }}>Inativo</span>
-            )}
+
             <div style={{ flex: 1 }} />
+
+            {/* Agendar consulta — sempre visível */}
+            <button onClick={agendar} style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '7px 14px',
+              border: '1.5px solid var(--sky)',
+              borderRadius: 7, background: 'var(--sky-pale)',
+              cursor: 'pointer', fontSize: 12, fontWeight: 700,
+              color: 'var(--sky)', fontFamily: 'Lato, sans-serif',
+            }}>
+              📅 Agendar consulta
+            </button>
+
+            {/* Inativar/Reativar — só para paciente existente */}
             {!isNovo && (
-              <>
-                <button onClick={agendar} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', border: 'none', borderRadius: 7, background: 'var(--sky)', color: '#fff', fontFamily: 'var(--font-lato)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
-                  📅 Agendar consulta
-                </button>
-                <button onClick={toggleStatus} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', border: '1.5px solid var(--border)', borderRadius: 7, background: '#fff', fontFamily: 'var(--font-lato)', fontSize: 11, fontWeight: 700, cursor: 'pointer', color: p.ativo ? '#C53030' : '#1A6A42' }}>
-                  {p.ativo ? '⊘ Inativar' : '✓ Reativar'}
-                </button>
-                <button onClick={() => editMode ? descartar() : setEditMode(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', border: `1.5px solid ${editMode ? 'var(--border)' : 'var(--navy)'}`, borderRadius: 7, background: editMode ? '#fff' : 'var(--navy)', color: editMode ? 'var(--text-soft)' : '#fff', fontFamily: 'var(--font-lato)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
-                  {editMode ? '✕ Cancelar' : '✏️ Editar ficha'}
-                </button>
-              </>
+              <button onClick={toggleStatus} style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '7px 14px',
+                border: `1.5px solid ${p.ativo ? '#F5B8B8' : 'var(--green-bdr)'}`,
+                borderRadius: 7,
+                background: p.ativo ? 'var(--red-pale)' : 'var(--green-pale)',
+                cursor: 'pointer', fontSize: 12, fontWeight: 700,
+                color: p.ativo ? 'var(--red)' : 'var(--green)',
+                fontFamily: 'Lato, sans-serif',
+              }}>
+                {p.ativo ? '⊘ Inativar paciente' : '✓ Reativar paciente'}
+              </button>
             )}
-            {isNovo && (
-              <button onClick={descartar} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', border: '1.5px solid var(--border)', borderRadius: 7, background: '#fff', color: 'var(--text-soft)', fontFamily: 'var(--font-lato)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
-                ✕ Cancelar
+
+            {/* Cancelar edição — só quando editMode ou isNovo */}
+            {(editMode || isNovo) && (
+              <button onClick={descartar} style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '7px 14px',
+                border: 'none', borderRadius: 7,
+                background: 'var(--navy)',
+                cursor: 'pointer', fontSize: 12, fontWeight: 700,
+                color: '#fff', fontFamily: 'Lato, sans-serif',
+              }}>
+                ✕ Cancelar edição
               </button>
             )}
           </div>
@@ -568,14 +606,39 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
 
         {/* ── Barra de salvar sticky ── */}
         {(editMode || isNovo) && (
-          <div style={{ flexShrink: 0, background: '#fff', borderTop: '1px solid var(--border)', padding: '12px 24px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 -4px 16px rgba(27,58,92,.06)' }}>
-            <span style={{ fontSize: 12, color: 'var(--text-soft)' }}>✏️ Modo edição ativo</span>
+          <div style={{
+            position: 'sticky', bottom: 0, zIndex: 10,
+            background: 'var(--white)',
+            borderTop: '1px solid var(--border)',
+            padding: '10px 24px',
+            display: 'flex', alignItems: 'center', gap: 12,
+            boxShadow: '0 -2px 10px rgba(27,58,92,.06)',
+          }}>
+            <span style={{
+              fontSize: 11, color: 'var(--text-soft)',
+              display: 'flex', alignItems: 'center', gap: 5,
+            }}>
+              ✏️ Modo edição ativo
+            </span>
             <div style={{ flex: 1 }} />
-            <button onClick={descartar} style={{ padding: '8px 18px', border: '1.5px solid var(--border)', borderRadius: 7, background: '#fff', color: 'var(--text-soft)', fontFamily: 'var(--font-lato)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+            <button onClick={descartar} style={{
+              padding: '7px 16px',
+              border: '1.5px solid var(--border)',
+              borderRadius: 7, background: '#fff',
+              cursor: 'pointer', fontSize: 12, fontWeight: 700,
+              color: 'var(--text-soft)', fontFamily: 'Lato, sans-serif',
+            }}>
               Descartar
             </button>
-            <button onClick={salvar} disabled={isPending} style={{ padding: '8px 22px', border: 'none', borderRadius: 7, background: 'var(--green)', color: '#fff', fontFamily: 'var(--font-lato)', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: isPending ? 0.7 : 1 }}>
-              {isPending ? 'Salvando...' : (isNovo ? '✓ Cadastrar paciente' : '✓ Salvar alterações')}
+            <button onClick={salvar} disabled={isPending} style={{
+              padding: '7px 20px',
+              border: 'none', borderRadius: 7,
+              background: 'var(--green)', color: '#fff',
+              cursor: 'pointer', fontSize: 12, fontWeight: 700,
+              fontFamily: 'Lato, sans-serif',
+              opacity: isPending ? .7 : 1,
+            }}>
+              {isPending ? 'Salvando...' : 'Salvar alterações'}
             </button>
           </div>
         )}
