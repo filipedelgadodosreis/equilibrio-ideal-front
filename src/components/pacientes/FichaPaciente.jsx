@@ -55,13 +55,13 @@ const viewValueStyle = {
 };
 
 const secaoStyle = {
-  background: '#ffffff', border: '1px solid #D4E8F2',
-  borderRadius: 10, padding: '16px 20px', marginBottom: 12,
+  backgroundColor: '#ffffff', border: '1.5px solid #D4E8F2',
+  borderRadius: 10, padding: '18px 20px', marginBottom: 14,
 };
 
 const secaoTituloStyle = {
   fontSize: 10, fontWeight: 700, letterSpacing: '.14em',
-  textTransform: 'uppercase', color: 'var(--text-soft)',
+  textTransform: 'uppercase', color: '#6B8BA4',
   marginBottom: 16, display: 'flex', alignItems: 'center',
   justifyContent: 'space-between',
 };
@@ -356,7 +356,7 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
         </div>
 
         {/* ── Corpo (scroll independente) ── */}
-        <div style={{ flex: 1, overflowY: 'auto', background: '#F4F9FC', padding: '16px 24px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#F4F9FC', padding: '16px 24px' }}>
 
             {/* ── ABA DADOS ── */}
             {abaAtiva === 'dados' && (
