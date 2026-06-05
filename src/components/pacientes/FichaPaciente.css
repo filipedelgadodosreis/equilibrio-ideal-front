@@ -7,7 +7,7 @@
 .btn-reativar { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1.5px solid var(--green-bdr); border-radius: 8px; background: #fff; color: var(--green); cursor: pointer; font-family: 'Lato', sans-serif; font-size: 12px; font-weight: 700; }
 .btn-edit-pat { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: none; border-radius: 8px; background: var(--navy); color: #fff; cursor: pointer; font-family: 'Lato', sans-serif; font-size: 12px; font-weight: 700; }
 
-.pat-summary { margin: 0 20px 0; padding: 16px 18px; background: var(--sky-mist); border-radius: 12px; border: 1.5px solid var(--border); display: flex; align-items: center; gap: 16px; }
+.pat-summary { margin: 14px 20px; padding: 16px 18px; background: var(--sky-mist); border-radius: 12px; border: 1.5px solid var(--border); display: flex; align-items: center; gap: 16px; }
 .ps-av { width: 52px; height: 52px; border-radius: 50%; background: var(--sky-light); border: 2px solid var(--sky); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--navy); flex-shrink: 0; }
 .ps-name { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--navy); }
 .ps-info { font-size: 11px; color: var(--text-soft); margin-top: 3px; display: flex; gap: 12px; flex-wrap: wrap; }

@@ -230,11 +230,12 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="ps-name">{isNovo ? (form.nome || 'Novo Paciente') : p.nome}</div>
               <div className="ps-info">
-                <span style={{ padding: '1px 7px', borderRadius: 5, fontSize: 10, fontWeight: 700, background: form.convenioId ? 'var(--sky-pale)' : '#F2EFFA', color: form.convenioId ? '#1E6FA3' : '#6B52A8', border: `1px solid ${form.convenioId ? 'var(--sky-light)' : '#C4B5F4'}` }}>
-                  {convenioNomeAtual}
-                </span>
+                <span>🇧🇷</span>
                 {!isNovo && p.cpf && <span>📋 {p.cpf}</span>}
                 {!isNovo && p.whatsapp && <span>📱 {p.whatsapp}</span>}
+                <span style={{ padding: '1px 7px', borderRadius: 5, fontSize: 10, fontWeight: 700, background: 'var(--sky-pale)', color: '#1E6FA3', border: '1px solid var(--sky-light)' }}>
+                  {p.convenioNome || 'Particular'}
+                </span>
               </div>
             </div>
             <div className="ps-stats">
