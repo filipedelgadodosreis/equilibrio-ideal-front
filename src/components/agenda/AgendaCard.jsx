@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { horaDeIso } from '../../utils/horarios';
 
 const SPEC_COLORS = {
   Psicologia:     { bg: 'var(--psico-bg)', border: 'var(--psico)' },
@@ -23,7 +23,7 @@ export function AgendaCard({ agendamento, onClick }) {
   const statusSt  = STATUS_STYLE[agendamento.status] || STATUS_STYLE.Agendado;
   const tagSt     = agendamento.convenioId ? TAG_CONV : TAG_PART;
   const horaStr   = agendamento.dataHora
-    ? format(new Date(agendamento.dataHora), 'HH:mm')
+    ? horaDeIso(agendamento.dataHora)
     : '';
 
   return (

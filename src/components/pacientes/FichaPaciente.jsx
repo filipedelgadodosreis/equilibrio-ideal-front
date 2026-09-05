@@ -172,9 +172,10 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
 
   function agendar() {
     if (paciente) {
-      sessionStorage.setItem('agendarPaciente', JSON.stringify({
-        id: paciente.id, nome: paciente.nome, conv: paciente.convenioNome,
-      }));
+      navigate('/agenda', {
+        state: { pacienteId: paciente.id, pacienteNome: paciente.nome },
+      });
+      return;
     }
     navigate('/agenda');
   }

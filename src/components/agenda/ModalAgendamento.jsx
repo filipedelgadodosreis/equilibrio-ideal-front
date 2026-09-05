@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useProfissionais, useSalas, useDisponibilidade, useCriarAgendamento } from '../../hooks/useAgenda';
 import { pacientesApi } from '../../api/pacientes';
+import { horaDeIso } from '../../utils/horarios';
 
 const HORARIOS = [];
 for (let h = 8; h < 21; h++) {
@@ -51,6 +52,35 @@ export function ModalAgendamento({ aberto, onFechar, contextoInicial = null }) {
     }
     if (contextoInicial.hora)  setHorario(contextoInicial.hora);
     if (contextoInicial.data)  setData(format(contextoInicial.data, 'yyyy-MM-dd'));
+  }, [contextoInicial]);
+
+  // Paciente vindo da ficha: busca a ficha completa, pois o POST precisa do
+  // convenioId. Só pula para o passo 2 com a ficha em mãos; se a busca falhar,
+  // fica no passo 1 com o nome preenchido para a recepção reselecionar.
+  useEffect(() => {
+    const id = contextoInicial?.pacienteId;
+    if (!id) return;
+
+    let cancelado = false;
+    setBusca(contextoInicial.pacienteNome || '');
+
+    pacientesApi.obter(id)
+      .then(res => {
+        if (cancelado) return;
+        const ficha = res.data;
+        if (!ficha?.id) throw new Error('ficha vazia');
+        setPaciente(ficha);
+        setBusca(ficha.nome || contextoInicial.pacienteNome || '');
+        setResultados([]);
+        setPasso(2);
+      })
+      .catch(() => {
+        if (cancelado) return;
+        setPaciente(null);
+        setPasso(1);
+      });
+
+    return () => { cancelado = true; };
   }, [contextoInicial]);
 
   // Debounce da busca de pacientes
@@ -110,10 +140,13 @@ export function ModalAgendamento({ aberto, onFechar, contextoInicial = null }) {
   const profSelecionado = profs.find(p => p.id === profId);
   const salaSelecionada = salas.find(s => s.id === salaId);
 
-  // Slots disponíveis: pode ser array de strings ou array de objetos { horario, disponivel }
+  // Slots disponíveis: a API devolve objetos { inicio, fim } em ISO (ver
+  // horaDeIso para a convenção de fuso). Entradas ilegíveis viram '' em vez de
+  // serem descartadas, para não encolher o array e cair no fallback de
+  // length === 0, que liberaria todos os horários.
   const horariosDisponiveis = slots
     ? Array.isArray(slots)
-      ? slots.map(s => typeof s === 'string' ? s : s.horario)
+      ? slots.map(s => typeof s === 'string' ? s : horaDeIso(s.inicio))
       : []
     : null;
 

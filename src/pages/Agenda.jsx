@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { format, addDays, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useAgendamentos, useProfissionais, useSalas } from '../hooks/useAgenda';
@@ -6,6 +7,7 @@ import { AgendaCard } from '../components/agenda/AgendaCard';
 import { SlotDisponivel } from '../components/agenda/SlotDisponivel';
 import { ModalAgendamento } from '../components/agenda/ModalAgendamento';
 import { useAuth } from '../context/AuthContext';
+import { horaDeIso } from '../utils/horarios';
 import Sidebar from '../components/Sidebar';
 
 const HORARIOS = [];
@@ -191,6 +193,8 @@ function FilterChip({ label, cls, onRemove }) {
 // ── Página principal ─────────────────────────────────────────────────────────
 export default function Agenda() {
   const { usuario } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [data, setData]         = useState(new Date());
   const [modoDisp, setModoDisp] = useState(false);
@@ -226,7 +230,7 @@ export default function Agenda() {
   function getAgendamento(profId, hora) {
     return agendamentosFiltrados.find(a =>
       a.profissionalId === profId &&
-      format(new Date(a.dataHora), 'HH:mm') === hora
+      horaDeIso(a.dataHora) === hora
     );
   }
 
@@ -234,6 +238,16 @@ export default function Agenda() {
     setContextoModal(contexto);
     setModalAberto(true);
   }
+
+  // Paciente vindo da ficha ("Agendar consulta"): abre o modal já com ele.
+  // Limpa o state em seguida para que um refresh não reabra o modal.
+  useEffect(() => {
+    const { pacienteId, pacienteNome } = location.state || {};
+    if (!pacienteId) return;
+    setContextoModal({ pacienteId, pacienteNome });
+    setModalAberto(true);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location, navigate]);
 
   const opcoesProf = todosProfs.map(p => ({
     value: p.id,
