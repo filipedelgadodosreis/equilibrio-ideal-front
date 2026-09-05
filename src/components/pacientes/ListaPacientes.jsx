@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
 import Sidebar from '../Sidebar';
+import { dataDeIso } from '../../utils/horarios';
 
 const FILTROS = [
   { key: 'todos',  label: 'Todos' },
@@ -13,10 +13,11 @@ function iniciais(nome = '') {
 }
 
 export function ListaPacientes({
-  pacientes, isLoading,
+  pacientes, isLoading, contagens = {},
   filtroStatus, onFiltroChange,
   busca, onBuscaChange,
-  onVerFicha, onNovoPaciente,
+  ordem, onOrdemChange, ordenacoes = [],
+  onVerFicha, onEditarFicha, onNovoPaciente,
   selectedDate, onDateChange,
 }) {
   return (
@@ -89,10 +90,31 @@ export function ListaPacientes({
                 transition: 'all .15s',
               }}
             >
-              {f.label}
-              {f.key === 'todos' && ` (${pacientes.length})`}
+              {f.label} ({contagens[f.key] ?? 0})
             </button>
           ))}
+
+          <div style={{ flex: 1 }} />
+
+          {/* Ordenação */}
+          <div style={{ fontSize: 11, color: 'var(--text-soft)', display: 'flex', alignItems: 'center', gap: 6 }}>
+            Ordenar por
+            <select
+              value={ordem}
+              onChange={e => onOrdemChange(e.target.value)}
+              style={{
+                border: '1.5px solid var(--border)', borderRadius: 7, padding: '3px 8px',
+                fontFamily: 'var(--font-lato)', fontSize: 11, background: 'var(--sky-mist)',
+                outline: 'none', color: 'var(--text)', height: 28, cursor: 'pointer',
+              }}
+            >
+              {ordenacoes.map(o => (
+                <option key={o.key} value={o.key} disabled={!o.disponivel}>
+                  {o.label}{o.disponivel ? '' : ' (sem dado)'}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Tabela */}
@@ -113,7 +135,7 @@ export function ListaPacientes({
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'var(--sky-mist)' }}>
-                  {['Paciente', 'WhatsApp', 'Convênio', 'Status', ''].map((h, i) => (
+                  {['Paciente', 'CPF', 'WhatsApp', 'Convênio', 'Status', 'Última consulta', 'Total consultas', ''].map((h, i) => (
                     <th key={i} style={{
                       padding: '9px 16px', textAlign: 'left',
                       fontSize: 9.5, fontWeight: 700, letterSpacing: '.1em',
@@ -144,9 +166,12 @@ export function ListaPacientes({
                         </div>
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>{p.nome}</div>
-                          <div style={{ fontSize: 10, color: 'var(--text-soft)', marginTop: 1 }}>{p.cpf}</div>
+                          <div style={{ fontSize: 10, color: 'var(--text-soft)', marginTop: 1 }}>{p.email || '—'}</div>
                         </div>
                       </div>
+                    </td>
+                    <td style={{ padding: '11px 16px', fontSize: 12, color: 'var(--navy)' }}>
+                      {p.cpf || '—'}
                     </td>
                     <td style={{ padding: '11px 16px', fontSize: 12, color: 'var(--navy)' }}>
                       {p.whatsapp || '—'}
@@ -171,13 +196,19 @@ export function ListaPacientes({
                         {p.ativo ? '● Ativo' : '⊘ Inativo'}
                       </span>
                     </td>
+                    <td style={{ padding: '11px 16px', fontSize: 12, color: 'var(--navy)' }}>
+                      {dataDeIso(p.ultimaConsulta) || '—'}
+                    </td>
+                    <td style={{ padding: '11px 16px', fontSize: 12, color: 'var(--navy)' }}>
+                      {p.totalConsultas ?? '—'}
+                    </td>
                     <td style={{ padding: '11px 16px' }}>
                       <div style={{ display: 'flex', gap: 5 }}>
                         <button
-                          onClick={e => { e.stopPropagation(); onVerFicha(p); }}
-                          title="Ver ficha"
+                          onClick={e => { e.stopPropagation(); onEditarFicha(p); }}
+                          title="Editar ficha"
                           style={{ width: 28, height: 28, border: '1.5px solid var(--border)', borderRadius: 7, background: '#fff', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                        >👁</button>
+                        >✏️</button>
                         <button
                           onClick={e => { e.stopPropagation(); /* agendar */ }}
                           title="Agendar"

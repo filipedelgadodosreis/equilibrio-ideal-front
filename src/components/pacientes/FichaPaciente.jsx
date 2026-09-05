@@ -89,7 +89,7 @@ function F({ label, field, form, view, editMode, onChange, placeholder, type = '
   );
 }
 
-export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, selectedDate, onDateChange }) {
+export function FichaPaciente({ pacienteId, isNovo = false, iniciarEditando = false, onVoltar, onSalvo, selectedDate, onDateChange }) {
   const navigate = useNavigate();
 
   const { data: paciente, isLoading } = usePaciente(pacienteId);
@@ -100,7 +100,7 @@ export function FichaPaciente({ pacienteId, isNovo = false, onVoltar, onSalvo, s
   const altStatus = useAlterarStatusPaciente();
 
   const [abaAtiva, setAbaAtiva]               = useState('dados');
-  const [editMode, setEditMode]               = useState(isNovo);
+  const [editMode, setEditMode]               = useState(isNovo || iniciarEditando);
   const [form, setForm]                       = useState(FORM_VAZIO);
   const [erros, setErros]                     = useState({});
   const [erro, setErro]                       = useState('');

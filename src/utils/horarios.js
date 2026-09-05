@@ -19,3 +19,16 @@ export function horaDeIso(iso) {
   const m = iso.match(/T(\d{2}:\d{2})/);
   return m ? m[1] : '';
 }
+
+/**
+ * Data em dd/MM/yyyy pelo mesmo princípio — componentes lidos do texto, sem
+ * `new Date`. Aqui o motivo é ainda mais direto: `new Date('2026-05-02')` é
+ * interpretado como meia-noite UTC e, em America/Sao_Paulo, exibiria 01/05.
+ *
+ * Aceita data pura ("2026-05-02") e data-hora ("2026-05-02T09:00:00Z").
+ */
+export function dataDeIso(iso) {
+  if (typeof iso !== 'string') return '';
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : '';
+}
