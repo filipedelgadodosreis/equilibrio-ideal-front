@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://equilibrio-ideal-api-production.up.railway.app/api';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const client = axios.create({
   baseURL: BASE_URL,
