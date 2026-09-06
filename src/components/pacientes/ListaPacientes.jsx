@@ -6,6 +6,7 @@ const FILTROS = [
   { key: 'conv',   label: 'Convênio' },
   { key: 'part',   label: 'Particular' },
   { key: 'ativo',  label: 'Ativos' },
+  { key: 'inativo', label: 'Inativos' },
 ];
 
 function iniciais(nome = '') {

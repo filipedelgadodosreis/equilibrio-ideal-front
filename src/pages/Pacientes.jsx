@@ -46,6 +46,7 @@ export default function Pacientes() {
     conv:  pacientes.filter(temConvenio).length,
     part:  pacientes.filter(p => !temConvenio(p)).length,
     ativo: pacientes.filter(p => p.ativo).length,
+    inativo: pacientes.filter(p => !p.ativo).length,
   }), [pacientes]);
 
   const ordenacoes = useMemo(() => ORDENACOES.map(o => ({
@@ -58,6 +59,7 @@ export default function Pacientes() {
       if (filtro === 'conv')  return temConvenio(p);
       if (filtro === 'part')  return !temConvenio(p);
       if (filtro === 'ativo') return !!p.ativo;
+      if (filtro === 'inativo') return !p.ativo;
       return true;
     });
     if (ordem === 'ultima')   return [...filtrados].sort(porIsoDesc('ultimaConsulta'));

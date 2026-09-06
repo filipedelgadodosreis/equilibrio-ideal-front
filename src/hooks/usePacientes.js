@@ -41,7 +41,14 @@ export function useCriarPaciente() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: pacientesApi.criar,
-    onSuccess:  () => qc.invalidateQueries({ queryKey: ['pacientes'] }),
+    onSuccess:  (res) => {
+      qc.invalidateQueries({ queryKey: ['pacientes'] });
+      // A resposta do POST já traz a ficha criada: semear ['paciente', id]
+      // evita que a ficha passe por "Carregando…" logo após salvar, o que
+      // esconderia a mensagem de sucesso no meio da transição.
+      const criado = res?.data;
+      if (criado?.id != null) qc.setQueryData(['paciente', criado.id], res);
+    },
   });
 }
 
@@ -60,6 +67,12 @@ export function useAlterarStatusPaciente() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, ativo }) => pacientesApi.alterarStatus(id, ativo),
-    onSuccess:  () => qc.invalidateQueries({ queryKey: ['pacientes'] }),
+    onSuccess:  () => {
+      qc.invalidateQueries({ queryKey: ['pacientes'] });
+      // A ficha lê ['paciente', id], que não casa por prefixo com ['pacientes'].
+      // Sem esta linha o selo e o botão de status continuariam mostrando o
+      // estado anterior depois de inativar ou reativar.
+      qc.invalidateQueries({ queryKey: ['paciente'] });
+    },
   });
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -33,10 +33,21 @@ const FORM_VAZIO = {
   nome: '', cpf: '', rg: '', dataNascimento: '', sexo: '', estadoCivil: '',
   profissao: '', naturalidade: '',
   whatsapp: '', telefone: '', email: '', notificaWhatsapp: false,
-  cep: '', logradouro: '', numero: '', bairro: '', cidade: '', uf: '',
+  cep: '', logradouro: '', numero: '', complemento: '', bairro: '', cidade: '', uf: '',
   observacoes: '',
   convenioId: '', numeroCarteirinha: '', validadeCarteirinha: '', nomeTitular: '',
 };
+
+// Telefones são mascarados na entrada do formulário, independente de virem da
+// API crus ou já formatados — ver mascaraTelefone.
+function formDoPaciente(p) {
+  return {
+    ...FORM_VAZIO,
+    ...p,
+    whatsapp: mascaraTelefone(p?.whatsapp),
+    telefone: mascaraTelefone(p?.telefone),
+  };
+}
 
 function iniciais(nome = '') {
   return nome.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '??';
@@ -66,7 +77,39 @@ function formatData(d) {
   try { return format(new Date(d), 'dd/MM/yyyy'); } catch { return d; }
 }
 
-function F({ label, field, form, view, editMode, onChange, placeholder, type = 'text', erro }) {
+const digitos = v => String(v ?? '').replace(/\D/g, '');
+
+// (11) 98179-7291 para celular (11 dígitos) e (11) 3456-7890 para fixo (10).
+// Limpa os não-dígitos antes de formatar, então serve tanto para o que está
+// sendo digitado quanto para o valor que volta da API — mascarado ou cru.
+function mascaraTelefone(v = '') {
+  const n = digitos(v).slice(0, 11);
+  if (n.length <= 2)  return n;
+  if (n.length <= 6)  return `(${n.slice(0, 2)}) ${n.slice(2)}`;
+  if (n.length <= 10) return `(${n.slice(0, 2)}) ${n.slice(2, 6)}-${n.slice(6)}`;
+  return `(${n.slice(0, 2)}) ${n.slice(2, 7)}-${n.slice(7)}`;
+}
+
+// Campo em branco não é dado. Enviar null em vez de "" faz qualquer nullable da
+// API aceitar (DateOnly?, int?, Guid?), sem precisar listar campo a campo.
+// Comparação estrita para não converter false nem 0.
+function semVazios(obj) {
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => [k, v === '' ? null : v])
+  );
+}
+
+// <input type="month"> devolve "2027-12", que não é um DateOnly válido.
+// Carteirinha vale até o fim do mês informado, então completamos com o último
+// dia. Valor já completo ou vazio passa intacto.
+function fimDoMes(aaaaMM) {
+  const m = typeof aaaaMM === 'string' && aaaaMM.match(/^(\d{4})-(\d{2})$/);
+  if (!m) return aaaaMM;
+  const ultimo = new Date(Number(m[1]), Number(m[2]), 0).getDate();
+  return `${m[1]}-${m[2]}-${String(ultimo).padStart(2, '0')}`;
+}
+
+function F({ label, field, form, view, editMode, onChange, placeholder, type = 'text', erro, mask }) {
   return (
     <div>
       <div className="fld-label">{label}</div>
@@ -76,7 +119,7 @@ function F({ label, field, form, view, editMode, onChange, placeholder, type = '
             type={type}
             className="edit-input"
             value={form[field] ?? ''}
-            onChange={e => onChange(field, e.target.value)}
+            onChange={e => onChange(field, mask ? mask(e.target.value) : e.target.value)}
             placeholder={placeholder}
             style={erro ? { borderColor: '#FC8181' } : undefined}
           />
@@ -106,24 +149,65 @@ export function FichaPaciente({ pacienteId, isNovo = false, iniciarEditando = fa
   const [erro, setErro]                       = useState('');
   const [toast, setToast]                     = useState(null);
   const [confirmInativar, setConfirmInativar] = useState(false);
+  const [cepStatus, setCepStatus]             = useState(null); // 'buscando' | 'nao-encontrado' | 'erro'
+  const cepEditado                            = useRef(false);
 
   useEffect(() => {
-    if (paciente && !isNovo) setForm({ ...FORM_VAZIO, ...paciente });
+    if (paciente && !isNovo) setForm(formDoPaciente(paciente));
   }, [paciente, isNovo]);
+
+  // ViaCEP: consulta direta do navegador com fetch puro — o client axios manda
+  // Authorization e a baseURL da nossa API, que não devem ir para um serviço
+  // externo. Só preenche o que vier não-vazio, para não apagar o que já foi
+  // digitado (há CEPs que não trazem logradouro). Falha nunca bloqueia nada:
+  // os campos seguem editáveis à mão.
+  useEffect(() => {
+    // Só consulta CEP que a pessoa digitou. Sem isso, abrir a ficha em modo
+    // edição sobrescreveria um endereço já corrigido à mão pelo valor canônico
+    // do ViaCEP.
+    if (!editMode || !cepEditado.current) return;
+    const cep = digitos(form.cep);
+    if (cep.length !== 8) { setCepStatus(null); return; }
+
+    let cancelado = false;
+    setCepStatus('buscando');
+
+    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      .then(r => r.json())
+      .then(d => {
+        if (cancelado) return;
+        // O ViaCEP responde 200 com { erro: true } quando o CEP não existe.
+        if (d?.erro) { setCepStatus('nao-encontrado'); return; }
+        setCepStatus(null);
+        setForm(f => ({
+          ...f,
+          logradouro: d.logradouro || f.logradouro,
+          bairro:     d.bairro     || f.bairro,
+          cidade:     d.localidade || f.cidade,
+          uf:         d.uf         || f.uf,
+        }));
+      })
+      .catch(() => { if (!cancelado) setCepStatus('erro'); });
+
+    return () => { cancelado = true; };
+  }, [form.cep, editMode]);
 
   const abas = isNovo ? ABAS.filter(a => a.key !== 'historico') : ABAS;
 
   function handleChange(field, value) {
+    if (field === 'cep') cepEditado.current = true;
     setForm(f => ({ ...f, [field]: value }));
     if (erros[field]) setErros(prev => ({ ...prev, [field]: undefined }));
   }
 
   function descartar() {
     if (isNovo) { onVoltar(); return; }
-    setForm({ ...FORM_VAZIO, ...paciente });
+    setForm(formDoPaciente(paciente));
     setEditMode(false);
     setErros({});
     setErro('');
+    setCepStatus(null);
+    cepEditado.current = false;
   }
 
   function validar() {
@@ -131,6 +215,9 @@ export function FichaPaciente({ pacienteId, isNovo = false, iniciarEditando = fa
     if (!form.nome?.trim()) e.nome = 'Nome obrigatório.';
     if (!form.cpf?.trim()) e.cpf = 'CPF obrigatório.';
     else if (!validarCPF(form.cpf)) e.cpf = 'CPF inválido.';
+    if (!form.whatsapp?.trim()) e.whatsapp = 'WhatsApp obrigatório.';
+    else if (![10, 11].includes(digitos(form.whatsapp).length)) e.whatsapp = 'WhatsApp incompleto — informe DDD e número.';
+    if (form.telefone?.trim() && ![10, 11].includes(digitos(form.telefone).length)) e.telefone = 'Telefone incompleto — informe DDD e número.';
     return e;
   }
 
@@ -139,11 +226,23 @@ export function FichaPaciente({ pacienteId, isNovo = false, iniciarEditando = fa
     if (Object.keys(v).length) { setErros(v); return; }
     setErro('');
     try {
-      const payload = { ...form, cpf: form.cpf.replace(/\D/g, ''), convenioId: form.convenioId || null };
+      // Telefones seguem o mesmo contrato do CPF: só dígitos para a API.
+      const payload = semVazios({
+        ...form,
+        cpf:                 digitos(form.cpf),
+        whatsapp:            digitos(form.whatsapp),
+        telefone:            digitos(form.telefone),
+        validadeCarteirinha: fimDoMes(form.validadeCarteirinha),
+      });
       if (isNovo) {
         const res = await criar.mutateAsync(payload);
+        // editMode nasce de useState(isNovo) e não reage ao pai trocar de modo
+        // — a ficha não remonta. Sem desligar aqui, o cadastro recém-salvo
+        // continuaria em edição. Mesmo desfecho do salvamento de edição.
+        setEditMode(false);
         setToast('Paciente cadastrado com sucesso!');
-        setTimeout(() => { setToast(null); onSalvo?.(res.data); }, 1500);
+        onSalvo?.(res.data);
+        setTimeout(() => setToast(null), 2500);
       } else {
         await atualizar.mutateAsync({ id: pacienteId, data: payload });
         setEditMode(false);
@@ -166,6 +265,10 @@ export function FichaPaciente({ pacienteId, isNovo = false, iniciarEditando = fa
   async function confirmarInativacao() {
     setConfirmInativar(false);
     await altStatus.mutateAsync({ id: pacienteId, ativo: false });
+    // Inativar encerra a edição, como salvar. Aqui não é o caso do cadastro
+    // (estado preso na inicialização): editMode simplesmente nunca era
+    // desligado neste caminho.
+    setEditMode(false);
     setToast('Paciente inativado.');
     setTimeout(() => setToast(null), 2000);
   }
@@ -338,8 +441,8 @@ export function FichaPaciente({ pacienteId, isNovo = false, iniciarEditando = fa
                 {!editMode && !isNovo && <span className="sec-edit" onClick={() => setEditMode(true)}>Editar</span>}
               </div>
               <div className="fg3" style={{ marginBottom: 14 }}>
-                <F label="WhatsApp" field="whatsapp" form={form} view={p.whatsapp} editMode={editMode} onChange={handleChange} placeholder="(11) 99999-9999" />
-                <F label="Telefone" field="telefone" form={form} view={p.telefone} editMode={editMode} onChange={handleChange} placeholder="(11) 3333-4444" />
+                <F label={<>WhatsApp <span style={{ color: '#C53030' }}>*</span></>} field="whatsapp" form={form} view={mascaraTelefone(p.whatsapp)} editMode={editMode} onChange={handleChange} placeholder="(11) 99999-9999" mask={mascaraTelefone} erro={erros.whatsapp} />
+                <F label="Telefone" field="telefone" form={form} view={mascaraTelefone(p.telefone)} editMode={editMode} onChange={handleChange} placeholder="(11) 3333-4444" mask={mascaraTelefone} erro={erros.telefone} />
                 <F label="E-mail"   field="email"    form={form} view={p.email}    editMode={editMode} onChange={handleChange} placeholder="email@exemplo.com" type="email" />
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0' }}>
@@ -380,7 +483,7 @@ export function FichaPaciente({ pacienteId, isNovo = false, iniciarEditando = fa
                   <div>
                     <div className="fld-label">Validade</div>
                     {editMode
-                      ? <input type="month" className="edit-input" value={form.validadeCarteirinha || ''} onChange={e => handleChange('validadeCarteirinha', e.target.value)} />
+                      ? <input type="month" className="edit-input" value={(form.validadeCarteirinha || '').substring(0, 7)} onChange={e => handleChange('validadeCarteirinha', e.target.value)} />
                       : <div className="fld-value">{p.validadeCarteirinha || <span className="fld-empty">—</span>}</div>}
                   </div>
                   <F label="Nome do titular" field="nomeTitular" form={form} view={p.nomeTitular} editMode={editMode} onChange={handleChange} placeholder="Se diferente do paciente" />
@@ -396,10 +499,34 @@ export function FichaPaciente({ pacienteId, isNovo = false, iniciarEditando = fa
                 <span className="sec-title">ENDEREÇO</span>
                 {!editMode && !isNovo && <span className="sec-edit" onClick={() => setEditMode(true)}>Editar</span>}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 100px', gap: '14px 20px', marginBottom: 14 }}>
-                <F label="CEP"        field="cep"        form={form} view={p.cep}        editMode={editMode} onChange={handleChange} placeholder="00000-000" />
-                <F label="Logradouro" field="logradouro" form={form} view={p.logradouro} editMode={editMode} onChange={handleChange} placeholder="Rua, Av..." />
-                <F label="Número"     field="numero"     form={form} view={p.numero}     editMode={editMode} onChange={handleChange} placeholder="123" />
+              <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 100px 160px', gap: '14px 20px', marginBottom: 14 }}>
+                <div>
+                  <div className="fld-label">CEP</div>
+                  {editMode ? (
+                    <>
+                      <input
+                        className="edit-input"
+                        value={form.cep ?? ''}
+                        onChange={e => handleChange('cep', e.target.value)}
+                        placeholder="00000-000"
+                      />
+                      {cepStatus === 'buscando' && (
+                        <div style={{ fontSize: 10, color: 'var(--text-soft)', marginTop: 3 }}>Buscando endereço…</div>
+                      )}
+                      {cepStatus === 'nao-encontrado' && (
+                        <div style={{ fontSize: 10, color: '#C53030', marginTop: 3 }}>CEP não encontrado. Preencha à mão.</div>
+                      )}
+                      {cepStatus === 'erro' && (
+                        <div style={{ fontSize: 10, color: '#C53030', marginTop: 3 }}>Não foi possível consultar. Preencha à mão.</div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="fld-value">{p.cep || <span className="fld-empty">—</span>}</div>
+                  )}
+                </div>
+                <F label="Logradouro"  field="logradouro"  form={form} view={p.logradouro}  editMode={editMode} onChange={handleChange} placeholder="Rua, Av..." />
+                <F label="Número"      field="numero"      form={form} view={p.numero}      editMode={editMode} onChange={handleChange} placeholder="123" />
+                <F label="Complemento" field="complemento" form={form} view={p.complemento} editMode={editMode} onChange={handleChange} placeholder="Opcional" />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 80px', gap: '14px 20px' }}>
                 <F label="Bairro" field="bairro" form={form} view={p.bairro} editMode={editMode} onChange={handleChange} placeholder="Bairro" />
